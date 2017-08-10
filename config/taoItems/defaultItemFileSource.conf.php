@@ -5,4 +5,4 @@
  * To replace this add a file taoItems/config/header/defaultItemFileSource.conf.php
  */
 
-return LOCAL_NAMESPACE.'#i150238011578594';
+return 'http://tao.local/mytao.rdf#i149696370359864';

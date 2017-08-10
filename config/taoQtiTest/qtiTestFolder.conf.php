@@ -5,4 +5,4 @@
  * To replace this add a file taoQtiTest/config/header/qtiTestFolder.conf.php
  */
 
-return LOCAL_NAMESPACE.'#i1502380446855328';
+return 'http://tao.local/mytao.rdf#i1496963713386428';
