@@ -7,42 +7,42 @@
  */
 
 return new oat\oatbox\filesystem\FileSystemService(array(
-    'filesPath' => '/Users/lars/code/opened/tao/data/',
+    'filesPath' => FILES_PATH,
     'adapters' => array(
-        'http://tao.local/mytao.rdf#i149696370299861' => array(
+        LOCAL_NAMESPACE.'#i150237991640531' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => '/Users/lars/code/opened/tao/data/tao/upload/'
+                'root' => FILES_PATH.'tao/upload/'
             )
         ),
-        'http://tao.local/mytao.rdf#i149696370281232' => array(
+        LOCAL_NAMESPACE.'#i150237991753522' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => '/Users/lars/code/opened/tao/data/tao/public/'
+                'root' => FILES_PATH.'tao/public/'
             )
         ),
-        'http://tao.local/mytao.rdf#i149696370256393' => array(
+        LOCAL_NAMESPACE.'#i150237991854493' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => '/Users/lars/code/opened/tao/data/tao/private/'
+                'root' => FILES_PATH.'tao/private/'
             )
         ),
-        'http://tao.local/mytao.rdf#i149696370359864' => array(
+        LOCAL_NAMESPACE.'#i150238011578594' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => '/Users/lars/code/opened/tao/data/taoItems/itemData/'
+                'root' => FILES_PATH.'taoItems/itemData/'
             )
         ),
         'taoQtiItem' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => '/Users/lars/code/opened/tao/data/taoQtiItem'
+                'root' => FILES_PATH.'taoQtiItem'
             )
         ),
-        'http://tao.local/mytao.rdf#i1496963713142727' => array(
+        LOCAL_NAMESPACE.'#i1502380445525727' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => '/Users/lars/code/opened/tao/data/taoQtiTest/'
+                'root' => FILES_PATH.'taoQtiTest/'
             )
         )
     )

@@ -2,7 +2,7 @@
 /**
  * The persistence configuration contains a list of persistences
  * identified by name.
- *
+ * 
  * See common_persistence_Manager for a list of drivers
  * provided by  generis. Aditional drivers can be used by setting
  * the drivers full class name
@@ -20,10 +20,11 @@ return new common_persistence_Manager(array(
         ),
         'default' => array(
             'driver' => 'pdo_pgsql',
-            'host' => 'ec2-23-21-220-48.compute-1.amazonaws.com',
-            'dbname' => 'denf7cjo8to9or',
-            'user' => 'xzhbkwcodgdmti',
-            'password' => '06b8936eb6ef74b4d1817d7e023879028ac3f480044892245d7c74b5c409a950'
+            'host' => getenv('DB_HOST'),
+            'dbname' => getenv('DB_NAME'),
+            'user' => getenv('DB_USERNAME'),
+            'password' => getenv('DB_PASSWORD'),
+            'port' => getenv('DB_PORT')
         ),
         'serviceState' => array(
             'driver' => 'phpfile'

@@ -2,7 +2,7 @@
 /**
  * Default config header
  *
- * To replace this add a file /Users/lars/code/opened/tao/tao/config/header/themes.conf.php
+ * To replace this add a file tao/config/header/themes.conf.php
  */
 
 return array(

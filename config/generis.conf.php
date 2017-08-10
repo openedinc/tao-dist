@@ -32,15 +32,15 @@
 
 
 # local namespace
-define('LOCAL_NAMESPACE','http://tao.local/mytao.rdf');
+define('LOCAL_NAMESPACE','http://opened/tao.rdf');
 
 # platform identification
 define('GENERIS_INSTANCE_NAME','mytao');
-define('GENERIS_SESSION_NAME','tao_aAXv47I8');
+define('GENERIS_SESSION_NAME',getenv('GENERIS_SESSION_NAME'));
 
 # paths
-define('ROOT_PATH','/Users/lars/code/opened/tao/');
-define('ROOT_URL','http://tao.local/');
+define('ROOT_PATH', getenv('ROOT_PATH'));
+define('ROOT_URL', getenv('ROOT_URL'));
 
 # language
 define('DEFAULT_LANG','en-US');
@@ -67,11 +67,11 @@ define('USE_HTTP_PASS', '');
 #generis paths
 define('VENDOR_PATH' , ROOT_PATH.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR);
 define('EXTENSION_PATH' , ROOT_PATH);
-define('FILES_PATH','/Users/lars/code/opened/tao/data/');
+define('FILES_PATH',ROOT_PATH.'data'.DIRECTORY_SEPARATOR);
 define('GENERIS_CACHE_PATH', FILES_PATH.'generis'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR);
 
 #path to read configs from
-define('CONFIG_PATH', ROOT_PATH.'config/');
+define('CONFIG_PATH', ROOT_PATH.'config'.DIRECTORY_SEPARATOR);
 
 # users cache
 define('GENERIS_CACHE_USERS_ROLES', true);

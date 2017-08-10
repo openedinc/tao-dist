@@ -55,6 +55,7 @@
     "minimum-stability": "dev",
     "homepage": "http://www.taotesting.com",
     "require": {
+        "php": "^5.6.0",
         "oat-sa/extension-tao-funcacl" : "~2.7.2",
         "oat-sa/generis" : "~2.16.2",
         "oat-sa/extension-tao-ltideliveryprovider" : "~1.3.0",

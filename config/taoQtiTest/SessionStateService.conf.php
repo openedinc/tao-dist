@@ -2,7 +2,7 @@
 /**
  * Default config header
  *
- * To replace this add a file /Users/lars/code/opened/tao/taoQtiTest/config/header/SessionStateService.conf.php
+ * To replace this add a file taoQtiTest/config/header/SessionStateService.conf.php
  */
 
 return new oat\taoQtiTest\models\SessionStateService();

@@ -2,7 +2,7 @@
 /**
  * Default config header
  *
- * To replace this add a file /Users/lars/code/opened/tao/generis/config/header/event.conf.php
+ * To replace this add a file generis/config/header/event.conf.php
  */
 
 return new oat\oatbox\event\EventManager(array(

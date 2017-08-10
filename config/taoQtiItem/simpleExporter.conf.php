@@ -2,7 +2,7 @@
 /**
  * Default config header
  *
- * To replace this add a file /Users/lars/code/opened/tao/taoQtiItem/config/header/simpleExporter.conf.php
+ * To replace this add a file taoQtiItem/config/header/simpleExporter.conf.php
  */
 
 return new oat\taoQtiItem\model\flyExporter\simpleExporter\ItemExporter(array(

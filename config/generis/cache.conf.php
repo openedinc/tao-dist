@@ -2,7 +2,7 @@
 /**
  * Default config header
  *
- * To replace this add a file /Users/lars/code/opened/tao/generis/config/header/cache.conf.php
+ * To replace this add a file generis/config/header/cache.conf.php
  */
 
 return new common_cache_KeyValueCache(array(

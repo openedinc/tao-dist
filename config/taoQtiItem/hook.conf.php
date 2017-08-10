@@ -2,7 +2,7 @@
 /**
  * Default config header
  *
- * To replace this add a file /Users/lars/code/opened/tao/taoQtiItem/config/header/hook.conf.php
+ * To replace this add a file taoQtiItem/config/header/hook.conf.php
  */
 
 return array(

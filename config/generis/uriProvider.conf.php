@@ -16,5 +16,5 @@
  */
 return new core_kernel_uri_DatabaseSerialUriProvider(array(
     'persistence' => 'default',
-    'namespace' => 'http://tao.local/mytao.rdf#'
+    'namespace' => LOCAL_NAMESPACE.'#'
 ));
