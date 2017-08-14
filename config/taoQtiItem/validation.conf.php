@@ -1,8 +1,6 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoQtiItem/config/header/validation.conf.php
+ * Default config header created during install
  */
 
 return new oat\taoQtiItem\model\ValidationService();

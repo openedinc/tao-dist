@@ -20,9 +20,11 @@
 
 namespace oat\oatbox\service;
 
-use common_ext_ExtensionsManager;
+use oat\oatbox\Configurable;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use oat\oatbox\config\ConfigurationService;
+
 /**
  * The simple placeholder ServiceManager
  * @author Joel Bout <joel@taotesting.com>
@@ -38,43 +40,39 @@ class ServiceManager implements ServiceLocatorInterface
         }
         return self::$instance;
     }
-    
+
+    public static function setServiceManager(ServiceManager $serviceManager)
+    {
+        self::$instance = $serviceManager;
+    }
+
     private $services = array();
     
+    /**
+     * @var \common_persistence_KeyValuePersistence
+     */
     private $configService;
     
     public function __construct($configService)
     {
         $this->configService = $configService;
     }
-    
+
     /**
      * Returns the service configured for the serviceKey
      * or throws a ServiceNotFoundException
-     * 
+     *
      * @param string $serviceKey
-     * @throws \common_Exception
-     * @throws ServiceNotFoundException
+     * @return ConfigurableService
      */
     public function get($serviceKey)
     {
         if (!isset($this->services[$serviceKey])) {
-            $parts = explode('/', $serviceKey, 2);
-            if (count($parts) < 2) {
-                throw new ServiceNotFoundException($serviceKey, 'Invalid servicekey');
-            }
-            list($extId, $configId) = $parts;
-            $extension = common_ext_ExtensionsManager::singleton()->getExtensionById($extId);
-            $service = $extension->getConfig($configId);
-            
+            $service = $this->getConfig()->get($serviceKey);
             if ($service === false) {
                 throw new ServiceNotFoundException($serviceKey);
             }
-            if ($service instanceof ServiceLocatorAwareInterface) {
-                $service->setServiceLocator($this);
-            }
-            
-            $this->services[$serviceKey] = $service;
+            $this->services[$serviceKey] = $this->propagate($service);
         }
         return $this->services[$serviceKey];
     }
@@ -92,9 +90,8 @@ class ServiceManager implements ServiceLocatorInterface
         if (count($parts) < 2) {
             return false;
         }
-        list($extId, $configId) = $parts;
-        $extension = common_ext_ExtensionsManager::singleton()->getExtensionById($extId);
-        return $extension->hasConfig($configId);
+
+        return $this->getConfig()->exists($serviceKey);
     }
 
     /**
@@ -111,8 +108,18 @@ class ServiceManager implements ServiceLocatorInterface
         if (count($parts) < 2) {
             throw new \common_Exception('Invalid servicekey '.$serviceKey);
         }
+        $this->propagate($service);
         $this->services[$serviceKey] = $service;
-        $this->getConfig()->set($serviceKey, $service);
+        $success = $this->getConfig()->set($serviceKey, $service);
+        if (!$success) {
+            throw new \common_exception_Error('Unable to write '.$serviceKey);
+        }
+    }
+
+    public function unregister($serviceKey)
+    {
+        unset($this->services[$serviceKey]);
+        return $this->getConfig()->del($serviceKey);
     }
 
     /**
@@ -121,5 +128,38 @@ class ServiceManager implements ServiceLocatorInterface
     protected function getConfig()
     {
         return $this->configService;
+    }
+    
+    /**
+     * Propagate service dependencies
+     *
+     * @param  $service
+     * @return mixed
+     */
+    public function propagate($service)
+    {
+         if(is_object($service) &&  ($service instanceof ServiceLocatorAwareInterface)){
+            $service->setServiceLocator($this);
+        }
+        return $service;
+    }
+
+
+    /**
+     * Service or sub-service factory
+     *
+     * @param $className
+     * @param array $options
+     * @return mixed
+     */
+    public function build($className , array $options = [] )
+    {
+        if (is_a($className, Configurable::class, true)) {
+            $service = new $className($options);
+            $this->propagate($service);
+            return $service;
+        }
+
+        throw new ServiceNotFoundException($className);
     }
 }

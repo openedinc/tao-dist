@@ -21,14 +21,17 @@ define([
     'lodash',
     'i18n',
     'util/strPad',
+    'core/promise',
     'json!taoItems/preview/resources/device-list.json',
     'tpl!taoItems/preview/tpl/preview',
     'ui/themes',
     'ui/themeLoader',
+    'urlParser',
     'ui/modal',
     'select2',
-    'jquery.cookie'
-], function ($, _, __, strPad, deviceList, previewTpl, themeHandler, themeLoader) {
+    'jquery.cookie',
+    'css!taoItemsCss/preview'
+], function ($, _, __, strPad, Promise, deviceList, previewTpl, themeHandler, themeLoader, UrlParser) {
     'use strict';
 
 
@@ -59,6 +62,7 @@ define([
         $console,
         previewContainerMaxWidth,
         itemUri,
+        state,
         winScrollObj = { x:0, y:0 };
 
 
@@ -357,16 +361,21 @@ define([
      */
     var _getThemes = function() {
 
-        var activeTheme = themeLoader(themeObj).getActiveTheme();
-
         var options = [];
-        _(themeObj.available).forEach(function (data) {
-            options.push({
-                value: data.id,
-                label: data.name,
-                selected: data.id === activeTheme
+        var activeTheme;
+
+        //don't load themes if there is none
+        if(_.isPlainObject(themeObj) && !_.isEmpty(themeObj.base)){
+            activeTheme = themeLoader(themeObj).getActiveTheme();
+
+            _(themeObj.available).forEach(function (data) {
+                options.push({
+                    value: data.id,
+                    label: data.name,
+                    selected: data.id === activeTheme
+                });
             });
-        });
+        }
         return options;
     };
 
@@ -509,32 +518,39 @@ define([
 
     /**
      * Display the preview
+     * @returns {Promise} resolve once the preview is shown
      */
     var show = function () {
+        return new Promise(function (resolve, reject){
+            var parsed = new UrlParser(itemUri);
+            parsed.params.state = JSON.stringify(state);
+            $.ajax({
+                url: itemUri,
+                dataType: 'html',
+                method : 'POST',
+                data : parsed.params
+            }).done(function (data) {
 
-        $.ajax({
-            url: itemUri,
-            dataType: 'html'
-        }).done(function (data) {
+                winScrollObj = { x: window.scrollX, y: window.scrollY };
+                window.scrollTo(0,0);
 
-            winScrollObj = { x: window.scrollX, y: window.scrollY };
-            window.scrollTo(0,0);
+                $body.addClass('preview-mode');
 
-            $body.addClass('preview-mode');
+                // $.show() does not work from the item manager
+                // this is either a miracle or a jquery bug
+                // overlay.hide().show();
+                overlay[0].style.display = 'block';
 
-            // $.show() does not work from the item manager
-            // this is either a miracle or a jquery bug
-            // overlay.hide().show();
-            overlay[0].style.display = 'block';
+                overlay.find('select:visible').not('.preview-theme-selector').trigger('change');
+                _scale();
+                _positionPreview();
+                $('.preview-item-container').html(data);
+                resolve();
 
-            overlay.find('select:visible').not('.preview-theme-selector').trigger('change');
-            _scale();
-            _positionPreview();
-
-            $('.preview-item-container').html(data);
+            }).fail(function(xhr){
+                reject(new Error(__('Unable to render the item from %s : %s %s', itemUri, xhr.status, xhr.statusText)));
+            });
         });
-
-
     };
 
     /**
@@ -552,8 +568,9 @@ define([
      * Create preview
      *
      * @param {String} _itemUri
+     * @param {Object} _state
      */
-    var init = function (_itemUri) {
+    var init = function (_itemUri, _state) {
 
         if(!_itemUri || _itemUri.length === 0){
             throw new TypeError('Wrong URI');
@@ -603,6 +620,7 @@ define([
         });
 
         itemUri = _itemUri;
+        state = _state;
 
         return overlay;
     };

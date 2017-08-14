@@ -1,5 +1,4 @@
 <?php
-
 /**  
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * 
- * Copyright (c) 20013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013-2016 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  * 
  */
 
@@ -36,18 +35,28 @@ class common_http_Request
 
     /**
      * Creates an request from the current call
+     * 
+     * The scheme in used (http|https) will be derived from
+     * 
+     * * $_SERVER['HTTPS'] in case of a standard deployment
+     * * $_SERVER['HTTP_X_FORWARDED_PROTO'] or $_SERVER['HTTP_X_FORWARDED_SSL'] in case of being deployed behing a load balancer/proxy.
+     * 
+     * If no clues about whether HTTPS is in use are found, HTTP will be the scheme of the current request.
      *
-     * @return common_http_Request
-     * @throws common_exception_Error
+     * @return common_http_Request A request corresponding to the current HTTP(S) context.
+     * @throws common_exception_Error In case of a CLI execution context.
      */
     public static function currentRequest()
     {
         if (php_sapi_name() == 'cli') {
             throw new common_exception_Error('Cannot call ' . __FUNCTION__ . ' from command line');
         }
-        
-        $scheme = (! isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on") ? 'http' : 'https';
-        $url = $scheme . '://' . $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . $_SERVER['REQUEST_URI'];
+
+        $https = self::isHttps();
+
+        $scheme = $https ? 'https' : 'http';
+        $port = empty($_SERVER['HTTP_X_FORWARDED_PORT']) ? $_SERVER['SERVER_PORT'] : $_SERVER['HTTP_X_FORWARDED_PORT'];
+        $url = $scheme . '://' . $_SERVER['SERVER_NAME'] . ':' . $port . $_SERVER['REQUEST_URI'];
         
         $method = $_SERVER['REQUEST_METHOD'];
         
@@ -76,7 +85,6 @@ class common_http_Request
                 }
             }
         }
-        
         return new self($url, $method, $params, $headers);
     }
 
@@ -97,6 +105,27 @@ class common_http_Request
         $this->params = $params;
         $this->headers = $headers;
         $this->body = $body;
+    }
+
+    /**
+     * Detect whether we use https or http
+     * @return bool
+     */
+    public static function isHttps()
+    {
+        // Default is http scheme.
+        $https = false;
+
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
+            // $_SERVER['HTTPS'] is NOT set behind a proxy / load balancer
+            $https = true;
+        } elseif (
+            // $_SERVER['HTTPS'] is set behind a proxy / load balancer
+            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ||
+            !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
+            $https = true;
+        }
+        return $https;
     }
 
     public function getUrl()
@@ -195,11 +224,13 @@ class common_http_Request
         curl_close($curlHandler);
         return $httpResponse;
     }
+
     /**
      * @param array
+     * @return string
      */
 
-   static function postEncode($parameters){
+    public static function postEncode($parameters){
         
         //todo
         //$content_type = isset($this->headers['Content-Type']) ? $this->headers['Content-Type'] : 'text/plain';
@@ -212,7 +243,8 @@ class common_http_Request
 				break;
 		}
     }
-    static function headerEncode($headers){
+
+    public static function headerEncode($headers){
         $encodedHeaders = array();
         //todo using aray_walk
         foreach ($headers as $key => $value) {

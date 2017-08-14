@@ -22,13 +22,11 @@ define([
 ], function(_, Renderer, containerHelper){
     "use strict";
 
-    //store the curret execution context of the common renderer (preview)
+    //store the current execution context of the common renderer (preview)
     var _$previousContext = null;
 
     //configure and instanciate once only:
-    var _renderer = new Renderer({
-        shuffleChoices : true
-    });
+    var _renderer;
 
     var commonRenderer = {
         render : function(item, $container){
@@ -42,8 +40,23 @@ define([
 
             }, item.getUsedClasses());
         },
-        get : function(){
+        get : function(reset, config){
+            if(!_renderer || reset){
+
+                //create new instance of common renderer
+                _renderer = new Renderer({
+                    shuffleChoices : true
+                });
+
+                if(config){
+                    //update the resolver baseUrl
+                    _renderer.getAssetManager().setData({baseUrl : config.properties.baseUrl || '' });
+                }
+            }
             return _renderer;
+        },
+        getOption : function(name){
+            return _renderer.getOption(name);
         },
         setOption : function(name, value){
             return _renderer.setOption(name, value);

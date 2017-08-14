@@ -19,6 +19,7 @@
  */
 namespace oat\taoItems\model\pack\encoders;
 
+use oat\tao\model\media\MediaAsset;
 use oat\taoItems\model\pack\ExceptionMissingAsset;
 
 /**
@@ -28,18 +29,26 @@ use oat\taoItems\model\pack\ExceptionMissingAsset;
  */
 class Base64Encoder implements Encoding
 {
+    public function __construct()
+    {
+    }
 
     /**
-     * @param string $data content to encode
+     * @param string|MediaAsset $data content to encode
      *
      * @return string
      * @throws ExceptionMissingAsset
      */
-    public function encode( $data )
+    public function encode($data)
     {
-        if (is_string( $data )) {
-            return base64_encode( $data );
+        if ($data instanceof MediaAsset) {
+            $mediaSource = $data->getMediaSource();
+            $data = $mediaSource->getBaseName($data->getMediaIdentifier());
         }
-        throw new ExceptionMissingAsset( 'Incorrect asset type - cann\'t be encoded ' . $data );
+
+        if (is_string($data)) {
+            return base64_encode($data);
+        }
+        throw new ExceptionMissingAsset('Incorrect asset type - cann\'t be encoded ' . $data);
     }
 }

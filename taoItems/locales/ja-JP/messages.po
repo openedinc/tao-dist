@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T12:02:25\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T14:33:21\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -28,9 +28,6 @@ msgstr "閉じる"
 
 msgid "Close console"
 msgstr "コンソールを閉じる"
-
-msgid "Could not create language specific directory for item \'%s\"
-msgstr "アイテム\\'%s\\の言語用ディレクトリが作成できませんでした。"
 
 #, tao-public
 msgid "Create and design items and exercises."
@@ -66,9 +63,6 @@ msgstr "エクスポート"
 msgid "Failed retrieving %s"
 msgstr "検索失敗 %s"
 
-msgid "Failed to publish %s"
-msgstr "出力できませんでした %s"
-
 #, tao-public
 msgid "Filter"
 msgstr "フィルター"
@@ -76,9 +70,6 @@ msgstr "フィルター"
 #, tao-public
 msgid "Import"
 msgstr "インポート"
-
-msgid "Item \'%s\' has no model"
-msgstr "アイテム \\'%s\\' はモデルがありません"
 
 msgid "Item Model"
 msgstr "アイテムも出る"
@@ -138,9 +129,6 @@ msgstr "プロパティ"
 msgid "Published \"%1$s\" in language \"%2$s"
 msgstr "言語 \"%2$sで\"%1$s\" が公開されました。"
 
-msgid "Published %s"
-msgstr "%sが公開されました。"
-
 msgid "Remove this message"
 msgstr "このメッセージを除く"
 
@@ -172,6 +160,9 @@ msgstr "言語 %s のリソースをコピーできません。"
 
 msgid "Unable to create deployement directory"
 msgstr "実行ディレクトリーを作成できません。"
+
+msgid "Unable to render the item from %s : %s %s"
+msgstr ""
 
 msgid "You checked out this item %2s ago"
 msgstr "%2s 前にアイテムはチェックアウトされています。"

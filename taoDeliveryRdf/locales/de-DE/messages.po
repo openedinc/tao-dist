@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint12\n"
-"PO-Revision-Date: 2015-11-30T10:29:33\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T15:00:34\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de-DE\n"
@@ -14,6 +14,9 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 msgid "%s test-taker(s) are excluded."
+msgstr ""
+
+msgid "Access deliveries as a guest"
 msgstr ""
 
 msgid "An error occured during the import"
@@ -31,7 +34,22 @@ msgstr ""
 msgid "Assigned to"
 msgstr ""
 
+msgid "Attempt %1$s of %2$s"
+msgstr ""
+
 msgid "Attempts"
+msgstr ""
+
+msgid "Attempts %1$s of %2$s"
+msgstr ""
+
+msgid "Available from %1$s to %2$s"
+msgstr ""
+
+msgid "Available from %s"
+msgstr ""
+
+msgid "Available until %s"
 msgstr ""
 
 msgid "Cancel"
@@ -58,6 +76,9 @@ msgstr ""
 msgid "Delivery \"%s\" successfully imported"
 msgstr ""
 
+msgid "Delivery \'%s\' not found"
+msgstr ""
+
 msgid "Delivery is assigned to %s test-takers."
 msgstr ""
 
@@ -70,19 +91,26 @@ msgstr ""
 msgid "Delivery saved"
 msgstr ""
 
+msgid "Directory %s doesn\'t exist"
+msgstr ""
+
 msgid "Excluded test-takers"
 msgstr ""
 
-#, tao-public
-msgid "Export"
+msgid "Exported %1$s to %2$s"
+msgstr ""
+
+msgid "Exporting %s"
 msgstr ""
 
 #, tao-public
 msgid "Filter"
 msgstr ""
 
-#, tao-public
-msgid "Import"
+msgid "Guest access"
+msgstr ""
+
+msgid "Importing %1$s files into \'%2$s\"
 msgstr ""
 
 msgid "Manifest not found in assembly"
@@ -127,6 +155,12 @@ msgstr ""
 msgid "Selection saved successfully"
 msgstr ""
 
+msgid "TAO Guest"
+msgstr ""
+
+msgid "TAO Guest Access"
+msgstr ""
+
 msgid "Test-takers"
 msgstr ""
 
@@ -139,9 +173,21 @@ msgstr ""
 msgid "There is currently 1 attempt"
 msgstr ""
 
-msgid "Unable to export Archive"
+msgid "Unable to import Archive"
 msgstr ""
 
 msgid "Unkown error during impoort"
+msgstr ""
+
+msgid "unlimited"
+msgstr ""
+
+msgid "Usage: %s ASSEMBLY_FILE [ASSEMBLY_FILE_2] [ASSEMBLY_FILE_3] ..."
+msgstr ""
+
+msgid "Usage: %s DELIVERY_CLASS_URI OUTPUT_DIRECTORY"
+msgstr ""
+
+msgid "Usage: %s DELIVERY_URI OUTPUT_FILE"
 msgstr ""
 

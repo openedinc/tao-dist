@@ -46,9 +46,6 @@ class DeliveryServiceContainer extends AbstractContainer
      */
     protected function init()
     {
-        $delivery = $this->deliveryExecution->getDelivery();
-        $runtime = ServiceManager::getServiceManager()->get(AssignmentService::CONFIG_ID)->getRuntime($delivery);
-        $this->setData('serviceApi', \tao_helpers_ServiceJavascripts::getServiceApi($runtime, $this->deliveryExecution->getIdentifier()));
     }
     
     /**

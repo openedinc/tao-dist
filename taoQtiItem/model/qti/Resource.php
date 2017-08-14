@@ -49,6 +49,7 @@ class Resource
     protected static $testTypes = array(
         'imsqti_apiptestroot_xmlv2p1',
         'imsqti_test_xmlv2p1',
+        'imsqti_test_xmlv2p2',
         'imsqti_assessment_xmlv2p1'
     );
     
@@ -60,6 +61,7 @@ class Resource
     protected static $itemTypes = array(
         'imsqti_item_xmlv2p0',
         'imsqti_item_xmlv2p1',
+        'imsqti_item_xmlv2p2',
         'imsqti_apipitemroot_xmlv2p1',
         'imsqti_apipitem_xmlv2p1'
     );
@@ -150,6 +152,16 @@ class Resource
     public static function getTestTypes()
     {
         return self::$testTypes;
+    }
+
+    /**
+     * Get all valid item types
+     *
+     * @return array
+     */
+    public static function getItemTypes()
+    {
+        return self::$itemTypes;
     }
 
     /**

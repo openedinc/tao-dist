@@ -88,7 +88,7 @@ class PasswordConstraintsService extends \tao_models_classes_Service
             $this->validators[] = new \tao_helpers_form_validators_Regex(
                 array(
                     'message' => __( 'Must include upper case letters' ),
-                    'format'  => '/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/'
+                    'format'  => '/(\p{Lu}+)/',
                 ), 'caseUpper'
             );
         }
@@ -152,19 +152,16 @@ class PasswordConstraintsService extends \tao_models_classes_Service
      */
     protected function getConfig()
     {
-
-        try {
-            $ext = common_ext_ExtensionsManager::singleton()->getExtensionById( 'generis' );
-
-            $config = $ext->getConfig( 'passwords' );
-
-        } catch ( common_ext_ExtensionException $e ) {
+        if (\tao_install_utils_System::isTAOInstalled() && $this->getServiceLocator()->has(common_ext_ExtensionsManager::SERVICE_ID)) {
+            $ext = $this->getServiceLocator()
+                ->get(common_ext_ExtensionsManager::SERVICE_ID)
+                ->getExtensionById('generis');
+            $config = $ext->getConfig('passwords');
+        } else {
             $config = require_once( __DIR__ . '/../../config/default/passwords.conf.php' );
-
         }
 
         return (array) $config['constrains'];
-
     }
 
 }

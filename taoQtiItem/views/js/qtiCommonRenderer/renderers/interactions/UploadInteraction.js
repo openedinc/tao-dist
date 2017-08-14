@@ -26,44 +26,98 @@ define([
     'lodash',
     'i18n',
     'context',
+    'core/mimetype',
     'tpl!taoQtiItem/qtiCommonRenderer/tpl/interactions/uploadInteraction',
     'taoQtiItem/qtiCommonRenderer/helpers/container',
     'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager',
+    'taoQtiItem/qtiCommonRenderer/helpers/uploadMime',
     'ui/progressbar',
     'ui/previewer',
     'ui/modal',
-    'ui/waitForMedia',
-    'filereader'
-], function ($, _, __, context, tpl, containerHelper, instructionMgr) {
+    'ui/waitForMedia'
+], function ($, _, __, context, mimetype, tpl, containerHelper, instructionMgr, uploadHelper) {
     'use strict';
-
-    //FIXME this response is global to the app, it must be linked to the interaction!
-    var _response = {"base": null};
 
     var _initialInstructions = __('Browse your computer and select the appropriate file.');
 
     var _readyInstructions = __('The selected file is ready to be sent.');
 
-    var _handleSelectedFiles = function (interaction, file) {
-        instructionMgr.removeInstructions(interaction);
-        instructionMgr.appendInstruction(interaction, _initialInstructions);
+    /**
+     * Validate type of selected file
+     * @param file
+     * @param interaction
+     * @returns {boolean}
+     */
+    var validateFileType = function validateFileType (file, interaction) {
+        var expectedTypes = uploadHelper.getExpectedTypes(interaction, true);
+        var filetype = mimetype.getMimeType(file);
+        if (expectedTypes.length) {
+            return (_.indexOf(expectedTypes, filetype) >= 0);
+        }
+        return true;
+    };
 
+    /**
+     * Compute the message to be displayed when an invalid file type has been selected
+     *
+     * @param {Object} interaction
+     * @param {Function} userSelectedType
+     * @param {Function} messageWrongType
+     * @returns {String}
+     */
+    var getMessageWrongType = function getMessageWrongType(interaction, userSelectedType, messageWrongType){
+        var types = uploadHelper.getExpectedTypes(interaction);
+        var expectedTypeLabels = _.map(_.uniq(types), function(type){
+            var mime = _.find(uploadHelper.getMimeTypes(), {mime : type});
+            if(mime){
+                return mime.label;
+            }else{
+                return type;
+            }
+        });
+
+        if(messageWrongType && _.isFunction(messageWrongType)){
+            return messageWrongType({
+                userSelectedType : userSelectedType,
+                types : expectedTypeLabels
+            });
+        }else{
+            return __('Wrong type of file. Expected %s. The selected file has the mimetype "%s".', expectedTypeLabels.join(__(' or ')), userSelectedType);
+        }
+    };
+
+    var _handleSelectedFiles = function _handleSelectedFiles(interaction, file, messageWrongType) {
+
+        var reader;
         var $container = containerHelper.get(interaction);
 
         // Show information about the processed file to the candidate.
         var filename = file.name;
-        var filesize = file.size;
-        var filetype = file.type;
+        var filetype = mimetype.getMimeType(file);
+        instructionMgr.removeInstructions(interaction);
+        instructionMgr.appendInstruction(interaction, _initialInstructions);
+
+        if (!validateFileType(file, interaction)) {
+            instructionMgr.removeInstructions(interaction);
+            instructionMgr.appendInstruction(interaction, getMessageWrongType(interaction, filetype, messageWrongType), function () {
+                this.setLevel('error');
+                //clear preview
+            });
+            instructionMgr.validateInstructions(interaction);
+            return;
+        }
 
         $container.find('.file-name').empty()
             .append(filename);
 
         // Let's read the file to get its base64 encoded content.
-        var reader = new FileReader();
+        reader = new FileReader();
 
         // Update file processing progress.
 
         reader.onload = function (e) {
+            var base64Data, commaPosition, base64Raw, $previewArea;
+
             instructionMgr.removeInstructions(interaction);
             instructionMgr.appendInstruction(interaction, _readyInstructions, function () {
                 this.setLevel('success');
@@ -72,24 +126,19 @@ define([
 
             $container.find('.progressbar').progressbar('value', 100);
 
-            var base64Data = e.target.result;
-            var commaPosition = base64Data.indexOf(',');
+            base64Data = e.target.result;
+            commaPosition = base64Data.indexOf(',');
 
             // Store the base64 encoded data for later use.
-            var base64Raw = base64Data.substring(commaPosition + 1);
-            _response = {"base": {"file": {"data": base64Raw, "mime": filetype, "name": filename}}};
+            base64Raw = base64Data.substring(commaPosition + 1);
+            interaction.data('_response', {base: {file: {data: base64Raw, mime: filetype, name: filename}}});
 
-            var visibleFileUploadPreview = getCustomData(interaction);
-
-            var $previewArea = $container.find('.file-upload-preview');
-
-            $previewArea
-                .toggleClass('visible-file-upload-preview runtime-visible-file-upload-preview', visibleFileUploadPreview.isPreviewable)
-                .previewer({
-                    url: reader.result,
-                    name: filename,
-                    type: filetype.substr(0, filetype.indexOf('/'))
-                });
+            $previewArea = $container.find('.file-upload-preview');
+            $previewArea.previewer({
+                url: base64Data,
+                name: filename,
+                mime: filetype
+            });
 
             // we wait for the image to be completely loaded
             $previewArea.waitForMedia(function(){
@@ -118,11 +167,12 @@ define([
                 }
 
                 $previewArea.on('click', function(){
+                    var $modalBody;
 
                     $('.upload-ia-modal-bg').remove();
 
                     // remove any previous unnecessary content before inserting the preview image
-                    var $modalBody = $largeDisplay.find('.modal-body');
+                    $modalBody = $largeDisplay.find('.modal-body');
                     $modalBody.empty().append($originalImg.clone());
 
                     $largeDisplay
@@ -150,12 +200,12 @@ define([
 
         };
 
-        reader.onloadstart = function (e) {
+        reader.onloadstart = function onloadstart() {
             instructionMgr.removeInstructions(interaction);
             $container.find('.progressbar').progressbar('value', 0);
         };
 
-        reader.onprogress = function (e) {
+        reader.onprogress = function onprogress(e) {
             var percentProgress = Math.ceil(Math.round(e.loaded) / Math.round(e.total) * 100);
             $container.find('.progressbar').progressbar('value', percentProgress);
         };
@@ -164,14 +214,10 @@ define([
 
     };
 
-    var _resetGui = function (interaction) {
+    var _resetGui = function _resetGui(interaction) {
         var $container = containerHelper.get(interaction);
         $container.find('.file-name').text(__('No file selected'));
         $container.find('.btn-info').text(__('Browse...'));
-        $container.find('.file-upload-preview').toggleClass(
-            'visible-file-upload-preview',
-            interaction.attr('type') && interaction.attr('type').indexOf('image') === 0
-        );
     };
 
     /**
@@ -181,41 +227,34 @@ define([
      *
      * @param {object} interaction
      */
-    var render = function (interaction, options) {
+    var render = function render(interaction) {
+        var changeListener, self = this, $input;
         var $container = containerHelper.get(interaction);
         _resetGui(interaction);
 
         instructionMgr.appendInstruction(interaction, _initialInstructions);
 
-        var changeListener = function (e) {
+        //init response
+        interaction.data('_response', {base: null});
+
+        changeListener = function (e) {
             var file = e.target.files[0];
 
             // Are you really sure something was selected
             // by the user... huh? :)
             if (typeof(file) !== 'undefined') {
-                _handleSelectedFiles(interaction, file);
+                _handleSelectedFiles(interaction, file, self.getCustomMessage('upload', 'wrongType'));
             }
         };
 
-        var $input = $container.find('input');
+        $input = $container.find('input');
 
         $container.find('.progressbar').progressbar();
 
-        if (window.File && window.FileReader && window.FileList) {
-            // Yep ! :D
-            $input.bind('change', changeListener);
+        if (!window.FileReader) {
+            throw new Error('FileReader API not supported! Please use a compliant browser!');
         }
-        else {
-            // Nope... :/
-            $input.fileReader({
-                id: 'fileReaderSWFObject',
-                //FIXME this is not going to work outside of TAO
-                filereader: context.taobase_www + 'js/lib/polyfill/filereader.swf',
-                callback: function () {
-                    $input.bind('change', changeListener);
-                }
-            });
-        }
+        $input.bind('change', changeListener);
 
         // IE Specific hack, prevents button to slightly move on click
         $input.bind('mousedown', function (e) {
@@ -225,9 +264,7 @@ define([
         });
     };
 
-    var resetResponse = function (interaction) {
-
-        var $container = containerHelper.get(interaction);
+    var resetResponse = function resetResponse(interaction) {
         _resetGui(interaction);
     };
 
@@ -243,17 +280,17 @@ define([
      * @param {object} interaction
      * @param {object} response
      */
-    var setResponse = function (interaction, response) {
-        var $container = containerHelper.get(interaction);
+    var setResponse = function setResponse(interaction, response) {
+        var filename, $container = containerHelper.get(interaction);
 
         if (response.base !== null) {
-            var filename = (typeof response.base.file.name !== 'undefined') ? response.base.file.name :
+            filename = (typeof response.base.file.name !== 'undefined') ? response.base.file.name :
                 'previously-uploaded-file';
             $container.find('.file-name').empty()
                 .text(filename);
         }
 
-        _response = response;
+        interaction.data('_response', response);
     };
 
     /**
@@ -268,11 +305,11 @@ define([
      * @param {object} interaction
      * @returns {object}
      */
-    var getResponse = function (interaction) {
-        return _response;
+    var getResponse = function getResponse(interaction) {
+        return interaction.data('_response');
     };
 
-    var destroy = function (interaction) {
+    var destroy = function destroy(interaction) {
 
         //remove event
         $(document).off('.commonRenderer');
@@ -307,7 +344,6 @@ define([
      * @returns {Object} the interaction current state
      */
     var getState = function getState(interaction) {
-        var $container;
         var state = {};
         var response = interaction.getResponse();
 
@@ -322,13 +358,12 @@ define([
      * @param {Object} interaction - the interaction
      * @param {Object} [data] - interaction custom data
      * @returns {Object} custom data
-     * @TODO isPreviwable could be nicely implemented using tao/views/js/core/mimetype.js
      * This way we could cover a lot more types. How could this be matched with the preview templates
      * in tao/views/js/ui/previewer.js
      */
-    var getCustomData = function (interaction, data) {
+    var getCustomData = function getCustomData (interaction, data) {
         return _.merge(data || {}, {
-            isPreviewable: interaction.attr('type') && interaction.attr('type').indexOf('image') === 0
+            accept : uploadHelper.getExpectedTypes(interaction, true).join(',')
         });
     };
 

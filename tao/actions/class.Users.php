@@ -19,6 +19,9 @@
  *               2009-2012 (update and modification) Public Research Centre Henri Tudor (under the project TAO-SUSTAIN & TAO-DEV);
  * 
  */
+use oat\oatbox\event\EventManagerAwareTrait;
+use oat\tao\model\event\UserUpdatedEvent;
+use oat\tao\model\security\xsrf\TokenService;
 
 /**
  * This controller provide the actions to manage the application users (list/add/edit/delete)
@@ -30,6 +33,7 @@
  */
 class tao_actions_Users extends tao_actions_CommonModule
 {
+    use EventManagerAwareTrait;
     /**
      * @var tao_models_classes_UserService
      */
@@ -91,7 +95,10 @@ class tao_actions_Users extends tao_actions_CommonModule
         $order = array_key_exists($sortBy, $fieldsMap) ? $fieldsMap[$sortBy] : $fieldsMap['login'];
 
         // filtering
-        $filters = [];
+        $filters = [
+            PROPERTY_USER_LOGIN => '*',
+        ];
+        
         if ($filterQuery) {
             if (!$filterColumns) {
                 // if filter columns not set, search by all columns
@@ -180,16 +187,31 @@ class tao_actions_Users extends tao_actions_CommonModule
      */
     public function delete()
     {
+        // Csrf token validation
+        $tokenService = $this->getServiceManager()->get(TokenService::SERVICE_ID);
+        $tokenName = $tokenService->getTokenName();
+        $token = $this->getRequestParameter($tokenName);
+        if (! $tokenService->checkToken($token)) {
+            \common_Logger::w('Xsrf validation failed');
+            return $this->returnJson([
+                'deleted' => false,
+                'message' => 'Not authorized to perform action'
+            ]);
+        } else {
+            $tokenService->revokeToken($token);
+            $newToken = $tokenService->createToken();
+            $this->setCookie($tokenName, $newToken, null, '/');
+        }
+
         $deleted = false;
         $message = __('An error occured during user deletion');
         if (helpers_PlatformInstance::isDemo()) {
             $message = __('User deletion not permited on a demo instance');
         } elseif ($this->hasRequestParameter('uri')) {
             $user = new core_kernel_classes_Resource(tao_helpers_Uri::decode($this->getRequestParameter('uri')));
+            $this->checkUser($user->getUri());
 
-            if ($user->getUri() == LOCAL_NAMESPACE . DEFAULT_USER_URI_SUFFIX) {
-                $message = __('Default user cannot be deleted');
-            } elseif ($this->userService->removeUser($user)) {
+            if ($this->userService->removeUser($user)) {
                 $deleted = true;
                 $message = __('User deleted successfully');
             }
@@ -289,8 +311,10 @@ class tao_actions_Users extends tao_actions_CommonModule
         }
 
         $user = new core_kernel_classes_Resource(tao_helpers_Uri::decode($this->getRequestParameter('uri')));
+        $this->checkUser($user->getUri());
 
-        $myFormContainer = new tao_actions_form_Users($this->userService->getClass($user), $user);
+        $types = $user->getTypes();
+        $myFormContainer = new tao_actions_form_Users(reset($types), $user);
         $myForm = $myFormContainer->getForm();
 
         if ($myForm->isSubmited()) {
@@ -314,6 +338,7 @@ class tao_actions_Users extends tao_actions_CommonModule
                 $binder = new tao_models_classes_dataBinding_GenerisFormDataBinder($user);
 
                 if ($binder->bind($values)) {
+                    $this->getEventManager()->trigger(new UserUpdatedEvent($user, $values));
                     $this->setData('message', __('User saved'));
                 }
             }
@@ -322,5 +347,17 @@ class tao_actions_Users extends tao_actions_CommonModule
         $this->setData('formTitle', __('Edit a user'));
         $this->setData('myForm', $myForm->render());
         $this->setView('user/form.tpl');
+    }
+
+    /**
+     * Check whether user user data can be changed
+     * @param $uri
+     * @throws Exception
+     */
+    private function checkUser($uri)
+    {
+        if ($uri === LOCAL_NAMESPACE . DEFAULT_USER_URI_SUFFIX) {
+            throw new Exception('Default user data cannot be changed');
+        }
     }
 }

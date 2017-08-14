@@ -20,22 +20,22 @@
 
 namespace oat\taoQtiItem\model\qti;
 
+use oat\oatbox\event\EventManagerAwareTrait;
+use oat\taoItems\model\event\ItemUpdatedEvent;
+use oat\taoQtiItem\helpers\Authoring;
+use oat\taoQtiItem\model\ItemModel;
 use oat\taoQtiItem\model\qti\exception\XIncludeException;
 use oat\taoQtiItem\model\qti\metadata\MetadataRegistry;
 use oat\taoQtiItem\model\SharedLibrariesRegistry;
-use oat\taoQtiItem\model\qti\Parser;
-use oat\taoQtiItem\model\qti\Item;
-use oat\taoQtiItem\model\qti\XIncludeLoader;
 use oat\taoQtiItem\model\qti\exception\ParsingException;
 use \tao_models_classes_Service;
 use \core_kernel_classes_Resource;
 use \taoItems_models_classes_ItemsService;
 use \common_Logger;
 use \common_Exception;
-use \core_kernel_versioning_Repository;
 use \Exception;
-use oat\taoQtiItem\model\ItemModel;
 use oat\taoItems\model\media\ItemMediaResolver;
+use League\Flysystem\FileNotFoundException;
 
 /**
  * The QTI_Service gives you a central access to the managment methods of the
@@ -46,6 +46,9 @@ use oat\taoItems\model\media\ItemMediaResolver;
  */
 class Service extends tao_models_classes_Service
 {
+    use EventManagerAwareTrait;
+
+    const QTI_ITEM_FILE = 'qti.xml';
 
     /**
      * Load a QTI_Item from an, RDF Item using the itemContent property of the
@@ -55,92 +58,115 @@ class Service extends tao_models_classes_Service
      * @author Somsack Sipasseuth, <somsack.sipasseuth@tudor.lu>
      * @param  Resource item
      * @throws \common_Exception If $item is not representing an item with a QTI item model.
-     * @return oat\taoQtiItem\model\qti\Item An item as a business object.
+     * @return Item An item as a business object.
      */
     public function getDataItemByRdfItem(core_kernel_classes_Resource $item, $langCode = '', $resolveXInclude = false)
     {
-        
         $returnValue = null;
-        $itemService = taoItems_models_classes_ItemsService::singleton();
-
-        //check if the item is QTI item
-        if ($itemService->hasItemModel($item, array(ItemModel::MODEL_URI))) {
-
-            //get the QTI xml
-            $itemContent = $itemService->getItemContent($item, $langCode);
-
-            if (!empty($itemContent)) {
-                //Parse it and build the QTI_Data_Item
-                $qtiParser = new Parser($itemContent);
-                $returnValue = $qtiParser->load();
-                
-                if($resolveXInclude && !empty($langCode)){
-                    try{
-                        //loadxinclude
-                        $resolver = new ItemMediaResolver($item, $langCode);
-                        $xincludeLoader = new XIncludeLoader($returnValue, $resolver);
-                        $xincludeLoader->load(true);
-                    } catch(XIncludeException $exception){
-                        common_Logger::e($exception->getMessage());
-                    }
-                }
+        
+        try {
+            //Parse it and build the QTI_Data_Item
+            $file = $this->getXmlByRdfItem($item, $langCode);
+            $qtiParser = new Parser($file);
+            $returnValue = $qtiParser->load();
             
-                if (!$returnValue->getAttributeValue('xml:lang')) {
-                    $returnValue->setAttribute('xml:lang', \common_session_SessionManager::getSession()->getDataLanguage());
+            if($resolveXInclude && !empty($langCode)){
+                try{
+                    //loadxinclude
+                    $resolver = new ItemMediaResolver($item, $langCode);
+                    $xincludeLoader = new XIncludeLoader($returnValue, $resolver);
+                    $xincludeLoader->load(true);
+                } catch(XIncludeException $exception){
+                    common_Logger::e($exception->getMessage());
                 }
-            } else {
-                // fail silently, since file might not have been created yet
-                // $returnValue is then NULL.
-                common_Logger::d('item('.$item->getUri().') is empty, newly created?');
             }
-        } else {
-            throw new common_Exception('Non QTI item('.$item->getUri().') opened via QTI Service');
+        
+            if (!$returnValue->getAttributeValue('xml:lang')) {
+                $returnValue->setAttribute('xml:lang', \common_session_SessionManager::getSession()->getDataLanguage());
+            }
+        } catch (FileNotFoundException $e) {
+            // fail silently, since file might not have been created yet
+            // $returnValue is then NULL.
+            common_Logger::d('item('.$item->getUri().') is empty, newly created?');
         }
         
         return $returnValue;
     }
 
     /**
-     * Save a QTI_Item into an RDF Item, by exporting the QTI_Item to QTI xml
-     * and saving it in the itemContent prioperty of the RDF Item
+     * Load the XML of the QTI item
      *
-     * @access public
-     * @author Somsack Sipasseuth, <somsack.sipasseuth@tudor.lu>
-     * @param  Item qtiItem
-     * @param  Resource rdfItem
-     * @param  string commitMessage
-     * @param  Repository fileSource
-     * @return boolean
+     * @param core_kernel_classes_Resource $item
+     * @param string $language
+     * @return false|string
+     * @throws common_Exception
      */
-    public function saveDataItemToRdfItem(Item $qtiItem, core_kernel_classes_Resource $rdfItem, $commitMessage = '', core_kernel_versioning_Repository $fileSource = null)
+    public function getXmlByRdfItem(core_kernel_classes_Resource $item, $language = '')
     {
-        $returnValue = (bool) false;
-
-        if (!is_null($rdfItem) && !is_null($qtiItem)) {
-
-            $itemService = taoItems_models_classes_ItemsService::singleton();
-
-            //check if the item is QTI item
-            if ($itemService->hasItemModel($rdfItem, array(ItemModel::MODEL_URI))) {
-
-                //set the current data lang in the item content to keep the integrity
-                $qtiItem->setAttribute('xml:lang', \common_session_SessionManager::getSession()->getDataLanguage());
-
-                //get the QTI xml
-                $returnValue = $itemService->setItemContent($rdfItem, $qtiItem->toXML(), '', $commitMessage, $fileSource);
-            }
+        $itemService = taoItems_models_classes_ItemsService::singleton();
+        
+        //check if the item is QTI item
+        if (! $itemService->hasItemModel($item, array(ItemModel::MODEL_URI))) {
+            throw new common_Exception('Non QTI item('.$item->getUri().') opened via QTI Service');
         }
 
-        return (bool) $returnValue;
+        $file = $itemService->getItemDirectory($item, $language)->getFile(self::QTI_ITEM_FILE);
+        return $file->read();
+    }
+
+    /**
+     * Save a QTI_Item into an RDF Item, by exporting the QTI_Item to QTI xml
+     * and saving it in the itemContent property of the RDF Item
+     *
+     * @param \oat\taoQtiItem\model\qti\Item $qtiItem
+     * @param core_kernel_classes_Resource $rdfItem
+     * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
+     * @throws common_Exception
+     * @throws exception\QtiModelException
+     */
+    public function saveDataItemToRdfItem(Item $qtiItem, core_kernel_classes_Resource $rdfItem)
+    {
+        $label = mb_substr($rdfItem->getLabel(), 0, 256, 'UTF-8');
+        //set the current data lang in the item content to keep the integrity
+        $qtiItem->setAttribute('xml:lang', \common_session_SessionManager::getSession()->getDataLanguage());
+        $qtiItem->setAttribute('label', $label);
+        
+        $directory = taoItems_models_classes_ItemsService::singleton()->getItemDirectory($rdfItem);
+        $success = $directory->getFile(self::QTI_ITEM_FILE)->put($qtiItem->toXML());
+
+        if ($success) {
+            $this->getEventManager()->trigger(new ItemUpdatedEvent($rdfItem->getUri()));
+        }
+
+        return $success;
+    }
+
+    /**
+     * @param $xml
+     * @param core_kernel_classes_Resource $rdfItem
+     * @return bool
+     * @throws exception\QtiModelException
+     */
+    public function saveXmlItemToRdfItem($xml, core_kernel_classes_Resource $rdfItem)
+    {
+        $sanitized = Authoring::sanitizeQtiXml($xml);
+        Authoring::validateQtiXml($sanitized);
+
+        $qtiParser = new Parser($sanitized);
+        $qtiItem = $qtiParser->load();
+
+        return $this->saveDataItemToRdfItem($qtiItem, $rdfItem);
     }
 
     /**
      * Load a QTI item from a qti file in parameter.
      *
-     * @access public
-     * @author Somsack Sipasseuth, <somsack.sipasseuth@tudor.lu>
-     * @param  string file
-     * @return oat\taoQtiItem\model\qti\Item
+     * @param $file
+     * @return null|Item
+     * @throws Exception
+     * @throws ParsingException
      */
     public function loadItemFromFile($file)
     {
@@ -171,22 +197,18 @@ class Service extends tao_models_classes_Service
     /**
      * Build the XHTML/CSS/JS from a QTI_Item to be rendered.
      *
-     * @access public
-     * @author Somsack Sipasseuth, <somsack.sipasseuth@tudor.lu>
-     * @param  Item item the item to render
+     * @param Item $item
+     * @param string $language
      * @return string
      */
-    public function renderQTIItem(Item $item, $langCode = 'en-US')
+    public function renderQTIItem(Item $item, $language = 'en-US')
     {
-        $returnValue = '';
-
-        if (!is_null($item)) {
-            $returnValue = $item->toXHTML(array('lang' => $langCode));
+        if (! is_null($item)) {
+            return $item->toXHTML(array('lang' => $language));
         }
-
-        return (string) $returnValue;
+        return '';
     }
-    
+
     public function getVariableElements(Item $item)
     {
         $allData = $item->getDataForDelivery();
@@ -214,5 +236,10 @@ class Service extends tao_models_classes_Service
     public function getMetadataRegistry()
     {
         return new MetadataRegistry();
+    }
+
+    public function hasItemModel(core_kernel_classes_Resource $item, $models)
+    {
+        return taoItems_models_classes_ItemsService::singleton()->hasItemModel($item, $models);
     }
 }

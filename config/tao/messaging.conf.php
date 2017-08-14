@@ -1,8 +1,23 @@
 <?php
-/**
- * Default config header
+/**  
+ * Service to send messages to a user outside of the system
  *
- * To replace this add a file tao/config/header/messaging.conf.php
- */
+ * Does not send any messages by default
+ *
+ * Example:
+ * return new oat\tao\model\messaging\transportStrategy\MailAdapter(
+ *    array(
+ *        'SMTPConfig' => array(
+ *            'DEBUG_MODE' => false,
+ *            'SMTP_HOST' => '127.0.0.1',
+ *            'SMTP_PORT' => 25,
+ *            'SMTP_AUTH' => false,
+ *            'SMTP_USER' => '',
+ *            'SMTP_PASS' => '',
+ *        ),
+ *        'defaultSender' => 'noreply@example.com'
+ *    )
+ *); 
+ */  
 
-return 1;
+return new oat\tao\model\messaging\transportStrategy\NullSink();

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T12:00:37\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T14:36:54\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de-DE\n"
@@ -15,6 +15,9 @@ msgstr ""
 
 msgid " Fill in the gaps in a text from a set of choices."
 msgstr " Ersetze die Lücken im Text mit einer Auswahl an Textbausteinen."
+
+msgid " or "
+msgstr ""
 
 msgid "%d Item(s) of %d imported from the given IMS QTI Package."
 msgstr "%d Element(e) von %d wurde vom vorgegebenen IMS QTI Paket importiert."
@@ -40,14 +43,11 @@ msgstr "Hinzufügen"
 msgid "Add a modal feedback"
 msgstr "Modales Feedback hinzufügen"
 
-msgid "Add a QTI XML file"
-msgstr "QTI XML Datei hinzufügen"
+msgid "Add a QTI/APIP XML Item Document"
+msgstr ""
 
-msgid "Add a zip file containing APIP items"
-msgstr "ZIP-Datei mit APIP Elementen hinzufügen"
-
-msgid "Add a zip file containing QTI items"
-msgstr "ZIP-Datei mit QTI Elementen hinzufügen"
+msgid "Add a ZIP file containing QTI/APIP items"
+msgstr ""
 
 msgid "Add another option"
 msgstr "Eine weitere Option hinzufügen"
@@ -103,9 +103,6 @@ msgstr "Beim Laden des freigegebenen Signals trat ein Fehler auf."
 msgid "An error occured while parsing IMS QTI data."
 msgstr "Beim Verarbeiten von IMS QTI Daten trat ein Fehler auf."
 
-msgid "An unexpected error occured during the import of the IMS APIP Item Package."
-msgstr "Beim Import des IMS APIP Paketes trat ein unerwarteter Fehler auf."
-
 msgid "An unexpected error occured during the import of the IMS QTI Item Package."
 msgstr "Beim Import des IMS QTI Paketes trat ein unerwarteter Fehler auf."
 
@@ -118,14 +115,8 @@ msgstr "Bei der Antwortsverarbeitung trat ein unerwarteter Fehler auf."
 msgid "An unknown error occured while importing the IMS QTI Package."
 msgstr "Beim Import des IMS QTI Pakets trat ein unerwarteter Fehler auf."
 
-msgid "APIP data"
+msgid "APIP Content Package"
 msgstr ""
-
-msgid "APIP Package"
-msgstr "APIP Paket"
-
-msgid "APIP Package 1.0"
-msgstr "APIP Paket 1.0"
 
 msgid "Arrange a list of choices in the correct order."
 msgstr "Ordne eine Auswahl von Antworten in der korrekten Reihenfolge."
@@ -144,6 +135,9 @@ msgstr "mindestens"
 
 msgid "Autostart"
 msgstr "Autostart"
+
+msgid "Back to Manage Items"
+msgstr ""
 
 msgid "Background color"
 msgstr "Hintergrundfarbe"
@@ -166,11 +160,11 @@ msgstr "Computer durchsuchen und die geeignete Datei auswählen."
 msgid "Browse..."
 msgstr "Durchsuchen..."
 
-msgid "cancel"
-msgstr "abbrechen"
-
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "cancel"
+msgstr "abbrechen"
 
 msgid "chars"
 msgstr "Zeichen"
@@ -187,11 +181,11 @@ msgstr "Auswahl Interaktion"
 msgid "Choice Properties"
 msgstr "Auswahleigenschaften"
 
-msgid "choices"
-msgstr ""
-
 msgid "Choices"
 msgstr "Auswahl"
+
+msgid "choices"
+msgstr ""
 
 msgid "Click again to remove"
 msgstr "Zum Entfernen erneut klicken"
@@ -217,14 +211,11 @@ msgstr "Einschränkungen"
 msgid "Control the playing parameters (auto-start, loop) of a video or audio file and report the number of time it has been played."
 msgstr "Kontrolliert die Wiedergabe-Parameter (Auto-Start, Schleife) eines Videos oder einer Audio-Datei und berichtet über die Anzahl der Wiedergaben."
 
-msgid "Correct"
-msgstr "Richtig"
-
 msgid "correct"
 msgstr "Richtig"
 
-msgid "Could not create language specific directory for item \'%s\"
-msgstr "Sprachspezifischer Ordner für Element \\'%s\\ konnte nicht angelegt werden"
+msgid "Correct"
+msgstr "Richtig"
 
 msgid "Create assocations and fill the score in the form below"
 msgstr "Stelle Assoziationen her und trage das Ergebnis in das unten stehende Formular ein"
@@ -370,6 +361,9 @@ msgstr "Beende Versuchsinteraktion"
 msgid "Enlarge font size"
 msgstr "Schriftgröße erhöhen"
 
+msgid "Enter a select MIME-type"
+msgstr ""
+
 msgid "Enter choices…"
 msgstr ""
 
@@ -378,6 +372,13 @@ msgstr "Exportieren"
 
 msgid "Export APIP 1.0 Package"
 msgstr "APIP 1.0 Paket exportieren"
+
+#, tao-public
+msgid "Export metadata"
+msgstr ""
+
+msgid "Export metadata item"
+msgstr ""
 
 msgid "Export QTI 2.1 Package"
 msgstr "QTI 2.1 Paket exportieren"
@@ -481,10 +482,10 @@ msgstr "Wie die mathematischen Ausdrücke bearbeitet werden sollen"
 msgid "identical pair already exists"
 msgstr "Identische Paare existieren bereits"
 
-msgid "identifier"
+msgid "Identifier"
 msgstr "Bezeichner"
 
-msgid "Identifier"
+msgid "identifier"
 msgstr "Bezeichner"
 
 msgid "If given, the pattern mask specifies a regular expression that the candidate's response must match in order to be considered valid"
@@ -499,14 +500,11 @@ msgstr "Wenn die String-Interaktion an eine numerische Antwortvariable gebunden 
 msgid "Import"
 msgstr "Importieren"
 
-msgid "Import a QTI 2.X Package"
-msgstr "QTI 2.X Paket importieren"
+msgid "Import a QTI/APIP Content Package"
+msgstr ""
 
-msgid "Import an APIP 1.0 Package"
-msgstr "APIP 1.0 Paket importieren"
-
-msgid "Import QTI 2.X Item"
-msgstr "QTI 2.X Element importieren"
+msgid "Import a QTI/APIP XML Item Document"
+msgstr ""
 
 msgid "IMS QTI Item referenced as \"%s\" in the IMS Manifest file could not be imported."
 msgstr "IMS QRI Element, im IMS Manifest als \"%s\" referenziert, konnte nicht importiert werden."
@@ -550,10 +548,10 @@ msgstr "Element \"%s\" ist in keiner Sprache verfügbar"
 msgid "Item \'%s\' has no model"
 msgstr "Element \\'%s\\' hat kein Modell"
 
-msgid "Item Properties"
+msgid "Item properties"
 msgstr "Elementeigenschaften"
 
-msgid "Item properties"
+msgid "Item Properties"
 msgstr "Elementeigenschaften"
 
 msgid "Item width"
@@ -860,8 +858,14 @@ msgstr "CSS wird vorbereitet, Bitte warten..."
 msgid "Preview"
 msgstr "Vorschau"
 
+msgid "Preview the item"
+msgstr ""
+
 msgid "Print"
 msgstr "Drucken"
+
+msgid "Print the item"
+msgstr ""
 
 msgid "Provides a hint to the candidate as to the expected number of lines of input required. A line is expected to have about 72 characters."
 msgstr "Gibt dem Kandidaten einen Hinweis, wie viele Zeilen als Antwort erwartet werden. Eine Zeile hat einen Umfang von ungefähr 72 Zeichen."
@@ -872,14 +876,8 @@ msgstr "Gibt dem Kandidaten einen Hinweis auf die erwarte Gesamtlänge der Antwo
 msgid "Published %s"
 msgstr "Veröffentlicht %s"
 
-msgid "QTI Item"
-msgstr "QTI Element"
-
 msgid "QTI Item Runner"
 msgstr "QTI Element Runner"
-
-msgid "QTI Package"
-msgstr "QTI Paket"
 
 msgid "QTI Package 2.0"
 msgstr "QTI Paket 2.0"
@@ -887,8 +885,17 @@ msgstr "QTI Paket 2.0"
 msgid "QTI Package 2.1"
 msgstr "QTI Paket 2.1"
 
+msgid "QTI Package 2.2"
+msgstr ""
+
 msgid "QTI-XML error at line %1$d \"%2$s\"."
 msgstr "QTI-XML Fehler in Zeile %1$d \"%2$s\"."
+
+msgid "QTI/APIP Content Package"
+msgstr ""
+
+msgid "QTI/APIP XML Item Document"
+msgstr ""
 
 msgid "Question"
 msgstr "Frage"
@@ -967,6 +974,9 @@ msgstr "Zurücksetzen auf..."
 
 msgid "Save"
 msgstr "Speichern"
+
+msgid "Save the item"
+msgstr ""
 
 msgid "score"
 msgstr "Punktzahl"
@@ -1264,9 +1274,6 @@ msgid "The validation of the imported QTI item failed. The system returned the f
 msgstr "Die Überprüfung des importierten QTI Elements schlug fehl. Fehlermeldung: %s\n"
 ""
 
-msgid "The ZIP archive containing the IMS APIP Item cannot be extracted."
-msgstr "Die ZIP-Datei mit dem IMS APIP Element kann nicht extrahiert werden."
-
 msgid "The ZIP archive containing the IMS QTI Item cannot be extracted."
 msgstr "Die ZIP-Datei mit dem IMS QTI Element kann nicht extrahiert werden."
 
@@ -1351,8 +1358,14 @@ msgstr "Worte"
 msgid "Would you like to replace the alt text"
 msgstr "Möchten Sie den Alternativ-Text ersetzen?"
 
+msgid "Wrong type of file. Expected %s"
+msgstr ""
+
 msgid "XHTML"
 msgstr "XHTML"
+
+msgid "XML error \"%1$s\"."
+msgstr ""
 
 msgid "XML error at line %1$d \"%2$s\"."
 msgstr "XML-Fehler in Zeile %1$d \"%2$s\"."

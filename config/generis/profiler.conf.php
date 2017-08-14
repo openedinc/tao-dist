@@ -77,7 +77,9 @@ $udpArchiver = array(
 $logArchiver = array(
     'class'			=> 'LoggerAppender'
 );
-return array(
-    array(
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => array(
+        array(
+        )
     )
-);
+));

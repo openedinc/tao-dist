@@ -1,5 +1,5 @@
 <?php
-/*  
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -19,6 +19,8 @@
  * 
  */
 
+use oat\oatbox\service\ServiceManager;
+use oat\oatbox\service\ConfigurableService;
 
 /**
  * The ExtensionsManager class is dedicated to Extensions Management. It provides
@@ -32,9 +34,11 @@
  * @see @license  GNU General Public (GPL) Version 2 http://www.opensource.org/licenses/gpl-2.0.php
  
  */
-class common_ext_ExtensionsManager
+class common_ext_ExtensionsManager extends ConfigurableService
 {
     const EXTENSIONS_CONFIG_KEY = 'installation';
+
+    const SERVICE_ID = 'generis/extensionManager';
 
     public static $RESERVED_WORDS = array(
     	'config', 'data', 'vendor', 'tests'
@@ -58,6 +62,8 @@ class common_ext_ExtensionsManager
     private static $instance = null;
 
     /**
+     * @deprecated Use ServiceManager::get(\common_ext_ExtensionsManager::SERVICE_ID) instead
+     *
      * Obtain a reference on a unique common_ext_ExtensionsManager
      * class instance.
      *
@@ -67,14 +73,25 @@ class common_ext_ExtensionsManager
      */
     public static function singleton()
     {
-        $returnValue = null;
+        if (! isset(self::$instance)) {
+            if (ServiceManager::getServiceManager()->has(self::SERVICE_ID)) {
+                self::$instance = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+            } else {
+                self::$instance = new common_ext_ExtensionsManager();
+                ServiceManager::getServiceManager()->propagate(self::$instance);
+            }
+        }
+        return self::$instance;
+    }
 
-		if (!isset(self::$instance)) {
-			self::$instance = new self();
-		}
-		$returnValue = self::$instance;
-
-        return $returnValue;
+    /**
+     * Get list of ids of installed extensions
+     * @return mixed
+     */
+    public function getInstalledExtensionsIds()
+    {
+        $installData = $this->getExtensionById('generis')->getConfig(self::EXTENSIONS_CONFIG_KEY);
+        return is_array($installData) ? array_keys($installData) : array();
     }
 
     /**
@@ -88,15 +105,10 @@ class common_ext_ExtensionsManager
     public function getInstalledExtensions()
     {
         $returnValue = array();
-
-        $installed = $this->getExtensionById('generis')->getConfig(self::EXTENSIONS_CONFIG_KEY);
-        if (is_array($installed)) {
-            foreach (array_keys($installed) as $extId) {
-                $returnValue[$extId] = $this->getExtensionById($extId);
-            }
+        foreach ($this->getInstalledExtensionsIds() as $extId) {
+            $returnValue[$extId] = $this->getExtensionById($extId);
         }
-
-        return (array) $returnValue;
+        return $returnValue;
     }
 
     /**
@@ -116,16 +128,6 @@ class common_ext_ExtensionsManager
 			}
 			$extension->load();
 		}
-    }
-
-    /**
-     * Creates a new instance of common_ext_ExtensionsManager
-     *
-     * @access private
-     * @author Joel Bout, <joel@taotesting.com>
-     */
-    private function __construct()
-    {
     }
 
     /**
@@ -182,20 +184,24 @@ class common_ext_ExtensionsManager
      *
      * @access public
      * @author Joel Bout, <joel@taotesting.com>
-     * @param  string id The id of the extension.
+     * @param  string $id The id of the extension.
      * @return common_ext_Extension A common_ext_Extension instance or null if it does not exist.
      * @throws common_ext_ExtensionException If the provided id is empty.
      */
     public function getExtensionById($id)
     {
-        if (!is_string($id) || strlen($id) == 0) {
+        if (! is_string($id) || strlen($id) == 0) {
         	throw new common_ext_ExtensionException('No id specified for getExtensionById()');
         }
-        if (!isset($this->extensions[$id])) {
-        	$this->extensions[$id] = new common_ext_Extension($id, false);
+        if (! isset($this->extensions[$id])) {
+            $extension = new common_ext_Extension($id, false);
+            $this->getServiceManager()->propagate($extension);
+
+            // loads the extension if it hasn't been loaded yet
+            $extension->load();
+            // if successfully loaded add to list
+            $this->extensions[$id] = $extension;
         }
-        // loads the extension if it hasn't been loaded yet
-        $this->extensions[$id]->load();
         
         return $this->extensions[$id];
     }
@@ -217,8 +223,6 @@ class common_ext_ExtensionsManager
         $exts = $this->getExtensionById('generis')->getConfig(self::EXTENSIONS_CONFIG_KEY);
         return isset($exts[$extensionId]) ? $exts[$extensionId]['installed'] : null;
     }
-    
-    
 
     public function setEnabled($extensionId, $enabled = true)
     {

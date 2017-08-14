@@ -20,6 +20,8 @@
 
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\service\ConfigurableService;
+use oat\tao\model\state\StateStorage;
+
 /**
  * Persistence for the item delivery service
  *
@@ -28,7 +30,7 @@ use oat\oatbox\service\ConfigurableService;
  * @package tao
  */
 class tao_models_classes_service_StateStorage
-    extends ConfigurableService
+    extends ConfigurableService implements StateStorage
 {
     /**
      * @var string name of former hardcoded persistence
@@ -44,7 +46,7 @@ class tao_models_classes_service_StateStorage
      * @deprecated
      */
     public static function singleton() {
-        return ServiceManager::getServiceManager()->getServiceManager()->get('tao/stateStorage');
+        return ServiceManager::getServiceManager()->getServiceManager()->get(StateStorage::SERVICE_ID);
     }
     
     /**

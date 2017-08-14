@@ -21,7 +21,6 @@
 namespace oat\taoOpenWebItem\model\import;
 
 use \core_kernel_classes_Class;
-use \core_kernel_versioning_Repository;
 use \taoItems_models_classes_ItemsService;
 use \common_report_Report;
 use \common_exception_Error;
@@ -57,7 +56,7 @@ class ImportService
 	 * @param  Repository repository
 	 * @return common_report_Report
 	 */
-	public function importXhtmlFile($xhtmlFile,  core_kernel_classes_Class $itemClass, $validate = true,  core_kernel_versioning_Repository $repository = null)
+	public function importXhtmlFile($xhtmlFile,  core_kernel_classes_Class $itemClass, $validate = true)
 	{
 		//get the services instances we will need
 		$itemService = taoItems_models_classes_ItemsService::singleton();
@@ -97,16 +96,20 @@ class ImportService
         		$rdfItem->setPropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY), TAO_ITEM_MODEL_XHTML);
         		
         		$itemContent = file_get_contents($folder .'index.html');
-        		$itemService->setItemContent($rdfItem, $itemContent, null, 'HOLD_COMMIT');
-        
-        		$itemPath = $itemService->getItemFolder($rdfItem);
-        		if (!tao_helpers_File::move($folder, $itemPath)) {
-        			common_Logger::w('Unable to move '.$folder.' to '.$itemPath);
-        			// clean up
-        			$itemService->deleteItem($rdfItem);
-        			helpers_File::remove($folder);
-        			throw new taoItems_models_classes_Import_ImportException('Unable to copy the resources');
-        		}
+        		$dir = $itemService->getItemDirectory($rdfItem);
+    		    foreach (
+    		        $iterator = new \RecursiveIteratorIterator(
+    		            new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS),
+    		            \RecursiveIteratorIterator::SELF_FIRST) as $item
+    		    ) {
+    		        if (!$item->isDir()) {
+                        common_Logger::i('Upload '.$item.' to '.$iterator->getSubPathName());
+    		            $file = $dir->getFile($iterator->getSubPathName());
+    		            $fh = fopen($item, 'r');
+    		            $file->write($fh);
+    		            fclose($fh);
+    		        }
+    		    }
         		
         		$report->setMessage(__('The OWI Item was successfully imported.'));
         		$report->setData($rdfItem);
@@ -178,13 +181,19 @@ class ImportService
 	    
 	        if(!$validate || $fileParser->isValid()){
 	    
-	            $itemContent = file_get_contents($folder .'index.html');
-        		taoItems_models_classes_ItemsService::singleton()->setItemContent($item, $itemContent);
-	            $itemPath = taoItems_models_classes_ItemsService::singleton()->getItemFolder($item, $language);
-	            if(!tao_helpers_File::move($folder, $itemPath)){
-	                common_Logger::w('Unable to move '.$folder.' to '.$itemPath);
-	                helpers_File::remove($folder);
-	                throw new taoItems_models_classes_Import_ImportException('Unable to copy the resources');
+	            $dir = taoItems_models_classes_ItemsService::singleton()->getItemDirectory($item);
+	            foreach (
+	                $iterator = new \RecursiveIteratorIterator(
+	                    new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS),
+	                    \RecursiveIteratorIterator::SELF_FIRST) as $content
+	            ) {
+	                if (!$content->isDir()) {
+	                    common_Logger::i('Upload '.$content.' to '.$iterator->getSubPathName());
+	                    $file = $dir->getFile($iterator->getSubPathName());
+	                    $fh = fopen($content, 'r');
+	                    $file->write($fh);
+	                    fclose($fh);
+	                }
 	            }
 	            $returnValue = common_report_Report::createSuccess(__('%s was successfully replaced', $item->getLabel()), $item);
 	        } else {

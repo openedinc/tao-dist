@@ -19,11 +19,15 @@
  * 
  */
 
+use oat\taoLti\models\classes\LtiVariableMissingException;
+
 class taoLti_models_classes_LtiLaunchData
 {
     const OAUTH_CONSUMER_KEY               = 'oauth_consumer_key';
     const RESOURCE_LINK_ID                 = 'resource_link_id';
     const RESOURCE_LINK_TITLE              = 'resource_link_title';
+    const CONTEXT_ID                       = 'context_id';
+    const CONTEXT_LABEL                    = 'context_label';
     
     const USER_ID                          = 'user_id';
     const ROLES                            = 'roles';
@@ -110,13 +114,31 @@ class taoLti_models_classes_LtiLaunchData
         if (isset($this->variables[$key])) {
             return $this->variables[$key];
         } else {
-            throw new taoLti_models_classes_LtiException('Undefined LTI variable '.$key);
+            throw new LtiVariableMissingException($key);
         }
     }
     
     public function getCustomParameter($key) {
         return isset($this->customParams[$key]) ? $this->customParams[$key] : null; 
-    }    
+    }
+
+    /**
+     * Get all custom parameters provided during launch.
+     *
+     * @return array
+     */
+    public function getCustomParameters() {
+        return $this->customParams;
+    }
+
+    /**
+     * Get all lti variables provided during launch.
+     *
+     * @return array
+     */
+    public function getVariables() {
+        return $this->variables;
+    }
 
     // simpler access
     
@@ -193,5 +215,15 @@ class taoLti_models_classes_LtiLaunchData
      */
     public function getReturnUrl() {
         return $this->getVariable(self::LAUNCH_PRESENTATION_RETURN_URL);
+    }
+
+    public function hasReturnUrl(){
+        if($this->hasVariable(self::LAUNCH_PRESENTATION_RETURN_URL)){
+            if(filter_var($this->getReturnUrl(), FILTER_VALIDATE_URL)){
+                return true;
+            }
+            common_Logger::w("Please provide a valid url. " . $this->getReturnUrl() . " is not valid");
+        }
+        return false;
     }
 }

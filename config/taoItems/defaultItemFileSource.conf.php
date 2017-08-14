@@ -1,8 +1,8 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoItems/config/header/defaultItemFileSource.conf.php
+ * Default config header created during install
  */
 
-return 'http://tao.local/mytao.rdf#i149696370359864';
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => 'itemDirectory'
+));

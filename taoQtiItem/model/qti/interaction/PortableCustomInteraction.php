@@ -22,12 +22,12 @@
 namespace oat\taoQtiItem\model\qti\interaction;
 
 use oat\taoQtiItem\model\qti\ParserFactory;
-use oat\taoQtiItem\model\qti\interaction\CustomInteraction;
 use oat\taoQtiItem\model\qti\exception\QtiModelException;
 use \DOMElement;
+use oat\taoQtiItem\model\qti\PortableElementTrait;
 
 /**
- * The QTI custom interaction is a subclass of the main QTI Interaction class
+ * The PortableCustomInteraction is the class of the OAT specific PCI implementation
  *
  * @access public
  * @author Sam, <sam@taotesting.com>
@@ -37,18 +37,19 @@ use \DOMElement;
  */
 class PortableCustomInteraction extends CustomInteraction
 {
-    
+    use PortableElementTrait;
+
     const NS_NAME = 'pci';
-    
-    protected $nsMap = array(
-        'pci' => 'http://www.imsglobal.org/xsd/portableCustomInteraction'
-    );
-    
-    
+    const NS_URI = 'http://www.imsglobal.org/xsd/portableCustomInteraction';
+
+    protected $markupNs = 'html5';
     protected $properties = array();
     protected $libraries = array();
+    protected $stylesheets = array();
+    protected $mediaFiles = array();
     protected $typeIdentifier = '';
     protected $entryPoint = '';
+    protected $version = '0.0.0';
     
     public function setTypeIdentifier($typeIdentifier){
         $this->typeIdentifier = $typeIdentifier;
@@ -78,6 +79,30 @@ class PortableCustomInteraction extends CustomInteraction
         }
     }
 
+    public function getStylesheets(){
+        return $this->stylesheets;
+    }
+    
+    public function setStylesheets($stylesheets){
+        $this->stylesheets = $stylesheets;
+    }
+    
+    public function getMediaFiles(){
+        return $this->mediaFiles;
+    }
+    
+    public function setMediaFiles($mediaFiles){
+        $this->mediaFiles = $mediaFiles;
+    }
+    
+    public function getVersion(){
+        return $this->version;
+    }
+
+    public function setVersion($version){
+        return $this->version = $version;
+    }
+
     public function getLibraries(){
         return $this->libraries;
     }
@@ -93,182 +118,99 @@ class PortableCustomInteraction extends CustomInteraction
     public function toArray($filterVariableContent = false, &$filtered = array()){
         
         $returnValue = parent::toArray($filterVariableContent, $filtered);
-        
-        $returnValue['libraries'] = $this->libraries;
-        $returnValue['properties'] = $this->getArraySerializedPrimitiveCollection($this->getProperties(), $filterVariableContent, $filtered);
-        $returnValue['entryPoint'] = $this->entryPoint;
+
         $returnValue['typeIdentifier'] = $this->typeIdentifier;
-        
+        $returnValue['version'] = $this->version;
+        $returnValue['entryPoint'] = $this->entryPoint;
+        $returnValue['libraries'] = $this->libraries;
+        $returnValue['stylesheets'] = $this->stylesheets;
+        $returnValue['mediaFiles'] = $this->mediaFiles;
+        $returnValue['properties'] = $this->getArraySerializedPrimitiveCollection($this->getProperties(), $filterVariableContent, $filtered);
+
         return $returnValue;
     }
 
     public static function getTemplateQti(){
-        return static::getTemplatePath().'interactions/qti.customInteraction.tpl.php';
+        return static::getTemplatePath().'interactions/qti.portableCustomInteraction.tpl.php';
     }
     
     protected function getTemplateQtiVariables(){
 
-        $nsMarkup = 'html5';
         $variables = parent::getTemplateQtiVariables();
         $variables['libraries'] = $this->libraries;
-        $variables['serializedProperties'] = $this->serializePciProperties($this->properties, self::NS_NAME);
+        $variables['stylesheets'] = $this->stylesheets;
+        $variables['mediaFiles'] = $this->mediaFiles;
+        $variables['serializedProperties'] = $this->serializePortableProperties($this->properties, self::NS_NAME, self::NS_URI);
         $variables['entryPoint'] = $this->entryPoint;
         $variables['typeIdentifier'] = $this->typeIdentifier;
-        $variables['markup'] = preg_replace('/<(\/)?([^!])/', '<$1'.$nsMarkup.':$2', $variables['markup']);
-        $this->getRelatedItem()->addNamespace($nsMarkup, $nsMarkup);
+        $variables['markup'] = preg_replace('/<(\/)?([^!])/', '<$1'.$this->markupNs.':$2', $variables['markup']);
+        $this->getRelatedItem()->addNamespace($this->markupNs, $this->markupNs);
         return $variables;
     }
     
     /**
      * Feed the pci instance with data provided in the pci dom node
-     * 
-     * @param \oat\taoQtiItem\model\qti\ParserFactory $parser
+     *
+     * @param ParserFactory $parser
      * @param DOMElement $data
+     * @throws InvalidArgumentException
+     * @throws QtiModelException
      */
-    public function feed(ParserFactory $parser, DOMElement $data){
+    public function feed(ParserFactory $parser, DOMElement $data, $xmlns = ''){
 
-        $ns = $parser->getPciNamespace();
-
-        $pciNodes = $parser->queryXPathChildren(array('portableCustomInteraction'), $data, $ns);
-        if($pciNodes->length){
-            $typeIdentifier = $pciNodes->item(0)->getAttribute('customInteractionTypeIdentifier');
-            if(empty($typeIdentifier)){
-                throw new QtiModelException('the type identifier of the pci is missing');
-            }else{
-                $this->setTypeIdentifier($typeIdentifier);
-            }
-            
-            $entryPoint = $pciNodes->item(0)->getAttribute('hook');
-            if(empty($entryPoint)){
-                throw new QtiModelException('the entry point of the pci is missing');
-            }else{
-                $this->setEntryPoint($entryPoint);
-            }
+        $pciNodes = $parser->queryXPathChildren(array('portableCustomInteraction'), $data, $xmlns);
+        if(!$pciNodes->length) {
+            $xmlns = '';//even if a namespace has been defined, it may not be used
+            $pciNodes = $parser->queryXPathChildren(array('portableCustomInteraction'), $data, $xmlns);
+        }
+        if(!$pciNodes->length) {
+            throw new QtiModelException('no oat portableCustomInteraction node found');
         }
 
-        $libNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'resources', 'libraries', 'lib'), $data, $ns);
+        $typeIdentifier = $pciNodes->item(0)->getAttribute('customInteractionTypeIdentifier');
+        if(empty($typeIdentifier)){
+            throw new QtiModelException('the type identifier of the pci is missing');
+        }else{
+            $this->setTypeIdentifier($typeIdentifier);
+        }
+        $this->setEntryPoint($pciNodes->item(0)->getAttribute('hook'));
+
+        $version = $pciNodes->item(0)->getAttribute('version');
+        if($version){
+            $this->setVersion($version);
+        }
+
+        $libNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'resources', 'libraries', 'lib'), $data, $xmlns);
         $libs = array();
         foreach($libNodes as $libNode){
             $libs[] = $libNode->getAttribute('id');
         }
         $this->setLibraries($libs);
 
-        $propertyNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'properties'), $data, $ns);
+        $stylesheetNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'resources', 'stylesheets', 'link'), $data, $xmlns);
+        $stylesheets = array();
+        foreach($stylesheetNodes as $styleNode){
+            $stylesheets[] = $styleNode->getAttribute('href');
+        }
+        $this->setStylesheets($stylesheets);
+
+        $mediaNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'resources', 'mediaFiles', 'file'), $data, $xmlns);
+        $media = array();
+        foreach($mediaNodes as $mediaNode){
+            $media[] = $mediaNode->getAttribute('src');
+        }
+        $this->setMediaFiles($media);
+
+        $propertyNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'properties'), $data, $xmlns);
         if($propertyNodes->length){
-            $properties = $this->extractPciProperties($propertyNodes->item(0), $ns);
+            $properties = $this->extractProperties($propertyNodes->item(0), $xmlns);
             $this->setProperties($properties);
         }
 
-        $markupNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'markup'), $data, $ns);
+        $markupNodes = $parser->queryXPathChildren(array('portableCustomInteraction', 'markup'), $data, $xmlns);
         if($markupNodes->length){
             $markup = $parser->getBodyData($markupNodes->item(0), true, true);
             $this->setMarkup($markup);
         }
-        
     }
-    
-    /**
-     * Format the pci namespace prefix used for pci
-     * @param string $ns
-     * @return string
-     */
-    private function formatPciNs($ns){
-        $ns = $ns ? $ns : '';
-        if($ns){
-            if(substr($ns, -1) !== ':'){
-                $ns .= ':';
-            }
-        }
-        return $ns;
-    }
-    
-    /**
-     * Parse a pci properties dom node into an associative array
-     * 
-     * @param DOMElement $propertiesNode
-     * @param string $ns
-     * @return array
-     */
-    private function extractPciProperties(DOMElement $propertiesNode, $ns = ''){
-
-        $properties = array();
-        
-        $ns = $this->formatPciNs($ns);
-        
-        foreach($propertiesNode->childNodes as $prop){
-            if($prop instanceof DOMElement){
-                switch($prop->tagName){
-                    case $ns.'entry':
-                        $key = $prop->getAttribute('key');
-                        $properties[$key] = $prop->nodeValue;
-                        break;
-                    case $ns.'properties':
-                        $key = $prop->getAttribute('key');
-                        $properties[$key] = $this->extractPciProperties($prop, $ns);
-                        break;
-                }
-            }
-        }
-
-        return $properties;
-    }
-    
-    /**
-     * Serialize an associative array of pci properties into a pci xml
-     * 
-     * @param array $properties
-     * @param string $ns
-     * @return string
-     */
-    private function serializePciProperties($properties, $ns = '', $name = null, $element = null){
-        $document = null;
-        $result = '';
-        
-        if (!isset($this->nsMap[$ns])) {
-            $ns = '';
-        }
-        
-        if ($element === null) {
-            $document = new \DomDocument();
-            $element = $ns ? 
-                $document->createElementNS($this->nsMap[$ns], $ns . ':properties') : 
-                $document->createElement('properties');
-            
-            $document->appendChild($element);
-        } else {
-            $newElement = $ns ? 
-                $element->ownerDocument->createElementNS($this->nsMap[$ns], $ns . ':properties') : 
-                $element->ownerDocument->createElement('properties');
-            
-            $element->appendChild($newElement);
-            $element = $newElement;
-        }
-
-        if ($name !== null) {
-            $element->setAttribute('key', $name);
-        } 
-
-        foreach ($properties as $name => $value) {
-            if(is_array($value)){
-                $this->serializePciProperties($value, $ns, $name, $element);
-            } else {
-                $entryElement = $ns ? 
-                    $element->ownerDocument->createElementNS($this->nsMap[$ns], $ns . ':entry') : 
-                    $element->ownerDocument->createElementNS('entry');
-                
-                $entryElement->setAttribute('key', $name);
-                $entryElement->appendChild(new \DOMText($value));
-                $element->appendChild($entryElement);
-            }
-        }
-
-        if ($document !== null) {
-            foreach ($document->childNodes as $node) {
-               $result .= $document->saveXML($node);
-            }
-        }
-        
-        return $result;
-    }
-    
 }

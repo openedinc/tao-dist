@@ -1,10 +1,10 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file tao/config/header/js.conf.php
+ * Default config header created during install
  */
 
-return array(
-    'timeout' => 30
-);
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => array(
+        'timeout' => 30
+    )
+));

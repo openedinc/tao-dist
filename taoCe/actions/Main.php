@@ -22,6 +22,7 @@
 namespace oat\taoCe\actions;
 
 use oat\tao\helpers\TaoCe;
+use oat\tao\model\mvc\DefaultUrlService;
 
 /**
  * Just to override the paths and load the specific client side code
@@ -58,6 +59,20 @@ class Main extends \tao_actions_Main {
         } else {
             //render the index but with the taoCe URL used by client side routes
             parent::index();
+        }
+    }
+
+    /**
+     * Action used to redirect request made to root of tao.
+     */
+    public function rootEntry()
+    {
+        if (\common_session_SessionManager::isAnonymous()) {
+            /* @var $urlRouteService DefaultUrlService */
+            $urlRouteService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+            $this->redirect($urlRouteService->getLoginUrl());
+        } else {
+            $this->redirect(_url('entry', 'Main', 'tao'));
         }
     }
 }

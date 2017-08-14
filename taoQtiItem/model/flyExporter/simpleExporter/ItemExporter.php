@@ -21,8 +21,11 @@
 
 namespace oat\taoQtiItem\model\flyExporter\simpleExporter;
 
+use oat\oatbox\filesystem\File;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoQtiItem\model\flyExporter\extractor\Extractor;
+use oat\taoQtiItem\model\flyExporter\extractor\ExtractorException;
 
 /**
  *
@@ -42,9 +45,24 @@ class ItemExporter extends ConfigurableService implements SimpleExporter
     const CSV_DELIMITER = ',';
 
     /**
+     * Default csv enclosure
+     */
+    const CSV_ENCLOSURE = '"';
+
+    /**
      * Default property delimiter
      */
     const DEFAULT_PROPERTY_DELIMITER = '|';
+
+    /**
+     * Optional config option to set CSV enclosure
+     */
+    const CSV_ENCLOSURE_OPTION = 'enclosure';
+
+    /**
+     * Optional config option to set CSV delimiter
+     */
+    const CSV_DELIMITER_OPTION = 'delimiter';
 
     /**
      * Header of flyfile
@@ -66,52 +84,19 @@ class ItemExporter extends ConfigurableService implements SimpleExporter
     protected $extractors = [];
 
     /**
-     * Flysytem to manage file storage
-     * @var
-     */
-    protected $filesystem;
-
-    /**
-     * file location inside filesystem
-     * @var
-     */
-    protected $filelocation;
-
-
-    /**
-     * @inheritdoc
+     * Fileystem File to manage exported file storage
      *
-     * @param null $uri
-     * @return mixed
-     * @throws ExtractorException
+     * @var File
      */
-    public function export($uri=null)
-    {
-        $this->loadConfig();
-        $items = $this->getItems($uri);
-        $data  = $this->extractDataFromItems($items);
-        $this->save($data);
+    protected $exportFile;
 
-        return $this->filelocation;
-    }
-
-    /**
-     * Load config & check if mandatory settings exist
-     *
-     * @return $this
-     * @throws ExtractorException
-     * @throws \common_Exception
-     */
-    protected function loadConfig()
+    public function __construct(array $options)
     {
-        $this->filelocation = $this->getOption('fileLocation');
-        if (!$this->filelocation) {
+        parent::__construct($options);
+
+        if (! $this->hasOption('fileLocation')) {
             throw new ExtractorException('File location config is not correctly set.');
         }
-
-        $serviceManager = $this->getServiceManager();
-        $fsService = $serviceManager->get(FileSystemService::SERVICE_ID);
-        $this->filesystem = $fsService->getFileSystem(self::EXPORT_FILESYSTEM);
 
         $this->extractors = $this->getOption('extractors');
         $this->columns = $this->getOption('columns');
@@ -119,24 +104,171 @@ class ItemExporter extends ConfigurableService implements SimpleExporter
             throw new ExtractorException('Data config is not correctly set.');
         }
 
-        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws ExtractorException
+     * @param \core_kernel_classes_Resource[] $items
+     * @return File|string
+     */
+    public function export(array $items = null, $asFile = false)
+    {
+        if (empty($items)) {
+            $items = $this->getItems();
+        }
+
+        $data = $this->getDataByItems($items);
+        return $this->save($this->headers, $data, $asFile);
+    }
+
+    /**
+     * Loop all items and call extract function
+     *
+     * @param array $items
+     * @return array
+     * @throws ExtractorException
+     */
+    public function getDataByItems(array $items)
+    {
+        $output = [];
+        foreach ($items as $item) {
+            try {
+                $output[] = $this->getDataByItem($item);
+            } catch (ExtractorException $e) {
+                \common_Logger::e('ERROR on item ' . $item->getUri() . ' : ' . $e->getMessage());
+            }
+        }
+
+        if (empty($output)) {
+            throw new ExtractorException('No data item to export.');
+        }
+        return $output;
+    }
+
+    /**
+     * Loop foreach columns and extract data thought extractors
+     *
+     * @param \core_kernel_classes_Resource $item
+     * @return array
+     */
+    public function getDataByItem(\core_kernel_classes_Resource $item)
+    {
+        foreach ($this->columns as $column => $config) {
+            /** @var Extractor $extractor */
+            $extractor = $this->extractors[$config['extractor']];
+            if (isset($config['parameters'])) {
+                $parameters = $config['parameters'];
+            } else {
+                $parameters = [];
+            }
+            $extractor->addColumn($column, $parameters);
+        }
+
+        $data = ['0' => []];
+        foreach ($this->extractors as $extractor) {
+
+            $extractor->setItem($item);
+            $extractor->run();
+            $values = $extractor->getData();
+
+            foreach($values as $key => $value) {
+
+                if (count($value) > 1) {
+                    $interactionData = $value;
+                } else {
+                    $interactionData = $values;
+                }
+
+                if (array_values(array_intersect(array_keys($data[0]), array_keys($interactionData))) == array_keys($interactionData)) {
+                    $line = array_intersect_key($data[0], array_flip($this->headers));
+                    $data[] = array_merge($line, $interactionData);
+                } else {
+                    $data[0] = array_merge($data[0], $interactionData);
+                }
+
+                $this->headers = array_unique(array_merge($this->headers, array_keys($interactionData)));
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Save data to file
+     *
+     * @param array $headers
+     * @param array $data
+     * @param bool $asFile
+     * @return File|string
+     */
+    public function save(array $headers, array $data, $asFile = false)
+    {
+        $output = $contents = [];
+
+        $enclosure = $this->getCsvEnclosure();
+        $delimiter = $this->getCsvDelimiter();
+
+        $contents[] = $enclosure
+            . implode($enclosure . $delimiter . $enclosure, $headers)
+            . $enclosure;
+
+        if (! empty($data)) {
+            foreach ($data as $item) {
+                foreach ($item as $line) {
+                    foreach ($headers as $index => $value) {
+                        if (isset($line[$value]) && $line[$value]!=='') {
+                            $output[$value] = $enclosure . (string) $line[$value] . $enclosure;
+                            unset($line[$value]);
+                        } else {
+                            $output[$value] = '';
+                        }
+                    }
+                    $contents[] = implode($delimiter,  array_merge($output, $line));
+                }
+            }
+        }
+
+        $file = $this->getExportFile();
+        $file->put(chr(239) . chr(187) . chr(191) . implode("\n", $contents));
+        return $asFile ? $file : $file->getPrefix();
+    }
+
+    /**
+     * Get csv headers
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Get the file from config
+     *
+     * @return File
+     */
+    protected function getExportFile()
+    {
+        if (! $this->exportFile) {
+            $this->exportFile = $this->exportFile = $this->getServiceManager()
+                ->get(FileSystemService::SERVICE_ID)
+                ->getDirectory(self::EXPORT_FILESYSTEM)
+                ->getFile($this->getOption('fileLocation'));
+        }
+        return $this->exportFile;
     }
 
     /**
      * Get all items of given uri otherwise get default class
      *
-     * @param $uri
      * @return array
      */
-    protected function getItems($uri)
+    protected function getItems()
     {
-        if (!empty($uri)) {
-            $classUri = $uri;
-        } else {
-            $classUri = $this->getDefaultUriClass();
-        }
-
-        $class = new \core_kernel_classes_Class($classUri);
+        $class = new \core_kernel_classes_Class($this->getDefaultUriClass());
         return $class->getInstances(true);
     }
 
@@ -151,133 +283,28 @@ class ItemExporter extends ConfigurableService implements SimpleExporter
     }
 
     /**
-     * Loop all items and call extract function
+     * Get the CSV enclosure from config, if not set use default value
      *
-     * @param array $items
-     * @return array
-     * @throws ExtractorException
+     * @return string
      */
-    protected function extractDataFromItems(array $items)
+    protected function getCsvEnclosure()
     {
-        $output = [];
-        foreach ($items as $item) {
-            $output[] = $this->extractDataFromItem($item);
+        if ($this->hasOption(self::CSV_ENCLOSURE_OPTION)) {
+            return $this->getOption(self::CSV_ENCLOSURE_OPTION);
         }
-
-        if (empty($output)) {
-            throw new ExtractorException('No data to export.');
-        }
-
-        return $output;
+        return self::CSV_ENCLOSURE;
     }
 
     /**
-     * Loop foreach columns and extract data thought extractors
+     * Get the CSV delimiter from config, if not set use default value
      *
-     * @param \core_kernel_classes_Resource $item
-     * @return array
+     * @return string
      */
-    protected function extractDataFromItem(\core_kernel_classes_Resource $item)
+    protected function getCsvDelimiter()
     {
-        try {
-            foreach ($this->columns as $column => $config) {
-                $extractor = $this->extractors[$config['extractor']];
-                if (isset($config['parameters'])) {
-                    $parameters = $config['parameters'];
-                } else {
-                    $parameters = [];
-                }
-                $extractor->addColumn($column, $parameters);
-            }
-
-            $data = ['0' => []];
-            foreach ($this->extractors as $extractor) {
-
-                $extractor->setItem($item);
-                $extractor->run();
-                $values = $extractor->getData();
-
-                foreach($values as $key => $value) {
-
-                    if (count($value) > 1) {
-                        $interactionData = $value;
-                    } else {
-                        $interactionData = $values;
-                    }
-
-                    if (array_values(array_intersect(array_keys($data[0]), array_keys($interactionData))) == array_keys($interactionData)) {
-                        $line = array_intersect_key($data[0], array_flip($this->headers));
-                        $data[] = array_merge($line, $interactionData);
-                    } else {
-                        $data[0] = array_merge($data[0], $interactionData);
-                    }
-
-                    $this->headers = array_unique(array_merge($this->headers, array_keys($interactionData)));
-                }
-            }
-
-            return $data;
-
-        } catch (ExtractorException $e) {
-            \common_Logger::e('ERROR on item ' . $item->getUri() . ' : ' . $e->getMessage());
+        if ($this->hasOption(self::CSV_DELIMITER_OPTION)) {
+            return $this->getOption(self::CSV_DELIMITER_OPTION);
         }
-    }
-
-    /**
-     * Save data to file
-     *
-     * @param array $data
-     * @throws ExtractorException
-     * @throws \Exception
-     */
-    protected function save(array $data)
-    {
-        $this->handleFile($this->filelocation);
-
-        $output = $contents = [];
-
-        $contents[] = implode(self::CSV_DELIMITER, $this->headers);
-
-        foreach ($data as $item) {
-            foreach ($item as $line) {
-                foreach ($this->headers as $index => $value) {
-                    if (isset($line[$value]) && $line[$value]!=='') {
-                        $output[$value] = '"' . $line[$value] . '"';
-                        unset($line[$value]);
-                    } else {
-                        $output[$value] = '';
-                    }
-                }
-                $contents[] = implode(self::CSV_DELIMITER,  array_merge($output, $line));
-            }
-        }
-        $this->filesystem->update($this->filelocation, implode("\n", $contents));
-    }
-
-    /**
-     * Handle file, delete if already exist
-     *
-     * @param $filename
-     * @throws ExtractorException
-     * @throws \Exception
-     */
-    protected function handleFile($filename)
-    {
-        if (empty($filename)) {
-            throw new ExtractorException('Filename is empty!');
-        }
-
-        if ($this->filesystem->has($filename)) {
-            $this->filesystem->delete($filename);
-        }
-
-        if ($resource = fopen('temp', 'w')===false) {
-            throw new \Exception('Unable to create csv file.');
-        }
-
-        $this->filesystem->write($filename, $resource);
-        if (is_resource($resource)) {
-            fclose($resource);
-        }
+        return self::CSV_DELIMITER;
     }
 }

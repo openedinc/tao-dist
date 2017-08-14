@@ -9,15 +9,15 @@ $extpath = dirname(__FILE__).DIRECTORY_SEPARATOR;
 $taopath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'tao'.DIRECTORY_SEPARATOR;
 	
 return array(
-	'name' => 'taoResultServer',
+    'name' => 'taoResultServer',
     'label' => 'Result core extension',
-	'description' => 'Results Server management and exposed interfaces for results data submission',
+    'description' => 'Results Server management and exposed interfaces for results data submission',
     'license' => 'GPL-2.0',
-    'version' => '2.8.3',
-	'author' => 'Open Assessment Technologies',
+    'version' => '3.4.0',
+    'author' => 'Open Assessment Technologies',
     //taoResults may be needed for the taoResults taoResultServerModel that uses taoResults db storage
 	'requires' => array(
-	    'tao' => '>=2.7.0'
+        'tao' => '>=9.0.0'
 	),
 	'models' => array(
 		'http://www.tao.lu/Ontologies/TAOResultServer.rdf#'
@@ -25,7 +25,9 @@ return array(
 	'install' => array(
         'rdf' => array(
 			dirname(__FILE__). '/models/ontology/taoResultServer.rdf'
-		)
+		),
+        'php' => array(
+        )
     ),
     'update' => 'taoResultServer_scripts_update_Updater',
 
@@ -33,8 +35,6 @@ return array(
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOResultServer.rdf#ResultServerRole', array('ext'=>'taoResultServer')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoResultServer', 'mod' => 'ResultServerStateFull')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoResultServer', 'mod' => 'RestResultServer'))
-        
     ),
  	'constants' => array(
 	 	# actions directory
@@ -54,8 +54,5 @@ return array(
 	
 		#BASE URL (usually the domain root)
 		'BASE_URL'				=> ROOT_URL . '/taoResultServer',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL . '/taoResultServer/views/',
 	)
 );

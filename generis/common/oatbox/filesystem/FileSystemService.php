@@ -21,8 +21,8 @@ namespace oat\oatbox\filesystem;
 
 use oat\oatbox\service\ConfigurableService;
 use League\Flysystem\AdapterInterface;
-use League\Flysystem\Filesystem;
 use common_exception_Error;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
  /**
  * A service to reference and retrieve filesystems
  */
@@ -42,22 +42,66 @@ class FileSystemService extends ConfigurableService
     
     /**
      * 
-     * @param unknown $id
-     * @return Filesystem
+     * @param $id
+     * @return \oat\oatbox\filesystem\Directory
+     */
+    public function getDirectory($id)
+    {
+        $directory = new Directory($id, '');
+        $directory->setServiceLocator($this->getServiceLocator());
+        return $directory;
+    }
+    
+    /**
+     * Returns whenever or not a FS exists
+     * @param string $id
+     * @return boolean
+     */
+    public function hasDirectory($id)
+    {
+        $fsConfig = $this->getOption(self::OPTION_ADAPTERS);
+        return isset($fsConfig[$id]);
+    }
+
+    /**
+     * 
+     * @param string $id
+     * @return FileSystem
      */
     public function getFileSystem($id)
     {
         if (!isset($this->filesystems[$id])) {
-            $this->filesystems[$id] = new Filesystem($this->getFlysystemAdapter($id));
+            $this->filesystems[$id] = new FileSystem($id, $this->getFlysystemAdapter($id));
         }
         return $this->filesystems[$id];
     }
     
     /**
+     * Creates a filesystem using the default implementation (Local)
+     * Override this function to create your files elsewhere by default
+     *
+     * @param string $id
+     * @param string $subPath
+     * @return FileSystem
+     */
+    public function createFileSystem($id, $subPath = null)
+    {
+        $path = $this->getOption(self::OPTION_FILE_PATH).
+            (is_null($subPath) ? \helpers_File::sanitizeInjectively($id) : ltrim($subPath, '/'));
+        $adapters = $this->hasOption(self::OPTION_ADAPTERS) ? $this->getOption(self::OPTION_ADAPTERS) : array();
+        $adapters[$id] = array(
+            'class' => self::FLYSYSTEM_LOCAL_ADAPTER,
+            'options' => array('root' => $path)
+        );
+        $this->setOption(self::OPTION_ADAPTERS, $adapters);
+        return $this->getFileSystem($id);
+    }
+
+    /**
      * Create a new local file system
      * 
      * @param string $id
-     * @return Filesystem
+     * @return FileSystem
      */
     public function createLocalFileSystem($id)
     {
@@ -109,14 +153,15 @@ class FileSystemService extends ConfigurableService
      * inspired by burzum/storage-factory
      * 
      * @param string $id
-     * @throws common_Exception
+     * @throws \common_exception_NotFound if adapter doesn't exist
+     * @throws \common_exception_Error if adapter is not valid
      * @return AdapterInterface
      */
     protected function getFlysystemAdapter($id)
     {
         $fsConfig = $this->getOption(self::OPTION_ADAPTERS);
         if (!isset($fsConfig[$id])) {
-            throw new common_exception_Error('Undefined filesystem "'.$id.'"');
+            throw new \common_exception_NotFound('Undefined filesystem "'.$id.'"');
         }
         $adapterConfig = $fsConfig[$id];
         // alias?
@@ -139,6 +184,10 @@ class FileSystemService extends ConfigurableService
         if (!is_subclass_of($class, 'League\Flysystem\AdapterInterface')) {
             throw new common_exception_Error('"'.$class.'" is not a flysystem adapter');
         }
-        return (new \ReflectionClass($class))->newInstanceArgs($options);
+        $adapter = (new \ReflectionClass($class))->newInstanceArgs($options);
+        if ($adapter instanceof ServiceLocatorAwareInterface) {
+            $adapter->setServiceLocator($this->getServiceLocator());
+        }
+        return $adapter;
     }
 }

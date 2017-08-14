@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+    'use strict';
 
     var requirejs   = grunt.config('requirejs') || {};
     var clean       = grunt.config('clean') || {};
@@ -23,11 +24,14 @@ module.exports = function(grunt) {
             baseUrl : '../js',
             dir : out,
             mainConfigFile : './config/requirejs.build.js',
-            paths : { 'taoItems' : root + '/taoItems/views/js' },
+            paths : {
+                'taoItems' : root + '/taoItems/views/js',
+                'taoItemsCss' : root + '/taoItems/views/css'
+            },
             modules : [{
                 name: 'taoItems/controller/routes',
                 include : ext.getExtensionsControllers(['taoItems']),
-                exclude : ['mathJax', 'mediaElement'].concat(libs)
+                exclude : ['mathJax'].concat(libs)
             }]
         }
     };

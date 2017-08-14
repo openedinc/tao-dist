@@ -22,27 +22,102 @@
 
 namespace oat\taoQtiTest\models\runner\map;
 
+use oat\oatbox\service\ConfigurableService;
+use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoQtiTest\models\runner\config\RunnerConfig;
+use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use oat\taoQtiTest\models\runner\RunnerServiceContext;
 use qtism\data\NavigationMode;
-use qtism\runtime\tests\AssessmentItemSession;
 use qtism\runtime\tests\AssessmentTestSession;
-use qtism\runtime\tests\RouteItem;
+use taoQtiTest_helpers_TestRunnerUtils as TestRunnerUtils;
 
 /**
  * Class QtiRunnerMap
  * @package oat\taoQtiTest\models\runner\map
  */
-class QtiRunnerMap implements RunnerMap
+class QtiRunnerMap extends ConfigurableService implements RunnerMap
 {
+    const SERVICE_ID = 'taoQtiTest/QtiRunnerMap';
+
+    /**
+     * Fallback index in case of the delivery was compiled without the index of item href
+     * @var array
+     */
+    protected $itemHrefIndex;
+
+    /**
+     * Gets the file that contains the href for the AssessmentItemRef Identifier
+     * @param QtiRunnerServiceContext $context
+     * @param string $itemIdentifier
+     * @return \oat\oatbox\filesystem\File
+     */
+    protected function getItemHrefIndexFile(QtiRunnerServiceContext $context, $itemIdentifier)
+    {
+        $compilationDirectory = $context->getCompilationDirectory()['private'];
+        return $compilationDirectory->getFile(\taoQtiTest_models_classes_QtiTestCompiler::buildHrefIndexPath($itemIdentifier));
+    }
+
+    /**
+     * Checks if the AssessmentItemRef Identifier is in the index.
+     *
+     * @param QtiRunnerServiceContext $context
+     * @param string $itemIdentifier
+     * @return boolean
+     */
+    protected function hasItemHrefIndexFile(QtiRunnerServiceContext $context, $itemIdentifier)
+    {
+        $indexFile = $this->getItemHrefIndexFile($context, $itemIdentifier);
+        return $indexFile->exists();
+    }
+
+    /**
+     * Gets AssessmentItemRef's Href by AssessmentItemRef Identifier.
+     * 
+     * Returns the AssessmentItemRef href attribute value from a given $identifier.
+     * 
+     * @param QtiRunnerServiceContext $context
+     * @param string $itemIdentifier
+     * @return boolean|string The href value corresponding to the given $identifier. If no corresponding href is found, false is returned.
+     */
+    public function getItemHref(QtiRunnerServiceContext $context, $itemIdentifier)
+    {
+        $href = false;
+
+        $indexFile = $this->getItemHrefIndexFile($context, $itemIdentifier);
+        if ($indexFile->exists()) {
+            $href = $indexFile->read();
+        } else {
+            if (!isset($this->itemHrefIndex)) {
+            $storage = $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID);
+                $this->itemHrefIndex = $storage->loadItemHrefIndex($context->getTestExecutionUri());
+        }
+            if (isset($this->itemHrefIndex[$itemIdentifier])) {
+                $href = $this->itemHrefIndex[$itemIdentifier];
+        }
+        }
+        
+        return $href;
+    }
+    
     /**
      * Builds the map of an assessment test
      * @param RunnerServiceContext $context The test context
      * @param RunnerConfig $config The runner config
      * @return mixed
+     * @throws \common_exception_InvalidArgumentType
      */
     public function getMap(RunnerServiceContext $context, RunnerConfig $config)
     {
+        if (!($context instanceof QtiRunnerServiceContext)) {
+            throw new \common_exception_InvalidArgumentType(
+                'QtiRunnerMap',
+                'getMap',
+                0,
+                'oat\taoQtiTest\models\runner\QtiRunnerServiceContext',
+                $context
+            );
+        }
+        
         $map = [
             'parts' => [],
             'jumps' => []
@@ -50,9 +125,12 @@ class QtiRunnerMap implements RunnerMap
 
         // get config for the sequence number option
         $reviewConfig = $config->getConfigValue('review');
+        $checkInformational = $config->getConfigValue('checkInformational');
         $forceTitles = !empty($reviewConfig['forceTitle']);
+        $useTitle = !empty($reviewConfig['useTitle']);
         $uniqueTitle = isset($reviewConfig['itemTitle']) ? $reviewConfig['itemTitle'] : '%d';
-        
+        $displaySubsectionTitle = isset($reviewConfig['displaySubsectionTitle']) ? (bool) $reviewConfig['displaySubsectionTitle'] : true;
+
         /* @var AssessmentTestSession $session */
         $session = $context->getTestSession();
 
@@ -65,6 +143,13 @@ class QtiRunnerMap implements RunnerMap
             $offsetSection = 0;
             $lastPart = null;
             $lastSection = null;
+
+            // fallback index in case of the delivery was compiled without the index of item href
+            $this->itemHrefIndex = [];
+            $shouldBuildItemHrefIndex = !$this->hasItemHrefIndexFile($context, $session->getCurrentAssessmentItemRef()->getIdentifier());
+            \common_Logger::t('Store index ' . ($shouldBuildItemHrefIndex ? 'must be built' : 'is part of the package'));
+            
+            /** @var \qtism\runtime\tests\RouteItem $routeItem */
             foreach ($routeItems as $routeItem) {
                 // access the item reference
                 $itemRef = $routeItem->getAssessmentItemRef();
@@ -76,12 +161,18 @@ class QtiRunnerMap implements RunnerMap
                 // load item infos
                 $testPart = $routeItem->getTestPart();
                 $partId = $testPart->getIdentifier();
-                $sections = $routeItem->getAssessmentSections();
-                $sectionId = key(current($sections));
-                $section = $sections[$sectionId];
+
+                if ($displaySubsectionTitle) {
+                    $section = $routeItem->getAssessmentSection();
+                } else {
+                    $sections = $routeItem->getAssessmentSections()->getArrayCopy();
+                    $section = $sections[0];
+                }
+                $sectionId = $section->getIdentifier();
                 $itemId = $itemRef->getIdentifier();
-                $itemUri = strstr($itemRef->getHref(), '|', true);
-                $item = new \core_kernel_classes_Resource($itemUri);
+                $itemDefinition = $itemRef->getHref();
+                $itemUri = strstr($itemDefinition, '|', true);
+                
                 if ($lastPart != $partId) {
                     $offsetPart = 0;
                     $lastPart = $partId;
@@ -92,24 +183,57 @@ class QtiRunnerMap implements RunnerMap
                 }
 
                 if ($forceTitles) {
-                    $label = sprintf($uniqueTitle, $offsetSection + 1);
+                    $label = __($uniqueTitle, $offsetSection + 1);
                 } else {
-                    $label = $item->getLabel();
+                    if ($itemUri) {
+                        if ($useTitle) {
+                            $label = $context->getItemIndexValue($itemUri, 'title');
+                        } else {
+                            $label = '';
+                        }
+                        
+                        if (!$label) {
+                            $label = $context->getItemIndexValue($itemUri, 'label');
+                        }
+                        
+                        if (!$label) {
+                            $item = new \core_kernel_classes_Resource($itemUri);
+                            $label = $item->getLabel();
+                        }
+                    } else {
+                        // The item URI could not be parsed as expected. Maybe it's an adaptive placeholder?
+                        $adaptivePlaceholderCategory = \taoQtiTest_models_classes_QtiTestCompiler::ADAPTIVE_PLACEHOLDER_CATEGORY;
+                        if (in_array($adaptivePlaceholderCategory, $itemRef->getCategories()->getArrayCopy())) {
+                            // Use the section label as the label of this "position" in the test.
+                            $label = $section->getTitle();
+                        }
+                    }
                 }
-                
+
+                // fallback in case of the delivery was compiled without the index of item href
+                if ($shouldBuildItemHrefIndex) {
+                    $this->itemHrefIndex[$itemId] = $itemRef->getHref();
+                }
+
                 $itemInfos = [
                     'id' => $itemId,
                     'uri' => $itemUri,
+                    'definition' => $itemDefinition,
                     'label' => $label,
                     'position' => $offset,
                     'positionInPart' => $offsetPart,
                     'positionInSection' => $offsetSection,
+                    'index' => $offsetSection + 1,
                     'occurrence' => $occurrence,
                     'remainingAttempts' => $itemSession->getRemainingAttempts(),
-                    'answered' => \taoQtiTest_helpers_TestRunnerUtils::isItemCompleted($routeItem, $itemSession),
-                    'flagged' => \taoQtiTest_helpers_TestRunnerUtils::getItemFlag($session, $routeItem),
+                    'answered' => TestRunnerUtils::isItemCompleted($routeItem, $itemSession),
+                    'flagged' => TestRunnerUtils::getItemFlag($session, $routeItem),
                     'viewed' => $itemSession->isPresented(),
                 ];
+                
+                if ($checkInformational) {
+                    $itemInfos['informational'] = TestRunnerUtils::isItemInformational($routeItem, $itemSession);
+                }
                 
                 // update the map
                 $map['jumps'][] = [
@@ -141,6 +265,13 @@ class QtiRunnerMap implements RunnerMap
                 $offsetPart ++;
                 $offsetSection ++;
             }
+            
+            // fallback in case of the delivery was compiled without the index of item href
+            if ($shouldBuildItemHrefIndex) {
+                \common_Logger::t('Store index of item href into the test state storage');
+                $storage = $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID);
+                $storage->storeItemHrefIndex($context->getTestExecutionUri(), $this->itemHrefIndex);
+            }
         }
         
         return $map;
@@ -155,11 +286,16 @@ class QtiRunnerMap implements RunnerMap
     {
         if (!isset($target['stats'])) {
             $target['stats'] = [
+                'questions' => 0,
                 'answered' => 0,
                 'flagged' => 0,
                 'viewed' => 0,
                 'total' => 0,
             ];
+        }
+
+        if (empty($itemInfos['informational'])) {
+            $target['stats']['questions'] ++;
         }
         
         if (!empty($itemInfos['answered'])) {

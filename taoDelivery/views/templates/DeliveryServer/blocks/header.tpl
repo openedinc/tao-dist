@@ -1,7 +1,9 @@
 <?php
 use oat\tao\helpers\Layout;
+use oat\tao\helpers\Template;
 use oat\tao\model\theme\Theme;
 ?>
+<?php Template::inc('blocks/careers.tpl', 'tao'); ?>
 <header class="dark-bar clearfix">
     <?=Layout::renderThemeTemplate(Theme::CONTEXT_FRONTOFFICE, 'header-logo')?>
     <div class="lft title-box"></div>
@@ -23,7 +25,7 @@ use oat\tao\model\theme\Theme;
                     </span>
                 </li>
                 <li class="infoControl sep-before" data-control="logout">
-                    <a id="logout" class="" href="<?= _url('logout', 'DeliveryServer') ?>">
+                    <a id="logout" class="" href="<?= get_data('logout') ?>">
                         <span class="icon-logout"></span>
                         <span class="text"><?= __("Logout"); ?></span>
                     </a>

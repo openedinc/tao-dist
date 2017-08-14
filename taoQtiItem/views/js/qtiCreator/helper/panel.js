@@ -21,6 +21,7 @@ define([
     'taoQtiItem/qtiItem/core/Element'
 ], function($, _, Element){
     "use strict";
+
     var _getItemContainer = function(){
         return $('#item-editor-panel');
     };
@@ -47,7 +48,8 @@ define([
             object : 'Media',
             rubricBlock : 'Rubric Block',
             math : 'Math',
-            include : 'Shared Stimulus'
+            include : 'Shared Stimulus',
+            infoControl : 'Student Tool',
         };
 
         // all sections on the right sidebar are invisible by default
@@ -319,7 +321,7 @@ define([
         sections.each(function(){
             $(this).find(heading).trigger('click', {preserveOthers : preserveOthers, forceState : state});
         });
-    }
+    };
 
     /**
      * Close specific sections

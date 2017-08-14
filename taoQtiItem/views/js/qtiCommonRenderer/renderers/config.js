@@ -22,24 +22,17 @@ define([
     'ui/themes',
     'taoItems/assets/manager',
     'taoItems/assets/strategies',
-], function(_, context, themes, assetManagerFactory, assetStrategies){
+    'module',
+    'taoQtiItem/portableElementRegistry/assetManager/portableAssetStrategy'
+], function(_, context, themes, assetManagerFactory, assetStrategies, module, portableAssetStrategy){
     'use strict';
 
     var itemThemes = themes.get('items');
-
-    //stratgy to resolve portable info control and portable interactions paths.
-    //It should never be reached in the stack the ususal way and should be called only using resolveBy.
-    var portableAssetStrategy = {
-        name : 'portableElementLocation',
-        handle : function handlePortableElementLocation(url){
-            if(url.source === url.relative){
-                return window.location.pathname.replace(/([^\/]*)$/, '') + url.toString() + '/';
-            }
-        }
-    };
+    var moduleConfig = module.config();
 
     //Create asset manager stack
-    var assetManager = assetManagerFactory([{
+    var assetManager = assetManagerFactory([
+        {
             name : 'theme',
             handle : function handleTheme(url){
                 if(itemThemes && url.path && (url.path === itemThemes.base || _.contains(_.pluck(itemThemes.available, 'path'), url.path))){
@@ -50,9 +43,10 @@ define([
         assetStrategies.taomedia,
         assetStrategies.external,
         assetStrategies.base64,
+        assetStrategies.itemCssNoCache,
         assetStrategies.baseUrl,
         portableAssetStrategy
-    ], {baseUrl : ''});
+    ], {baseUrl : ''});//baseUrl is not predefined in the config, but should be set upon renderer instantiating
 
     //renderers locations
     var locations = {
@@ -66,6 +60,7 @@ define([
         'img' : 'taoQtiItem/qtiCommonRenderer/renderers/Img',
         'math' : 'taoQtiItem/qtiCommonRenderer/renderers/Math',
         'object' : 'taoQtiItem/qtiCommonRenderer/renderers/Object',
+        'table' : 'taoQtiItem/qtiCommonRenderer/renderers/Table',
         'rubricBlock' : 'taoQtiItem/qtiCommonRenderer/renderers/RubricBlock',
         'modalFeedback' : 'taoQtiItem/qtiCommonRenderer/renderers/ModalFeedback',
         'prompt' : 'taoQtiItem/qtiCommonRenderer/renderers/interactions/Prompt',
@@ -108,7 +103,14 @@ define([
         locations: locations,
         options:   {
             assetManager: assetManager,
-            themes : itemThemes
+            themes : itemThemes,
+            enableDragAndDrop: {
+                associate: !!moduleConfig.associateDragAndDrop,
+                gapMatch: !!moduleConfig.gapMatchDragAndDrop,
+                graphicGapMatch: !!moduleConfig.graphicGapMatchDragAndDrop,
+                order: !!moduleConfig.orderDragAndDrop
+            },
+            messages : moduleConfig.messages
         }
     };
 });

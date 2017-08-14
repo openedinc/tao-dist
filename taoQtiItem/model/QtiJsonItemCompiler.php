@@ -20,13 +20,12 @@
 
 namespace oat\taoQtiItem\model;
 
-use common_Logger;
 use common_report_Report;
 use core_kernel_classes_Resource;
 use oat\taoQtiItem\model\pack\QtiItemPacker;
 use oat\taoQtiItem\model\qti\exception\XIncludeException;
-use oat\taoQtiItem\model\qti\Parser;
 use oat\taoQtiItem\model\qti\Service;
+use tao_models_classes_service_StorageDirectory;
 
 /**
  * The QTI Json Item Compiler
@@ -51,37 +50,39 @@ class QtiJsonItemCompiler extends QtiItemCompiler
      *
      * @param core_kernel_classes_Resource $item
      * @param string $language
-     * @param string $publicDirectory
-     * @param string $privateFolder
+     * @param tao_models_classes_service_StorageDirectory $publicDirectory
+     * @param tao_models_classes_service_StorageDirectory $privateDirectory
      * @return common_report_Report
      */
-    protected function deployQtiItem(core_kernel_classes_Resource $item, $language, $publicDirectory, $privateFolder)
+    protected function deployQtiItem(
+        core_kernel_classes_Resource $item,
+        $language,
+        tao_models_classes_service_StorageDirectory $publicDirectory,
+        tao_models_classes_service_StorageDirectory $privateDirectory
+    )
     {
-        //start debugging here
-        common_Logger::d('destination original ' . $publicDirectory . ' ' . $privateFolder);
-
         $qtiService = Service::singleton();
 
 
         // retrieve the media assets
         try {
             $qtiItem = $this->retrieveAssets($item, $language, $publicDirectory);
+            $this->compileItemIndex($item->getUri(), $qtiItem, $language);
 
             //store variable qti elements data into the private directory
             $variableElements = $qtiService->getVariableElements($qtiItem);
-            $serializedVarElts = json_encode($variableElements);
-            file_put_contents($privateFolder . self::VAR_ELT_FILE_NAME, $serializedVarElts);
+            $privateDirectory->write($language.DIRECTORY_SEPARATOR.self::VAR_ELT_FILE_NAME, json_encode($variableElements));
 
             //create the item.json file in private directory
             $itemPacker = new QtiItemPacker();
             $itemPacker->setReplaceXinclude(false);
-            $itemPack = $itemPacker->packQtiItem($item, $language, $qtiItem);
+            $itemPack = $itemPacker->packQtiItem($item, $language, $qtiItem, $publicDirectory);
             $this->itemJson = $itemPack->JsonSerialize();
             //get the filtered data to avoid cheat
             $data = $qtiItem->getDataForDelivery();
             $this->itemJson['data'] = $data['core'];
 
-            file_put_contents($privateFolder . self::ITEM_FILE_NAME, json_encode($this->itemJson));
+            $privateDirectory->write($language.DIRECTORY_SEPARATOR.self::ITEM_FILE_NAME, json_encode($this->itemJson));
 
             return new common_report_Report(
                 common_report_Report::TYPE_SUCCESS, __('Successfully compiled "%s"', $language)

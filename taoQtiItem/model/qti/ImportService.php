@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -14,42 +14,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * 
- * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *               
- * 
+ * Copyright (c) 2016 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ *
  */
 
 namespace oat\taoQtiItem\model\qti;
 
 use common_exception_Error;
 use common_exception_UserReadableException;
-use common_ext_ExtensionsManager;
 use common_Logger;
 use common_report_Report;
 use core_kernel_classes_Class;
 use core_kernel_classes_Resource;
-use core_kernel_versioning_Repository;
 use DOMDocument;
 use Exception;
 use helpers_File;
-use oat\tao\model\media\MediaService;
 use oat\taoItems\model\media\ItemMediaResolver;
 use oat\taoItems\model\media\LocalItemSource;
-use oat\taoMediaManager\model\SharedStimulusImporter;
-use oat\taoMediaManager\model\SharedStimulusPackageImporter;
 use oat\taoQtiItem\helpers\Authoring;
-use oat\taoQtiItem\model\apip\ApipService;
 use oat\taoQtiItem\model\ItemModel;
+use oat\taoQtiItem\model\portableElement\exception\PortableElementException;
+use oat\taoQtiItem\model\portableElement\exception\PortableElementInvalidModelException;
+use oat\taoQtiItem\model\qti\asset\AssetManager;
+use oat\taoQtiItem\model\qti\asset\handler\LocalAssetHandler;
+use oat\taoQtiItem\model\qti\asset\handler\PortableAssetHandler;
+use oat\taoQtiItem\model\qti\asset\handler\SharedStimulusAssetHandler;
 use oat\taoQtiItem\model\qti\exception\ExtractException;
 use oat\taoQtiItem\model\qti\exception\ParsingException;
+use oat\taoQtiItem\model\qti\metadata\importer\MetadataImporter;
+use oat\taoQtiItem\model\qti\metadata\MetadataService;
 use oat\taoQtiItem\model\qti\parser\ValidationException;
 use oat\taoQtiItem\model\event\ItemImported;
 use qtism\data\storage\xml\XmlStorageException;
 use tao_helpers_File;
-use tao_models_classes_GenerisService;
 use taoItems_models_classes_ItemsService;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ServiceManager;
+use oat\oatbox\service\ConfigurableService;
 
 /**
  * Short description of class oat\taoQtiItem\model\qti\ImportService
@@ -58,8 +59,22 @@ use oat\oatbox\service\ServiceManager;
  * @author Joel Bout, <joel.bout@tudor.lu>
  * @package taoQTI
  */
-class ImportService extends tao_models_classes_GenerisService
+class ImportService extends ConfigurableService
 {
+
+    const SERVICE_ID = 'taoQtiItem/ImportService';
+
+    /**
+     * @return ImportService
+     */
+    public static function singleton() {
+        return ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+    }
+
+    /**
+     * @var MetadataImporter Service to manage Lom metadata during package import
+     */
+    protected $metadataImporter;
 
     /**
      * Short description of method importQTIFile
@@ -69,32 +84,19 @@ class ImportService extends tao_models_classes_GenerisService
      * @param $qtiFile
      * @param core_kernel_classes_Class $itemClass
      * @param bool $validate
-     * @param core_kernel_versioning_Repository $repository unused
      * @throws \common_Exception
      * @throws \common_ext_ExtensionException
      * @throws common_exception_Error
      * @return common_report_Report
      */
-    public function importQTIFile(
-        $qtiFile,
-        core_kernel_classes_Class $itemClass,
-        $validate = true,
-        core_kernel_versioning_Repository $repository = null,
-        $extractApip = false
-    ) {
+    public function importQTIFile($qtiFile, core_kernel_classes_Class $itemClass, $validate = true)
+    {
         $report = null;
 
         try {
 
             $qtiModel = $this->createQtiItemModel($qtiFile, $validate);
-
             $rdfItem = $this->createRdfItem($itemClass, $qtiModel);
-
-            // If APIP content must be imported, just extract the apipAccessibility element
-            // and store it along the qti.xml file.
-            if ($extractApip === true) {
-                $this->storeApip($qtiFile, $rdfItem);
-            }
 
             $report = \common_report_Report::createSuccess(__('The IMS QTI Item was successfully imported.'), $rdfItem);
 
@@ -109,12 +111,13 @@ class ImportService extends tao_models_classes_GenerisService
     /**
      *
      * @param core_kernel_classes_Class $itemClass
-     * @param unknown $qtiModel
+     * @param Item $qtiModel
+     * @param Resource $qtiItemResource
      * @throws common_exception_Error
      * @throws \common_Exception
      * @return core_kernel_classes_Resource
      */
-    protected function createRdfItem(core_kernel_classes_Class $itemClass, $qtiModel)
+    protected function createRdfItem(core_kernel_classes_Class $itemClass, Item $qtiModel, Resource $qtiItemResource)
     {
         $itemService = taoItems_models_classes_ItemsService::singleton();
         $qtiService = Service::singleton();
@@ -129,7 +132,15 @@ class ImportService extends tao_models_classes_GenerisService
         $itemService->setItemModel($rdfItem, new core_kernel_classes_Resource(ItemModel::MODEL_URI));
 
         //set the label
-        $rdfItem->setLabel($qtiModel->getAttributeValue('title'));
+        $label = '';
+        if($qtiModel->hasAttribute('label')) {
+            $label = $qtiModel->getAttributeValue('label');
+        } 
+        
+        if(empty($label)) {
+           $label = $qtiModel->getAttributeValue('title'); 
+        }
+        $rdfItem->setLabel($label);
 
         //save itemcontent
         if (!$qtiService->saveDataItemToRdfItem($qtiModel, $rdfItem)) {
@@ -149,8 +160,6 @@ class ImportService extends tao_models_classes_GenerisService
             $qtiParser->validate();
 
             if (!$qtiParser->isValid()) {
-                $failedValidation = true;
-
                 $eStrs = array();
                 foreach ($qtiParser->getErrors() as $libXmlError) {
                     $eStrs[] = __('QTI-XML error at line %1$d "%2$s".', $libXmlError['line'],
@@ -166,6 +175,14 @@ class ImportService extends tao_models_classes_GenerisService
         }
 
         $qtiItem = $qtiParser->load();
+        if (!$qtiItem && count($qtiParser->getErrors())) {
+            $errors = [];
+            foreach ($qtiParser->getErrors() as $error) {
+                $errors[] = $error['message'];
+            }
+
+            throw new ValidationException($qtiFile, $errors);
+        }
 
         return $qtiItem;
     }
@@ -182,8 +199,14 @@ class ImportService extends tao_models_classes_GenerisService
 
                 $eStrs = array();
                 foreach ($qtiManifestParser->getErrors() as $libXmlError) {
-                    $eStrs[] = __('XML error at line %1$d "%2$s".', $libXmlError['line'],
-                        str_replace('[LibXMLError] ', '', trim($libXmlError['message'])));
+                    if(isset($libXmlError['line'])){
+                        $error = __('XML error at line %1$d "%2$s".', $libXmlError['line'],
+                            str_replace('[LibXMLError] ', '', trim($libXmlError['message'])));
+                    } else{
+                        $error = __('XML error "%1$s".',str_replace('[LibXMLError] ', '', trim($libXmlError['message'])));
+                    }
+                    $eStrs[] = $error;
+
                 }
 
                 // Add sub-report.
@@ -192,15 +215,6 @@ class ImportService extends tao_models_classes_GenerisService
         }
 
         return $qtiManifestParser->load();
-    }
-
-    private function storeApip($qtiFile, $rdfItem)
-    {
-        $originalDoc = new DOMDocument('1.0', 'UTF-8');
-        $originalDoc->load($qtiFile);
-
-        $apipService = ApipService::singleton();
-        $apipService->storeApipAccessibilityContent($rdfItem, $originalDoc);
     }
 
     /**
@@ -212,7 +226,6 @@ class ImportService extends tao_models_classes_GenerisService
      * @param $file
      * @param core_kernel_classes_Class $itemClass
      * @param bool $validate
-     * @param core_kernel_versioning_Repository $repository
      * @param bool $rollbackOnError
      * @param bool $rollbackOnWarning
      * @throws Exception
@@ -227,10 +240,8 @@ class ImportService extends tao_models_classes_GenerisService
         $file,
         core_kernel_classes_Class $itemClass,
         $validate = true,
-        core_kernel_versioning_Repository $repository = null,
         $rollbackOnError = false,
-        $rollbackOnWarning = false,
-        $extractApip = false
+        $rollbackOnWarning = false
     ) {
 
         //load and validate the package
@@ -251,65 +262,44 @@ class ImportService extends tao_models_classes_GenerisService
 
         $report = new common_report_Report(common_report_Report::TYPE_SUCCESS, '');
         $successItems = array();
-        try {
+        $allCreatedClasses = array();
+        $itemCount = 0;
 
-            // -- Initializing metadata services.
-            $metadataMapping = Service::singleton()->getMetadataRegistry()->getMapping();
-            $metadataInjectors = array();
-            $metadataGuardians = array();
-            $metadataClassLookups = array();
-            $metadataValues = array();
+        try {
 
             // The metadata import feature needs a DOM representation of the manifest.
             $domManifest = new DOMDocument('1.0', 'UTF-8');
             $domManifest->load($folder . 'imsmanifest.xml');
 
-            foreach ($metadataMapping['injectors'] as $injector) {
-                $metadataInjectors[] = new $injector();
-                \common_Logger::i("Metadata Injector '${injector}' registered.");
-            }
-
-            foreach ($metadataMapping['guardians'] as $guardian) {
-                $metadataGuardians[] = new $guardian();
-                \common_Logger::i("Metadata Guardian '${guardian}' registered.");
-            }
-
-            foreach ($metadataMapping['classLookups'] as $classLookup) {
-                $metadataClassLookups[] = new $classLookup();
-                \common_Logger::i("Metadata Class Lookup '{$classLookup}' registered.");
-            }
-
-            foreach ($metadataMapping['extractors'] as $extractor) {
-                $metadataExtractor = new $extractor();
-                \common_Logger::i("Metatada Extractor '${extractor}' registered.");
-                $metadataValues = array_merge($metadataValues, $metadataExtractor->extract($domManifest));
-            }
-
-            $metadataCount = count($metadataValues, COUNT_RECURSIVE);
-            \common_Logger::i("${metadataCount} Metadata Values found in manifest by extractor(s).");
-
+            /** @var Resource[] $qtiItemResources */
             $qtiItemResources = $this->createQtiManifest($folder . 'imsmanifest.xml');
-            $itemCount = 0;
-            $sharedFiles = array();
+
+            $metadataValues = $this->getMetadataImporter()->extract($domManifest);
+
+            $createdClasses = array();
             foreach ($qtiItemResources as $qtiItemResource) {
                 $itemCount++;
                 $itemReport = $this->importQtiItem(
                     $folder,
                     $qtiItemResource,
                     $itemClass,
-                    $extractApip,
                     array(),
                     $metadataValues,
-                    $metadataInjectors,
-                    $metadataGuardians,
-                    $metadataClassLookups,
-                    $sharedFiles
+                    array(),
+                    array(),
+                    array(),
+                    array(),
+                    $createdClasses
                 );
-
+                
+                $allCreatedClasses = array_merge($allCreatedClasses, $createdClasses);
+                
                 $rdfItem = $itemReport->getData();
+                
                 if ($rdfItem) {
                     $successItems[$qtiItemResource->getIdentifier()] = $rdfItem;
                 }
+                
                 $report->add($itemReport);
             }
         } catch (ValidationException $ve) {
@@ -338,11 +328,11 @@ class ImportService extends tao_models_classes_GenerisService
 
         if ($rollbackOnError === true) {
             if ($report->getType() === common_report_Report::TYPE_ERROR || $report->contains(common_report_Report::TYPE_ERROR)) {
-                $this->rollback($successItems, $report);
+                $this->rollback($successItems, $report, $allCreatedClasses);
             }
         } elseif ($rollbackOnWarning === true) {
-            if ($report->getType() === common_report_Report::TYPE_WARNING || $report->contains(common_report_Report::TYPE_WARNING)) {
-                $this->rollback($successItems, $report);
+            if ($report->contains(common_report_Report::TYPE_WARNING)) {
+                $this->rollback($successItems, $report, $allCreatedClasses);
             }
         }
 
@@ -357,13 +347,13 @@ class ImportService extends tao_models_classes_GenerisService
      * @param $folder
      * @param \oat\taoQtiItem\model\qti\Resource $qtiItemResource
      * @param $itemClass
-     * @param bool|false $extractApip
      * @param array $dependencies
      * @param array $metadataValues
      * @param array $metadataInjectors
      * @param array $metadataGuardians
      * @param array $metadataClassLookups
      * @param array $sharedFiles
+     * @param array $createdClass
      * @return common_report_Report
      * @throws common_exception_Error
      */
@@ -371,177 +361,86 @@ class ImportService extends tao_models_classes_GenerisService
         $folder,
         Resource $qtiItemResource,
         $itemClass,
-        $extractApip = false,
         array $dependencies = array(),
         array $metadataValues = array(),
         array $metadataInjectors = array(),
         array $metadataGuardians = array(),
         array $metadataClassLookups = array(),
-        array &$sharedFiles = array()
+        array $sharedFiles = array(),
+        &$createdClasses = array()
     ) {
 
         try {
-            //load the information about resources in the manifest
-
-            $itemService = taoItems_models_classes_ItemsService::singleton();
             $qtiService = Service::singleton();
 
-            $sources = MediaService::singleton()->getWritableSources();
-            $sharedStorage = array_shift($sources);
-
+            //load the information about resources in the manifest
             try {
-
                 $resourceIdentifier = $qtiItemResource->getIdentifier();
 
-                // Use the guardians to check whether or not the item has to be imported.
-                foreach ($metadataGuardians as $guardian) {
+                $this->getMetadataImporter()->setMetadataValues($metadataValues);
 
-                    if (isset($metadataValues[$resourceIdentifier]) === true) {
-                        if (($guard = $guardian->guard($metadataValues[$resourceIdentifier])) !== false) {
-                            \common_Logger::i("Resource '${resourceIdentifier}' is already stored in the database and will not be imported.");
-                            $msg = __('The IMS QTI Item referenced as "%s" in the IMS Manifest file was already stored in the Item Bank.', $resourceIdentifier);
-                            $report = common_report_Report::createInfo($msg, $guard);
-
-                            // Simply do not import again.
-                            return $report;
-                        }
-                    }
+                $guardian = $this->getMetadataImporter()->guard($resourceIdentifier);
+                if ($guardian !== false) {
+                    \common_Logger::i('Resource "' . $resourceIdentifier . '" is already stored in the database and will not be imported.');
+                    return common_report_Report::createInfo(
+                        __('The IMS QTI Item referenced as "%s" in the IMS Manifest file was already stored in the Item Bank.', $resourceIdentifier),
+                        $guardian
+                    );
                 }
 
-                $targetClass = false;
-                // Use the classLookups to determine where the item has to go.
-                foreach ($metadataClassLookups as $classLookup) {
-                    if (isset($metadataValues[$resourceIdentifier]) === true) {
-                        \common_Logger::i("Target Class Lookup for resource '${resourceIdentifier}' ...");
-                        if (($targetClass = $classLookup->lookup($metadataValues[$resourceIdentifier])) !== false) {
-                            \common_Logger::i("Class Lookup Successful. Resource '${resourceIdentifier}' will be stored in RDFS Class '" . $targetClass->getUri() . "'.");
-                            break;
-                        }
-                    }
+                $validationReport = $this->getMetadataImporter()->validate($resourceIdentifier);
+
+                if ($validationReport->getType() !== \common_report_Report::TYPE_SUCCESS) {
+                    \common_Logger::i('Item metadata is not valid: ' . $validationReport->getMessage());
+                    return $validationReport;
                 }
+
+                $targetClass = $this->getMetadataImporter()->classLookUp($resourceIdentifier, $createdClasses);
 
                 $qtiFile = $folder . helpers_File::urlToPath($qtiItemResource->getFile());
 
+                common_Logger::i('file :: ' . $qtiItemResource->getFile());
+
                 $qtiModel = $this->createQtiItemModel($qtiFile);
-                $rdfItem = $this->createRdfItem((($targetClass !== false) ? $targetClass : $itemClass), $qtiModel);
-                $name = $rdfItem->getLabel();
-                $itemContent = $itemService->getItemContent($rdfItem);
+                $rdfItem = $this->createRdfItem((($targetClass !== false) ? $targetClass : $itemClass), $qtiModel, $qtiItemResource);
 
-                $xincluded = array();
-                foreach ($qtiModel->getBody()->getComposingElements('oat\taoQtiItem\model\qti\Xinclude') as $xincludeEle) {
-                    $xincluded[] = $xincludeEle->attr('href');
-                    \common_Logger::i("Xinclude component found in resource '${resourceIdentifier}' with href '" . $xincludeEle->attr('href') . "'.");
-                }
+                $itemAssetManager = new AssetManager();
+                $itemAssetManager->setItemContent($qtiModel->toXML());
+                $itemAssetManager->setSource($folder);
 
-                $local = new LocalItemSource(array('item' => $rdfItem));
+                /**
+                 * Load asset handler following priority handler defined by you
+                 * The first applicable will be used to import assets
+                 */
 
-                foreach ($qtiItemResource->getAuxiliaryFiles() as $auxResource) {
-                    // file on FS
-                    $auxFile = $folder . str_replace('/', DIRECTORY_SEPARATOR, $auxResource);
+                /** Portable element handler */
+                $peHandler = new PortableAssetHandler($qtiModel, $folder, dirname($qtiFile));
+                $itemAssetManager->loadAssetHandler($peHandler);
 
-                    // rel path in item
-                    $auxPath = str_replace(DIRECTORY_SEPARATOR, '/', helpers_File::getRelPath($qtiFile, $auxFile));
+                /** Shared stimulus handler */
+                $sharedStimulusHandler = new SharedStimulusAssetHandler();
+                $sharedStimulusHandler
+                    ->setQtiModel($qtiModel)
+                    ->setItemSource(new ItemMediaResolver($rdfItem, ''))
+                    ->setSharedFiles($sharedFiles)
+                    ->setParentPath($rdfItem->getLabel());
+                $itemAssetManager->loadAssetHandler($sharedStimulusHandler);
 
-                    if (!empty($sharedStorage) && in_array($auxPath, $xincluded)) {
-                        $md5 = md5_file($auxFile);
-                        if (isset($sharedFiles[$md5])) {
-                            $info = $sharedFiles[$md5];
-                            \common_Logger::i('Auxiliary file \'' . $auxPath . '\' linked to shared storage.');
-                        } else {
-                            // TODO cleanup sharedstimulus import/export
-                            // move to taoQti item or library
+                /** Local storage handler */
+                $localHandler = new LocalAssetHandler();
+                $localHandler->setItemSource(new LocalItemSource(array('item' => $rdfItem)));
+                $itemAssetManager->loadAssetHandler($localHandler);
 
-                            // validate the shared stimulus
-                            SharedStimulusImporter::isValidSharedStimulus($auxFile);
-                            // embed assets in the shared stimulus
-                            $newXmlFile = SharedStimulusPackageImporter::embedAssets($auxFile);
-                            $info = $sharedStorage->add($newXmlFile, basename($auxFile), $name);
-                            if (method_exists($sharedStorage, 'forceMimeType')) {
-                                // add() does not return link, so we need to parse it
-                                $resolver = new ItemMediaResolver($rdfItem, '');
-                                $asset = $resolver->resolve($info['uri']);
-                                $sharedStorage->forceMimeType($asset->getMediaIdentifier(), 'application/qti+xml');
-                            }
-                            $sharedFiles[$md5] = $info;
-                            \common_Logger::i('Auxiliary file \'' . $auxPath . '\' added to shared storage.');
-                        }
-                    } else {
-                        // store locally, in a safe directory
-                        $safePath = '';
-                        if (dirname($auxPath) !== '.') {
-                            $safePath = str_replace('../', '', dirname($auxPath)) . '/';
-                        }
-                        $info = $local->add($auxFile, basename($auxFile), $safePath);
-                        \common_Logger::i('Auxiliary file \'' . $auxPath . '\' copied.');
-                    }
+                $itemAssetManager
+                    ->importAuxiliaryFiles($qtiItemResource)
+                    ->importDependencyFiles($qtiItemResource, $dependencies);
 
-                    // replace uri if changed
-                    if ($auxPath != ltrim($info['uri'], '/')) {
-                        $itemContent = str_replace($auxPath, $info['uri'], $itemContent);
-                    }
-                }
+                $itemAssetManager->finalize();
 
-                foreach ($qtiItemResource->getDependencies() as $dependency) {
-                    // file on FS
-                    if (isset($dependencies[$dependency])) {
-                        $auxFile = $dependencies[$dependency]->getFile();
+                $qtiModel = $this->createQtiItemModel($itemAssetManager->getItemContent(), false);
+                $qtiService->saveDataItemToRdfItem($qtiModel, $rdfItem);
 
-                        $auxFile = $folder . str_replace('/', DIRECTORY_SEPARATOR, $auxFile);
-
-                        // rel path in item
-                        $auxPath = str_replace(DIRECTORY_SEPARATOR, '/', helpers_File::getRelPath($qtiFile, $auxFile));
-
-                        if (!empty($sharedStorage) && in_array($auxPath, $xincluded)) {
-                            $md5 = md5_file($auxFile);
-                            if (isset($sharedFiles[$md5])) {
-                                $info = $sharedFiles[$md5];
-                                \common_Logger::i('Auxiliary file \'' . $auxPath . '\' linked to shared storage.');
-                            } else {
-                                // TODO cleanup sharedstimulus import/export
-                                // move to taoQti item or library
-
-                                // validate the shared stimulus
-                                SharedStimulusImporter::isValidSharedStimulus($auxFile);
-                                // embed assets in the shared stimulus
-                                $newXmlFile = SharedStimulusPackageImporter::embedAssets($auxFile);
-                                $info = $sharedStorage->add($newXmlFile, basename($auxFile), $name);
-                                if (method_exists($sharedStorage, 'forceMimeType')) {
-                                    // add() does not return link, so we need to parse it
-                                    $resolver = new ItemMediaResolver($rdfItem, '');
-                                    $asset = $resolver->resolve($info['uri']);
-                                    $sharedStorage->forceMimeType($asset->getMediaIdentifier(), 'application/qti+xml');
-                                }
-                                $sharedFiles[$md5] = $info;
-                                \common_Logger::i('Auxiliary file \'' . $auxPath . '\' added to shared storage.');
-                            }
-                        } else {
-                            // store locally, in a safe directory
-                            $safePath = '';
-                            if (dirname($auxPath) !== '.') {
-                                $safePath = str_replace('../', '', dirname($auxPath)) . '/';
-                            }
-                            $info = $local->add($auxFile, basename($auxFile), $safePath);
-                            \common_Logger::i('Auxiliary file \'' . $auxPath . '\' copied.');
-                        }
-
-                        // replace uri if changed
-                        if ($auxPath != ltrim($info['uri'], '/')) {
-                            $itemContent = str_replace($auxPath, $info['uri'], $itemContent);
-                        }
-
-
-                    }
-                }
-
-                $itemService->setItemContent($rdfItem, $itemContent);
-
-                // Finally, import metadata.
-                $this->importItemMetadata($metadataValues, $qtiItemResource, $rdfItem, $metadataInjectors);
-
-                // And Apip if wanted
-                if ($extractApip) {
-                    $this->storeApip($qtiFile, $rdfItem);
-                }
+                $this->getMetadataImporter()->inject($resourceIdentifier, $rdfItem);
 
                 $eventManager = ServiceManager::getServiceManager()->get(EventManager::CONFIG_ID);
                 $eventManager->trigger(new ItemImported($rdfItem, $qtiModel));
@@ -551,10 +450,13 @@ class ImportService extends tao_models_classes_GenerisService
                 $report = common_report_Report::createSuccess($msg, $rdfItem);
 
             } catch (ParsingException $e) {
-                $report = new common_report_Report(common_report_Report::TYPE_ERROR, $e->getUserMessage());
+
+                $message = $e->getUserMessage();
+
+                $report = new common_report_Report(common_report_Report::TYPE_ERROR, $message);
+
             } catch (ValidationException $ve) {
-                $report = \common_report_Report::createFailure(__('IMS QTI Item referenced as "%s" in the IMS Manifest file could not be imported.',
-                    $qtiItemResource->getIdentifier()));
+                $report = common_report_Report::createFailure(__('IMS QTI Item referenced as "%s" in the IMS Manifest file could not be imported.', $qtiItemResource->getIdentifier()));
                 $report->add($ve->getReport());
             } catch (XmlStorageException $e){
 
@@ -571,14 +473,34 @@ class ImportService extends tao_models_classes_GenerisService
 
                 $report = new common_report_Report(common_report_Report::TYPE_ERROR,
                     $message);
+            } catch (PortableElementInvalidModelException $pe) {
+                $report = common_report_Report::createFailure(__('IMS QTI Item referenced as "%s" contains a portable element and cannot be imported.', $qtiItemResource->getIdentifier()));
+                $report->add($pe->getReport());
+                if (isset($rdfItem) && ! is_null($rdfItem) && $rdfItem->exists()) {
+                    $rdfItem->delete();
+                }
+            } catch (PortableElementException $e) {
+                // an error occured during a specific item
+                if ($e instanceof common_exception_UserReadableException) {
+                    $msg = __('Error on item %1$s : %2$s', $qtiItemResource->getIdentifier(), $e->getUserMessage());
+                } else {
+                    $msg = __('Error on item %s', $qtiItemResource->getIdentifier());
+                    common_Logger::d($e->getMessage());
+                }
+                $report = new common_report_Report(common_report_Report::TYPE_ERROR,$msg);
+                if (isset($rdfItem) && ! is_null($rdfItem) && $rdfItem->exists()) {
+                    $rdfItem->delete();
+                }
             } catch (Exception $e) {
                 // an error occured during a specific item
-                $report = new common_report_Report(common_report_Report::TYPE_ERROR,
-                    __("An unknown error occured while importing the IMS QTI Package."));
+                $report = new common_report_Report(common_report_Report::TYPE_ERROR, __("An unknown error occured while importing the IMS QTI Package."));
+                if (isset($rdfItem) && ! is_null($rdfItem) && $rdfItem->exists()) {
+                    $rdfItem->delete();
+                }
                 common_Logger::e($e->getMessage());
             }
         } catch (ValidationException $ve) {
-            $validationReport = \common_report_Report::createFailure("The IMS Manifest file could not be validated");
+            $validationReport = common_report_Report::createFailure("The IMS Manifest file could not be validated");
             $validationReport->add($ve->getReport());
             $report->setMessage(__("No Items could be imported from the given IMS QTI package."));
             $report->setType(common_report_Report::TYPE_ERROR);
@@ -595,13 +517,15 @@ class ImportService extends tao_models_classes_GenerisService
     /**
      * Import metadata to a given QTI Item.
      *
-     * @param oat\taoQtiItem\model\qti\metadata\MetadataValue[] $metadataValues An array of MetadataValue objects.
+     * @deprecated use MetadataService::getImporter::inject()
+     *
+     * @param MetadataValue[] $metadataValues An array of MetadataValue objects.
      * @param Resource $qtiResource The object representing the QTI Resource, from an IMS Manifest perspective.
      * @param core_kernel_classes_Resource $resource The object representing the target QTI Item in the Ontology.
-     * @param oat\taoQtiItem\model\qti\metadata\MetadataInjector[] $ontologyInjectors Implementations of MetadataInjector that will take care to inject the metadata values in the appropriate Ontology Resource Properties.
-     * @throws oat\taoQtiItem\model\qti\metadata\MetadataInjectionException If an error occurs while importing the metadata.
+     * @param MetadataInjector[] $ontologyInjectors Implementations of MetadataInjector that will take care to inject the metadata values in the appropriate Ontology Resource Properties.
+     * @throws MetadataInjectionException If an error occurs while importing the metadata.
      */
-    public function importItemMetadata(
+    public function importResourceMetadata(
         array $metadataValues,
         Resource $qtiResource,
         core_kernel_classes_Resource $resource,
@@ -625,14 +549,32 @@ class ImportService extends tao_models_classes_GenerisService
     /**
      * @param array $items
      * @param common_report_Report $report
+     * @param array $createdClasses (optional)
      * @throws common_exception_Error
      */
-    protected function rollback(array $items, common_report_Report $report)
+    protected function rollback(array $items, common_report_Report $report, array $createdClasses = array())
     {
         foreach ($items as $id => $item) {
             @taoItems_models_classes_ItemsService::singleton()->deleteItem($item);
             $report->add(new common_report_Report(common_report_Report::TYPE_WARNING,
                 __('The IMS QTI Item referenced as "%s" in the IMS Manifest was successfully rolled back.', $id)));
         }
+        
+        foreach ($createdClasses as $createdClass) {
+            @$createdClass->delete();
+        }
+    }
+
+    /**
+     * Get the lom metadata importer
+     *
+     * @return MetadataImporter
+     */
+    protected function getMetadataImporter()
+    {
+        if (! $this->metadataImporter) {
+            $this->metadataImporter = $this->getServiceLocator()->get(MetadataService::SERVICE_ID)->getImporter();
+        }
+        return $this->metadataImporter;
     }
 }

@@ -33,7 +33,7 @@ return array(
     'label' => 'Test-taker core extension',
 	'description' => 'TAO TestTaker extension',
     'license' => 'GPL-2.0',
-    'version' => '2.8.2',
+    'version' => '3.0.1',
 	'author' => 'Open Assessment Technologies, CRP Henri Tudor',
 	'requires' => array(
 	    'taoBackOffice' => '>=0.8'
@@ -49,9 +49,7 @@ return array(
 	'update' => "oat\\taoTestTaker\\scripts\\update\\Updater",
 	'managementRole' => 'http://www.tao.lu/Ontologies/TAOSubject.rdf#SubjectsManagerRole',
     'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/TAOSubject.rdf#SubjectsManagerRole', array('ext'=>'taoTestTaker')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole',array('ext'=>'taoTestTaker','mod' => 'Api'))
-        
+        array('grant', 'http://www.tao.lu/Ontologies/TAOSubject.rdf#SubjectsManagerRole', array('ext'=>'taoTestTaker'))
     ),
     'routes' => array(
         '/taoTestTaker' => 'oat\\taoTestTaker\\actions'
@@ -74,8 +72,5 @@ return array(
 	
 		#BASE URL (usually the domain root)
 		'BASE_URL'				=> ROOT_URL	.'taoTestTaker/',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL	.'taoTestTaker/views/',
 	)
 );

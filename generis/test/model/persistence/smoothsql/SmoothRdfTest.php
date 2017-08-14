@@ -23,7 +23,7 @@ use \core_kernel_persistence_smoothsql_SmoothRdf;
 use oat\generis\test\GenerisPhpUnitTestRunner;
 use Prophecy\Prophet;
 
-class SmoothRdfTest extends GenerisPhpUnitTestRunner
+class SmoothRdfTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -32,7 +32,6 @@ class SmoothRdfTest extends GenerisPhpUnitTestRunner
      */
     public function setUp()
     {
-        GenerisPhpUnitTestRunner::initTest();
     }
 
     /**
@@ -82,7 +81,7 @@ class SmoothRdfTest extends GenerisPhpUnitTestRunner
         
         $persistence = $this->prophesize('\common_persistence_SqlPersistence');
         $persistence->getPlatForm()->willReturn($platform->reveal());
-        $query = "INSERT INTO statements ( modelId, subject, predicate, object, l_language, epoch) VALUES ( ? , ? , ? , ? , ? , ?);";
+        $query = "INSERT INTO statements ( modelId, subject, predicate, object, l_language, epoch, author) VALUES ( ? , ? , ? , ? , ? , ?, ?);";
         
         $triple = new \core_kernel_classes_Triple();
         $triple->modelid = 22;
@@ -96,7 +95,8 @@ class SmoothRdfTest extends GenerisPhpUnitTestRunner
             'predicateUri',
             'objectUri',
             '',
-            'now'
+            'now',
+            ''
         ))->willReturn(true);
         
         $model = $this->prophesize('\core_kernel_persistence_smoothsql_SmoothModel');
@@ -105,6 +105,45 @@ class SmoothRdfTest extends GenerisPhpUnitTestRunner
         
         $rdf = new core_kernel_persistence_smoothsql_SmoothRdf($model->reveal());
         
+        $this->assertTrue($rdf->add($triple));
+    }
+
+    /**
+     *
+     * @author Lionel Lecaque, lionel@taotesting.com
+     */
+    public function testAddWithAuthor()
+    {
+        $platform = $this->prophesize('\common_persistence_sql_Platform');
+        $platform->getNowExpression()->willReturn('now');
+
+        $persistence = $this->prophesize('\common_persistence_SqlPersistence');
+        $persistence->getPlatForm()->willReturn($platform->reveal());
+        $query = "INSERT INTO statements ( modelId, subject, predicate, object, l_language, epoch, author) VALUES ( ? , ? , ? , ? , ? , ?, ?);";
+
+        $triple = new \core_kernel_classes_Triple();
+        $triple->modelid = 22;
+        $triple->subject = 'subjectUri';
+        $triple->predicate = 'predicateUri';
+        $triple->object = 'objectUri';
+        $triple->author = 'JohnDoe';
+
+        $persistence->exec($query, array(
+            22,
+            'subjectUri',
+            'predicateUri',
+            'objectUri',
+            '',
+            'now',
+            'JohnDoe'
+        ))->willReturn(true);
+
+        $model = $this->prophesize('\core_kernel_persistence_smoothsql_SmoothModel');
+        $model->getReadableModels()->willReturn(array(22));
+        $model->getPersistence()->willReturn($persistence->reveal());
+
+        $rdf = new core_kernel_persistence_smoothsql_SmoothRdf($model->reveal());
+
         $this->assertTrue($rdf->add($triple));
     }
     

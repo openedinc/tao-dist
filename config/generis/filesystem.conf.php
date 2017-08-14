@@ -1,36 +1,57 @@
 <?php
 /**
- * Configuration of the filesystem service
- * default implementation is oat\oatbox\filesystem\FileSystemService
- *
- * @author Open Assessment Technologies SA
+ * Default config header created during install
  */
 
 return new oat\oatbox\filesystem\FileSystemService(array(
     'filesPath' => FILES_PATH,
     'adapters' => array(
-        LOCAL_NAMESPACE.'#i150237991640531' => array(
+        'taskQueueStorage' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/upload/'
+                'root' => FILES_PATH.'taskQueueStorage'
             )
         ),
-        LOCAL_NAMESPACE.'#i150237991753522' => array(
+        'fileUploadDirectory' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/public/'
+                'root' => FILES_PATH.'tao/upload'
             )
         ),
-        LOCAL_NAMESPACE.'#i150237991854493' => array(
+        'public' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/private/'
+                'root' => FILES_PATH.'tao/public'
             )
         ),
-        LOCAL_NAMESPACE.'#i150238011578594' => array(
+        'private' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'taoItems/itemData/'
+                'root' => FILES_PATH.'tao/private'
+            )
+        ),
+        'log' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'tao/log'
+            )
+        ),
+        'sharedTmp' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'tmp'
+            )
+        ),
+        'stateBackup' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'stateBackup'
+            )
+        ),
+        'itemDirectory' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'taoItems/itemData'
             )
         ),
         'taoQtiItem' => array(
@@ -39,10 +60,34 @@ return new oat\oatbox\filesystem\FileSystemService(array(
                 'root' => FILES_PATH.'taoQtiItem'
             )
         ),
-        LOCAL_NAMESPACE.'#i1502380445525727' => array(
+        'taoQtiTest' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'taoQtiTest/'
+                'root' => FILES_PATH.'taoQtiTest'
+            )
+        ),
+        'taoQtiTestSessionFilesystem' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'taoQtiTestSessionFilesystem'
+            )
+        ),
+        'qtiItemPci' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'qtiItemPci'
+            )
+        ),
+        'qtiItemImsPci' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'qtiItemImsPci'
+            )
+        ),
+        'portableElementStorage' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => FILES_PATH.'portableElement'
             )
         )
     )

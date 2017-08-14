@@ -1,12 +1,10 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file tao/config/header/ServiceFileStorage.conf.php
+ * Default config header created during install
  */
 
 return new tao_models_classes_service_FileStorage(array(
-    'public' => LOCAL_NAMESPACE.'#i150237991753522',
-    'private' => LOCAL_NAMESPACE.'#i150237991854493',
-    'provider' => '598c7f8dcd5c2'
+    'public' => 'public',
+    'private' => 'private',
+    'provider' => '5991bf717a9e6'
 ));

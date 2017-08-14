@@ -1,1 +1,1 @@
-<?php return array(0 => 'splash');
+<?php return array(0 => 'splash',1 => 'hasAccess',2 => 'getRawParameter');

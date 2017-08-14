@@ -34,6 +34,8 @@ define([
 
     var timeZone = moment.tz.guess();
 
+    var slice = Array.prototype.slice;
+
     /**
      * Create the overseer intance
      * @param {String} testIdentifier - a unique id for a test execution
@@ -49,14 +51,19 @@ define([
         // the list of registered probes
         var probes = [];
 
-        //the data store instance
-        var storage;
-
         //temp queue
         var queue = [];
 
-        //current write promise
-        var writing;
+        //immutable queue which will not be flushed
+        var immutableQueue = [];
+
+        /**
+         * @type {Storage} to store the collected events
+         */
+        var storage;
+
+        //writing promises array
+        var writing = [];
 
         //is the overseer started
         var started = false;
@@ -72,15 +79,14 @@ define([
             //event handler registered to collect data
             var probeHandler = function probeHandler(){
                 var now = moment();
-                var last;
                 var data = {
-                    id   : uuid(8, 16),
+                    id   : uuid(12, 16),
                     type : probe.name,
                     timestamp : now.format('x') / 1000,
                     timezone  : now.tz(timeZone).format('Z')
                 };
                 if(typeof probe.capture === 'function'){
-                    data.context = probe.capture(runner);
+                    data.context = probe.capture.apply(probe, [runner].concat(slice.call(arguments)));
                 }
                 overseer.push(data);
             };
@@ -92,7 +98,7 @@ define([
 
             _.forEach(probe.events, function(eventName){
                 var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
-                runner.on(listen, probeHandler);
+                runner.on(listen, _.partial(probeHandler, eventName));
             });
         };
 
@@ -104,7 +110,7 @@ define([
             var startHandler = function startHandler(){
                 var now = moment();
                 var data = {
-                    id: uuid(8, 16),
+                    id: uuid(12, 16),
                     marker: 'start',
                     type : probe.name,
                     timestamp : now.format('x') / 1000,
@@ -112,7 +118,7 @@ define([
                 };
 
                 if(typeof probe.capture === 'function'){
-                    data.context = probe.capture(runner);
+                    data.context = probe.capture.apply(probe, [runner].concat(slice.call(arguments)));
                 }
                 overseer.push(data);
             };
@@ -126,17 +132,17 @@ define([
                     timestamp : now.format('x') / 1000,
                     timezone  : now.tz(timeZone).format('Z')
                 };
-                overseer.getQueue().then(function(queue){
-                    last = _.findLast(queue, { type : probe.name, marker : 'start' });
-                    if(last && !_.findLast(queue, { type : probe.name, marker : 'stop', id : last.id })){
-                        data.id = last.id;
-                        data.marker = 'end';
-                        if(typeof probe.capture === 'function'){
-                            data.context = probe.capture(runner);
-                        }
-                        overseer.push(data);
+                var args = slice.call(arguments);
+
+                last = _.findLast(immutableQueue, { type : probe.name, marker : 'start' });
+                if(last && !_.findLast(immutableQueue, { type : probe.name, marker : 'end', id : last.id })){
+                    data.id = last.id;
+                    data.marker = 'end';
+                    if(typeof probe.capture === 'function'){
+                        data.context = probe.capture.apply(probe, [runner].concat(args));
                     }
-                });
+                    overseer.push(data);
+                }
             };
 
             //fallback
@@ -146,12 +152,33 @@ define([
 
             _.forEach(probe.startEvents, function(eventName){
                 var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
-                runner.on(listen, startHandler);
+                runner.on(listen, _.partial(startHandler, eventName));
             });
             _.forEach(probe.stopEvents, function(eventName){
                 var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
-                runner.on(listen, stopHandler);
+                runner.on(listen, _.partial(stopHandler, eventName));
             });
+        };
+
+        /**
+         * Get the storage instance
+         * @returns {Promise} that resolves with the storage
+         */
+        var getStorage = function getStorage(){
+            if(storage){
+                return Promise.resolve(storage);
+            }
+            return store('test-probe-' + testIdentifier).then(function(newStorage){
+                storage = newStorage;
+                return Promise.resolve(storage);
+            });
+        };
+
+        /**
+         * Unset the storage instance
+         */
+        var resetStorage = function resetStorage() {
+            storage = null;
         };
 
         //argument validation
@@ -161,9 +188,6 @@ define([
         if(!_.isPlainObject(runner) || !_.isFunction(runner.init) || !_.isFunction(runner.on)){
             throw new TypeError('Please set a test runner');
         }
-
-        //create a unique instance in the offline storage
-        storage = store('test-probe-' + testIdentifier);
 
         /**
          * @typedef {probeOverseer}
@@ -236,7 +260,9 @@ define([
              * @returns {Promise} with the data in parameterj
              */
             getQueue : function getQueue(){
-                return storage.getItem('queue');
+                return getStorage().then(function(storage){
+                    return storage.getItem('queue');
+                });
             },
 
             /**
@@ -253,15 +279,13 @@ define([
              */
             push : function push(entry){
                 queue.push(entry);
-
+                immutableQueue.push(entry);
                 //ensure the queue is pushed to the store consistently and atomically
-                if(writing){
-                    writing.then(function(){
-                        return storage.setItem('queue', queue);
+                Promise.all(writing).then(function(){
+                    getStorage().then(function(storage){
+                        writing.push(storage.setItem('queue', queue));
                     });
-                } else {
-                    writing = storage.setItem('queue', queue);
-                }
+                });
             },
 
             /**
@@ -269,14 +293,18 @@ define([
              * @returns {Promise} with the data in parameter
              */
             flush: function flush(){
-
-                return new Promise(function(resolve, reject){
-                    storage.getItem('queue').then(function(flushed){
-                        queue = [];
-                        return storage.setItem('queue', queue).then(function(){
-                            resolve(flushed);
+                return getStorage().then(function(storage){
+                    return new Promise(function(resolve){
+                        Promise.all(writing).then(function () {
+                            writing = [];
+                            storage.getItem('queue').then(function(flushed){
+                                queue = [];
+                                return storage.setItem('queue', queue).then(function(){
+                                    resolve(flushed);
+                                });
+                            });
                         });
-                    }).catch(reject);
+                    });
                 });
             },
 
@@ -285,13 +313,15 @@ define([
              * @returns {Promise} once started
              */
             start : function start(){
-                return storage.getItem('queue').then(function(savedQueue){
-
-                    if(_.isArray(savedQueue)){
-                        queue = savedQueue;
-                    }
-                    _.forEach(probes, collectEvent);
-                    started = true;
+                return getStorage().then(function(storage){
+                    return storage.getItem('queue').then(function(savedQueue){
+                        if(_.isArray(savedQueue)){
+                            queue = savedQueue;
+                            immutableQueue = savedQueue;
+                        }
+                        _.forEach(probes, collectEvent);
+                        started = true;
+                    });
                 });
             },
 
@@ -315,7 +345,10 @@ define([
                 });
 
                 queue = [];
-                return storage.clear();
+                immutableQueue = [];
+                return getStorage().then(function(storage){
+                    return storage.removeStore().then(resetStorage);
+                });
             }
         };
         return overseer;

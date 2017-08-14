@@ -20,19 +20,25 @@
  */
 namespace oat\taoWorkspace\scripts\update;
 
+use common_ext_ExtensionUpdater;
+use core_kernel_persistence_smoothsql_SmoothModel;
+use oat\generis\model\data\ModelManager;
+use oat\generis\model\kernel\persistence\smoothsql\search\ComplexSearchService;
 use oat\taoRevision\model\Repository;
+use oat\taoRevision\model\RepositoryService;
+use oat\taoWorkspace\model\generis\WrapperModel;
 use oat\taoWorkspace\model\RevisionWrapper;
 /**
  * 
  * @author Joel Bout <joel@taotesting.com>
  */
-class Updater extends \common_ext_ExtensionUpdater
+class Updater extends common_ext_ExtensionUpdater
 {
 
     /**
-     * 
-     * @param string $currentVersion
-     * @return string $versionUpdatedTo
+     *
+     * @param string $initialVersion
+     * @return void
      */
     public function update($initialVersion)
     {
@@ -49,6 +55,36 @@ class Updater extends \common_ext_ExtensionUpdater
             $this->setVersion('0.3.0');
         }
 
-        $this->skip('0.3.0', '0.3.1');
+        $this->skip('0.3.0', '0.4.1');
+
+        if ($this->isVersion('0.4.1')) {
+
+            $service = $this->getServiceManager()->get(Repository::SERVICE_ID);
+            $service->setOption(RepositoryService::OPTION_FS, 'revisions');
+            $this->getServiceManager()->register(Repository::SERVICE_ID, $service);
+
+            $this->setVersion('0.5.0');
+        }
+        
+        $this->skip('0.5.0', '0.6.0');
+        
+        if ($this->isVersion('0.6.0')) {
+            /* @var $modelWrapper WrapperModel */
+            $modelWrapper = ModelManager::getModel();
+            
+            $inner = $modelWrapper->getInnerModel();
+            $inner->setOption(core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE , ComplexSearchService::SERVICE_ID);
+            
+            $workspace = $modelWrapper->getWorkspaceModel();
+            $workspace->setOption(core_kernel_persistence_smoothsql_SmoothModel::OPTION_SEARCH_SERVICE , ComplexSearchService::SERVICE_ID);
+            
+            $wrapedModel = WrapperModel::wrap($inner, $workspace );
+            $wrapedModel->setServiceLocator($this->getServiceManager());
+            ModelManager::setModel($wrapedModel);
+            
+            $this->setVersion('0.6.1');
+        }
+
+        $this->skip('0.6.1', '1.0.0');
     }
 }

@@ -1,11 +1,8 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoDelivery/config/header/deliveryServer.conf.php
+ * Default config header created during install
  */
 
-return new taoDelivery_models_classes_DeliveryServerService(array(
-    'requireFullScreen' => false,
+return new oat\taoDelivery\model\execution\DeliveryServerService(array(
     'deliveryContainer' => 'oat\\taoDelivery\\helper\\container\\DeliveryServiceContainer'
 ));

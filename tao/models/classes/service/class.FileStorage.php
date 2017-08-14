@@ -1,28 +1,30 @@
 <?php
-/**  
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *               
- * 
+ *
+ *
  */
 
 use oat\tao\model\websource\WebsourceManager;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
 use oat\tao\model\websource\Websource;
+use oat\oatbox\filesystem\FileSystemService;
+
 /**
  * Represents the file storage used in services 
  *
@@ -46,31 +48,20 @@ class tao_models_classes_service_FileStorage extends ConfigurableService
         return ServiceManager::getServiceManager()->get(self::SERVICE_ID);
     }
     
-    /**
-     * @var core_kernel_fileSystem_FileSystem
-     */
-    private $publicFs;
-    
-    private $privateFs;
-    
     private $accessProvider;
 
-    protected function getPublicFs()
+    /**
+     * @return string
+     */
+    protected function getFsId($public)
     {
-        if (is_null($this->publicFs)) {
-            $this->publicFs = new core_kernel_fileSystem_FileSystem($this->getOption(self::OPTION_PUBLIC_FS));
-        }
-        return $this->publicFs;
+        return $public ? $this->getOption(self::OPTION_PUBLIC_FS) : $this->getOption(self::OPTION_PRIVATE_FS);
     }
-    
-    protected function getPrivateFs()
-    {
-        if (is_null($this->privateFs)) {
-            $this->privateFs = new core_kernel_fileSystem_FileSystem($this->getOption(self::OPTION_PRIVATE_FS));
-        }
-        return $this->privateFs;
-    }
-    
+
+    /**
+     * @return Websource
+     * @throws \oat\tao\model\websource\WebsourceNotFound
+     */
     protected function getAccessProvider()
     {
         if (is_null($this->accessProvider)) {
@@ -86,7 +77,6 @@ class tao_models_classes_service_FileStorage extends ConfigurableService
     public function spawnDirectory($public = false) {
         $id = common_Utils::getNewUri().($public ? '+' : '-');
         $directory = $this->getDirectoryById($id);
-        mkdir($directory->getPath(), 0700, true);
         return $directory;
     }
 
@@ -96,28 +86,61 @@ class tao_models_classes_service_FileStorage extends ConfigurableService
      */
     public function getDirectoryById($id) {
         $public = $id[strlen($id)-1] == '+';
-        $fs = $public ? $this->getPublicFs() : $this->getPrivateFs();
         $path = $this->id2path($id);
-        $dir = new tao_models_classes_service_StorageDirectory($id, $fs, $path, $public ? $this->getAccessProvider() : null);
+        $dir = new tao_models_classes_service_StorageDirectory(
+            $id,
+            $this->getFsId($public),
+            $path,
+            $public ? $this->getAccessProvider() : null
+        );
         $dir->setServiceLocator($this->getServiceLocator());
         return $dir;
     }
-    
-    public function import($id, $directoryPath) {
+
+    /**
+     * Delete directory represented by the $id
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function deleteDirectoryById($id)
+    {
+        $public = $id[strlen($id)-1] == '+';
+        $path = $this->id2path($id);
+        return $this->getServiceLocator()->get(FileSystemService::SERVICE_ID)->getFileSystem($this->getFsId($public))->deleteDir($path);
+    }
+
+    /**
+     * @param string $id
+     * @param string $directoryPath
+     * @throws common_Exception
+     */
+    public function import($id, $directoryPath)
+    {
         $directory = $this->getDirectoryById($id);
-        if (file_exists($directory->getPath())) {
-            if(tao_helpers_File::isDirEmpty($directory->getPath())){
-                common_Logger::d('Directory already found but content is empty');
-                helpers_File::copy($directoryPath, $directory->getPath(), true);
-                
-            }else if (tao_helpers_File::isIdentical($directory->getPath(), $directoryPath)) {
-                common_Logger::d('Directory already found but content is identical');
-            } else {
-                throw new common_Exception('Duplicate dir '.$id.' with different content');
+        if (is_dir($directoryPath) && is_readable($directoryPath)) {
+            foreach (
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($directoryPath, \RecursiveDirectoryIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::SELF_FIRST) as $item
+            ) {
+                if (!$item->isDir()) {
+                    $file = $directory->getFile($iterator->getSubPathName());
+                    $fh = fopen($item, 'rb');
+
+                    if ($file->exists()) {
+                        if (0 !== strcmp($this->getStreamHash($fh), $this->getStreamHash($file->readStream()))) {
+                            fclose($fh);
+                            throw new common_Exception('Different file content');
+                        }
+                    } else {
+                        $file->put($fh);
+                        fclose($fh);
+                    }
+                }
             }
         } else {
-            mkdir($directory->getPath(), 0700, true);
-            helpers_File::copy($directoryPath, $directory->getPath(), true);
+            common_Logger::w('Missing directory ' . $directoryPath);
         }
     }
     
@@ -135,5 +158,18 @@ class tao_models_classes_service_FileStorage extends ConfigurableService
         }
         
         return $returnValue.DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Calculates hash for given stream
+     * @param $stream
+     * @param string $hash
+     * @return string
+     */
+    private function getStreamHash($stream, $hash = 'md5')
+    {
+        $hc = hash_init($hash);
+        hash_update_stream($hc, $stream);
+        return hash_final($hc);
     }
 }

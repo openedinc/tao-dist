@@ -1,8 +1,8 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoResultServer/config/header/default_resultserver.conf.php
+ * Default config header created during install
  */
 
-return 'http://www.tao.lu/Ontologies/taoOutcomeRds.rdf#RdsResultStorage';
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => 'http://www.tao.lu/Ontologies/taoOutcomeRds.rdf#RdsResultStorage'
+));

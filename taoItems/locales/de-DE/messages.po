@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T12:00:04\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T14:36:17\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de-DE\n"
@@ -28,9 +28,6 @@ msgstr "Schließen"
 
 msgid "Close console"
 msgstr "Konsole schließen"
-
-msgid "Could not create language specific directory for item \'%s\"
-msgstr "Sprachspezifisches Verzeichnis für Item \\'%s\\ konnte nicht erstellt werden"
 
 #, tao-public
 msgid "Create and design items and exercises."
@@ -66,9 +63,6 @@ msgstr "Exportieren"
 msgid "Failed retrieving %s"
 msgstr "Fehler bei Abruf von %s"
 
-msgid "Failed to publish %s"
-msgstr "Fehler bei Veröffentlichung von %s"
-
 #, tao-public
 msgid "Filter"
 msgstr "Filter"
@@ -76,9 +70,6 @@ msgstr "Filter"
 #, tao-public
 msgid "Import"
 msgstr "Importieren"
-
-msgid "Item \'%s\' has no model"
-msgstr "Element \\'%s\\' hat kein Modell"
 
 msgid "Item Model"
 msgstr "Element-Modell"
@@ -138,9 +129,6 @@ msgstr "Eigenschaften"
 msgid "Published \"%1$s\" in language \"%2$s"
 msgstr "\"%1$s\" in Sprache \"%2$s veröffentlicht"
 
-msgid "Published %s"
-msgstr "%s veröffentlicht "
-
 msgid "Remove this message"
 msgstr "Diese Nachricht entfernen"
 
@@ -172,6 +160,9 @@ msgstr "Quellen für Sprache %s konnten nicht kopiert werden"
 
 msgid "Unable to create deployement directory"
 msgstr "Der Deployment-Ordner konnte nicht erstellt werden"
+
+msgid "Unable to render the item from %s : %s %s"
+msgstr ""
 
 msgid "You checked out this item %2s ago"
 msgstr "Sie haben dieses Element vor %2s überprüft"

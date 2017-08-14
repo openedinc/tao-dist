@@ -83,6 +83,9 @@ define(['jquery', 'lodash', 'iframeNotifier', 'urlParser'],
                             setIframeHeight();
                             iframeNotifier.parent('serviceloaded');
 
+                            //hot fix
+                            _.delay(setIframeHeight, 1600);
+
                             $frame.contents().find('img').on('load', _.throttle(function() {
                                 setIframeHeight();
                             }, 50));
@@ -93,7 +96,7 @@ define(['jquery', 'lodash', 'iframeNotifier', 'urlParser'],
                         }).on('itemready', function() {
                             // item is ready, we can connect.
                             itemApi.connect($frame[0]);
-                        }).on('itemcontentchange', function() {
+                        }).on('itemcontentchange imageloaded', function() {
                             setIframeHeight();
                         });
 

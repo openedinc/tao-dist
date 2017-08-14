@@ -20,7 +20,6 @@
  */
 namespace oat\tao\model\websource;
 
-use core_kernel_fileSystem_FileSystem;
 use common_ext_ExtensionsManager;
 
 /**
@@ -38,26 +37,26 @@ class TokenWebSource extends BaseWebsource
     const OPTION_PATH = 'path';
     const OPTION_TTL = 'ttl';
     
-    public static function spawnWebsource(core_kernel_fileSystem_FileSystem $fileSystem) {
-        $provider = self::spawn($fileSystem, array(
-        	self::OPTION_SECRET => md5(rand().$fileSystem->getPath()),
-            self::OPTION_PATH => $fileSystem->getPath(),
+    public static function spawnWebsource($fileSystemId, $path) {
+        $provider = self::spawn($fileSystemId, array(
+        	self::OPTION_SECRET => md5(rand().$path),
+            self::OPTION_PATH => $path,
             self::OPTION_TTL => (int) ini_get('session.gc_maxlifetime')
         ));
         return $provider;
     }
-    
-	public function getAccessUrl($relativePath) {
-	    $path = array();
-	    foreach (explode(DIRECTORY_SEPARATOR, ltrim($relativePath, DIRECTORY_SEPARATOR)) as $ele) {
-	        $path[] = rawurlencode($ele);
-	    }
-	    $relUrl = implode('/', $path);
-	    $relPath = rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $relativePath));
-	    $token = $this->generateToken($relUrl);
-	    $taoExtension = common_ext_ExtensionsManager::singleton()->getExtensionById('tao');
-	    return $taoExtension->getConstant('BASE_URL').'getFile.php/'.$this->getId().'/'.$token.'/'.$relUrl.'*/';
-	}
+
+    public function getAccessUrl($relativePath) {
+        $path = array();
+        foreach (preg_split('/[\/\\\]/', ltrim($relativePath, '/\\')) as $ele) {
+            $path[] = rawurlencode($ele);
+        }
+        $relUrl = implode('/', $path);
+        $relPath = rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $relativePath));
+        $token = $this->generateToken($relUrl);
+        $taoExtension = common_ext_ExtensionsManager::singleton()->getExtensionById('tao');
+        return $taoExtension->getConstant('BASE_URL').'getFile.php/'.$this->getId().'/'.$token.'/'.$relUrl.'*/';
+    }
 	// helpers
 	
 	/**
@@ -67,7 +66,7 @@ class TokenWebSource extends BaseWebsource
 	 * @param string $relPath
 	 * @return string
 	 */
-	private function generateToken($relPath) {
+	protected function generateToken($relPath) {
 		$time = time();
 		return $time.'/'.md5($time.$relPath.$this->getOption(self::OPTION_SECRET));
 	}

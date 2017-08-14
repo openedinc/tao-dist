@@ -18,130 +18,36 @@
  *
  */
 
-use oat\oatbox\Configurable;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoDelivery\model\execution\DeliveryExecution as InterfaceDeliveryExecution;
+use oat\taoDelivery\model\execution\implementation\KeyValueService;
+use oat\taoDelivery\model\execution\StateService;
+
 /**
  * Service to manage the execution of deliveries
  *
  * @access public
  * @author Joel Bout, <joel@taotesting.com>
  * @package taoDelivery
+ * @deprecated  please use oat\taoDelivery\model\execution\KeyValueService
  */
-class taoDelivery_models_classes_execution_KeyValueService extends Configurable
-    implements taoDelivery_models_classes_execution_Service
+class taoDelivery_models_classes_execution_KeyValueService extends KeyValueService
 {
-    const OPTION_PERSISTENCE = 'persistence';
-
-    const DELIVERY_EXECUTION_PREFIX = 'kve_de_';
-
-    const USER_EXECUTIONS_PREFIX = 'kve_ue_';
-
-    /**
-     * @var common_persistence_KeyValuePersistence
-     */
-    private $persistence;
-
-    protected function getPersistence()
-    {
-        if (is_null($this->persistence)) {
-            $persistenceOption = $this->getOption(self::OPTION_PERSISTENCE);
-            $this->persistence = (is_object($persistenceOption))
-                ? $persistenceOption
-                : common_persistence_KeyValuePersistence::getPersistence($persistenceOption);
-        }
-        return $this->persistence;
-    }
-
     public function getUserExecutions(core_kernel_classes_Resource $compiled, $userUri)
     {
-        $activ = $this->getDeliveryExecutionsByStatus($userUri, InterfaceDeliveryExecution::STATE_ACTIVE);
-        $finished = $this->getDeliveryExecutionsByStatus($userUri, InterfaceDeliveryExecution::STATE_FINISHIED);
+        /** @var StateService $statesService */
+        $statesService = $this->getServiceManager()->get(StateService::SERVICE_ID);
+
+        $deliveries = [];
+        $states = $statesService->getDeliveriesStates();
+        foreach ($states as $state) {
+            $deliveries = array_merge($deliveries, $this->getDeliveryExecutionsByStatus($userUri, $state));
+        }
 
         $returnValue = array();
-        foreach (array_merge($activ, $finished) as $de) {
+        foreach ($deliveries as $de) {
             if ($compiled->equals($de->getDelivery())) {
                 $returnValue[] = $de;
             }
         }
         return $returnValue;
-    }
-
-    public function getDeliveryExecutionsByStatus($userUri, $status) {
-        $returnValue = array();
-        $data = $this->getPersistence()->get(self::USER_EXECUTIONS_PREFIX.$userUri.$status);
-        $keys = $data !== false ? json_decode($data) : array();
-        if (is_array($keys)) {
-            foreach ($keys as $key) {
-                $returnValue[$key] = $this->getDeliveryExecution($key);
-            }
-        } else {
-            common_Logger::w('Non array "'.gettype($keys).'" received as active Delivery Keys for user '.$userUri);
-        }
-
-        return $returnValue;
-    }
-
-    /**
-     * Generate a new delivery execution
-     *
-     * @param core_kernel_classes_Resource $assembly
-     * @param string $userUri
-     * @return core_kernel_classes_Resource the delivery execution
-     */
-    public function initDeliveryExecution(core_kernel_classes_Resource $assembly, $userUri)
-    {
-        $deImplementation = \taoDelivery_models_classes_execution_KVDeliveryExecution::spawn($this->getPersistence(), $userUri, $assembly);
-        $deliveryExecution = new DeliveryExecution($deImplementation);
-
-        $this->updateDeliveryExecutionStatus($deliveryExecution, null, InterfaceDeliveryExecution::STATE_ACTIVE);
-
-        return $deliveryExecution;
-    }
-
-    public function getDeliveryExecution($identifier) {
-        $deImplementation = new \taoDelivery_models_classes_execution_KVDeliveryExecution($this->getPersistence(), $identifier);
-        return new DeliveryExecution($deImplementation);
-    }
-
-    /**
-     * Update the collection of deliveries
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @param string $old
-     * @param string $new
-     */
-    public function updateDeliveryExecutionStatus(DeliveryExecution $deliveryExecution, $old, $new) {
-
-        $userId = $deliveryExecution->getUserIdentifier();
-        if ($old != null) {
-            $oldReferences = $this->getDeliveryExecutionsByStatus($userId, $old);
-            foreach (array_keys($oldReferences) as $key) {
-                if ($oldReferences[$key]->getIdentifier() == $deliveryExecution->getIdentifier()) {
-                    unset($oldReferences[$key]);
-                }
-            }
-            $this->setDeliveryExecutions($userId, $old, $oldReferences);
-        }
-
-        $newReferences = $this->getDeliveryExecutionsByStatus($userId, $new);
-        $newReferences[] = $deliveryExecution;
-        $this->setDeliveryExecutions($userId, $new, $newReferences);
-
-    }
-
-    public function getData($deliveryExecutionId) {
-        $dataString = $this->getPersistence()->get($deliveryExecutionId);
-        $data = json_decode($dataString, true);
-        return $data;
-    }
-
-    private function setDeliveryExecutions($userUri, $status, $executions)
-    {
-        $keys = array();
-        foreach ($executions as $execution) {
-            $keys[] = $execution->getIdentifier();
-        }
-        return $this->getPersistence()->set(self::USER_EXECUTIONS_PREFIX.$userUri.$status, json_encode($keys));
     }
 }

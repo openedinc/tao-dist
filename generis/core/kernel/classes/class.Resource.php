@@ -22,6 +22,7 @@
 
 use oat\generis\model\data\ModelManager;
 use oat\oatbox\service\ServiceManager;
+use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Resource implements rdf:resource container identified by an uri (a string).
@@ -37,6 +38,7 @@ use oat\oatbox\service\ServiceManager;
 class core_kernel_classes_Resource
     extends core_kernel_classes_Container
 {
+    use OntologyAwareTrait;
     // --- ASSOCIATIONS ---
 
 
@@ -81,7 +83,7 @@ class core_kernel_classes_Resource
      * @return core_kernel_persistence_ResourceInterface
      */
     private function getImplementation() {
-        return ModelManager::getModel()->getRdfsInterface()->getResourceImplementation();
+        return $this->getModel()->getRdfsInterface()->getResourceImplementation();
     }
     
 
@@ -114,11 +116,6 @@ class core_kernel_classes_Resource
 		}
 		
 		$this->uriResource = $uri;
-        
-        if(DEBUG_MODE){
-        	$this->debug = $debug;
-        }
-        
     }
 
 
@@ -144,7 +141,7 @@ class core_kernel_classes_Resource
     public function isClass()
     {
         $returnValue = (bool) false;
-        if (count($this->getPropertyValues(new core_kernel_classes_Property(RDFS_SUBCLASSOF))) > 0) {
+        if (count($this->getPropertyValues($this->getProperty(RDFS_SUBCLASSOF))) > 0) {
         	$returnValue = true;
         } else {
 	        foreach($this->getTypes() as $type){
@@ -201,8 +198,14 @@ class core_kernel_classes_Resource
     {
         if (is_null($this->label)) {
             
-            $label =  $this->getOnePropertyValue(new core_kernel_classes_Property(RDFS_LABEL));
-            $this->label = ((is_null($label) === false) ? $label->literal : '');
+            $label =  $this->getOnePropertyValue($this->getProperty(RDFS_LABEL));
+            $this->label = is_null($label)
+                ? ''
+                : ($label instanceof core_kernel_classes_Resource
+                    ? $label->getUri()
+                    : (string)$label
+                   )
+            ;
         }
         
         return $this->label;
@@ -219,8 +222,8 @@ class core_kernel_classes_Resource
     public function setLabel($label)
     {
         $returnValue = (bool) false;
-        $this->removePropertyValues(new core_kernel_classes_Property(RDFS_LABEL));
-        $this->setPropertyValue(new core_kernel_classes_Property(RDFS_LABEL), $label);
+        $this->removePropertyValues($this->getProperty(RDFS_LABEL));
+        $this->setPropertyValue($this->getProperty(RDFS_LABEL), $label);
         $this->label = $label;
         return (bool) $returnValue;
     }
@@ -236,7 +239,7 @@ class core_kernel_classes_Resource
     {
         $returnValue = (string) '';
         if($this->comment == '') {
-            $comment =  $this->getOnePropertyValue(new core_kernel_classes_Property(RDFS_COMMENT));
+            $comment =  $this->getOnePropertyValue($this->getProperty(RDFS_COMMENT));
             $this->comment = $comment != null ? $comment->literal : '';
              
         }
@@ -255,8 +258,8 @@ class core_kernel_classes_Resource
     public function setComment($comment)
     {
         $returnValue = (bool) false;
-        $this->removePropertyValues(new core_kernel_classes_Property(RDFS_COMMENT));
-        $this->setPropertyValue(new core_kernel_classes_Property(RDFS_COMMENT), $comment);
+        $this->removePropertyValues($this->getProperty(RDFS_COMMENT));
+        $this->setPropertyValue($this->getProperty(RDFS_COMMENT), $comment);
         $this->comment = $comment;
         return (bool) $returnValue;
     }
@@ -280,17 +283,16 @@ class core_kernel_classes_Resource
     }
 
     /**
-     * Short description of method getPropertyValuesCollection
+     * Return a collection of values associated to $property
      *
-     * @access public
-     * @author Joel Bout, <joel.bout@tudor.lu>
-     * @param  Property property
+     * @param core_kernel_classes_Property $property
+     * @param array $options
      * @return core_kernel_classes_ContainerCollection
      */
-    public function getPropertyValuesCollection( core_kernel_classes_Property $property)
+    public function getPropertyValuesCollection( core_kernel_classes_Property $property, $options=array())
     {
         $returnValue = new core_kernel_classes_ContainerCollection($this);
-		foreach ($this->getPropertyValues($property) as $value){
+		foreach ($this->getPropertyValues($property, $options) as $value){
 			$returnValue->add(common_Utils::toResource($value));
 		}
         return $returnValue;

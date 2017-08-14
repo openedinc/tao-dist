@@ -5,12 +5,11 @@
         <div class="progressbar"></div>
         <span class="btn-info small col-4"></span>
         <span class="file-name placeholder col-8 truncate"></span>
-        <input type="file"/>
+        <input type="file" {{#if accept}}accept="{{accept}}"{{/if}}/>
     </div>
-    <div class="file-upload-preview lft {{#if isPreviewable}}{{{visible-file-upload-preview}}}{{/if}}">
+    <div class="file-upload-preview lft visible-file-upload-preview runtime-visible-file-upload-preview">
         <p class="nopreview">{{__ 'No preview available'}}</p>
     </div>
-
     <div class="file-upload-preview-popup modal">
         <div class="modal-body">
         </div>

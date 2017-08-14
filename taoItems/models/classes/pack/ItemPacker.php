@@ -23,13 +23,13 @@ namespace oat\taoItems\model\pack;
 
 use \core_kernel_classes_Resource;
 use \common_Exception;
-use \taoItems_models_classes_ItemsService;
+use oat\oatbox\filesystem\Directory;
 
 /**
  * To allow packing of Item. The goal of the packaging is to represent the data needed
  * to run an item (ie. an ItemPack).
  *
- * @package taoQtiItem
+ * @package taoItems
  */
 abstract class ItemPacker
 {
@@ -59,12 +59,15 @@ abstract class ItemPacker
      *
      * @param core_kernel_classes_Resource $item the item to pack
      * @param string $lang
+     * @param Directory $directory
      * @return \oat\taoItems\model\pack\ItemPack
      */
-    abstract public function packItem(core_kernel_classes_Resource $item, $lang);
+    abstract public function packItem(core_kernel_classes_Resource $item, $lang, Directory $directory);
 
 
     /**
+     * @deprecated by fly-authoring
+     *
      * @param core_kernel_classes_Resource $item
      * @param $lang
      * @return string
@@ -72,9 +75,7 @@ abstract class ItemPacker
      */
     protected function getPath(core_kernel_classes_Resource $item, $lang = "")
     {
-        $path = taoItems_models_classes_ItemsService::singleton()->getItemFolder($item, $lang);
-        return $path;
-
+        throw new \BadMethodCallException(__CLASS__ . ' - ' . __METHOD__ . ' disable by fly-authoring');
     }
 
     /**

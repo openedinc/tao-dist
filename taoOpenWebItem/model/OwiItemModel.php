@@ -71,8 +71,9 @@ class OwiItemModel
      */
     public function render( core_kernel_classes_Resource $item, $langCode)
     {
-    	$itemsService = taoItems_models_classes_ItemsService::singleton();
-        $xhtml = $itemsService->getItemContent($item, $langCode);
+    	$itemService = taoItems_models_classes_ItemsService::singleton();
+    	$file = $itemService->getItemDirectory($item)->getFile('index.html');
+        $xhtml = $file->read();
 
         // Check if all needed APIs are referenced.
         $xhtml = $this->replaceDeprecatedApis($xhtml); // throws ItemModelException.
@@ -133,7 +134,7 @@ class OwiItemModel
 	}
 
 	public function getCompilerClass() {
-	    return 'taoItems_models_classes_ItemCompiler';
+	    return OwiItemCompiler::class;
 	}
 
     public function getPackerClass() {

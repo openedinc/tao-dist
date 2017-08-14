@@ -38,12 +38,12 @@ return array(
     array(
         'class' => 'ArchiveFileAppender',
         'mask' => 62, // 111110
-        'tags' => array('GENERIS', 'TAO')
+        'tags' => array('GENERIS', 'TAO'),
         'file' => '/var/log/tao/debug.txt',
         'directory' => '/var/log/tao/',
         'max_file_size' => 10000000,
         'prefix' => '[dev]'
-    );
+    ),
 
     // Example of a UDP Appender
     array(
@@ -51,7 +51,7 @@ return array(
         'host' => '127.0.0.1',
         'port' => 5775,
         'threshold' => 1,
-        'prefix' => '[dev]'
-    );
+        'prefix' => 'dev'
+    ),
 );
 */

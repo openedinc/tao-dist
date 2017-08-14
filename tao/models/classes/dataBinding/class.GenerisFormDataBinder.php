@@ -35,6 +35,7 @@
 
 use oat\oatbox\service\ServiceManager;
 use oat\generis\model\fileReference\FileReferenceSerializer;
+use oat\tao\model\upload\UploadService;
 
 class tao_models_classes_dataBinding_GenerisFormDataBinder extends tao_models_classes_dataBinding_GenerisInstanceDataBinder
 {
@@ -92,6 +93,8 @@ class tao_models_classes_dataBinding_GenerisFormDataBinder extends tao_models_cl
      * @param  core_kernel_classes_Property $property The property to bind the data.
      * @param  tao_helpers_form_data_UploadFileDescription $desc the upload file description.
      * @return void
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     * @throws \common_Exception
      */
     protected function bindUploadFileDescription(
         core_kernel_classes_Property $property,
@@ -109,21 +112,21 @@ class tao_models_classes_dataBinding_GenerisFormDataBinder extends tao_models_cl
             $name = $desc->getName();
             $size = $desc->getSize();
 
-            if (!empty($name) && !empty($size)){
+            if (! empty($name) && ! empty($size)) {
 
-                // Remove old file
+                // Remove old
                 $this->removeFile($property);
 
                 // Move the file at the right place.
                 $source = $desc->getTmpPath();
-                $repository = tao_models_classes_TaoService::singleton()->getUploadFileSource();
-                $file = $repository->spawnFile($source, $desc->getName());
-                tao_helpers_File::remove($source);
+                $serial = tao_models_classes_TaoService::singleton()->storeUploadedFile($source, $name);
+                $this->getServiceLocator()->get(UploadService::SERVICE_ID)->remove($source);
 
-                $instance->setPropertyValue($property, $file->getUri());
+                // Create association between item & file, database side
+                $instance->editPropertyValues($property, $serial);
 
                 // Update the UploadFileDescription with the stored file.
-                $desc->setFile($file);
+                $desc->setFile($serial);
             }
         }
     }
@@ -139,14 +142,23 @@ class tao_models_classes_dataBinding_GenerisFormDataBinder extends tao_models_cl
     protected function removeFile(core_kernel_classes_Property $property)
     {
         $instance = $this->getTargetInstance();
+        $referencer = $this->getServiceLocator()->get(FileReferenceSerializer::SERVICE_ID);
 
-        // Delete old files.
-        foreach ($instance->getPropertyValues($property) as $oF){
-        	$oldFile = new core_kernel_versioning_File($oF);
-        	$oldFile->delete(true);
-
-            $instance->removePropertyValue($property, $oldFile->getUri());
+        foreach ($instance->getPropertyValues($property) as $oldFileSerial) {
+            /** @var \oat\oatbox\filesystem\File $oldFile */
+            $oldFile = $referencer->unserializeFile($oldFileSerial);
+            $oldFile->delete();
+            $referencer->cleanup($oldFileSerial);
+            $instance->removePropertyValue($property, $oldFileSerial);
         }
+    }
+
+    /**
+     * @return ServiceManager
+     */
+    public function getServiceLocator()
+    {
+        return ServiceManager::getServiceManager();
     }
 
 }

@@ -1,8 +1,8 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoQtiTest/config/header/qtiAcceptableLatency.conf.php
+ * Default config header created during install
  */
 
-return 'PT5S';
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => 'PT5S'
+));

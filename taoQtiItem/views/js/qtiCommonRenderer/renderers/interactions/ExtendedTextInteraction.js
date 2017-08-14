@@ -31,8 +31,9 @@ define([
     'taoQtiItem/qtiCommonRenderer/helpers/instructions/instructionManager',
     'ckeditor',
     'taoQtiItem/qtiCommonRenderer/helpers/ckConfigurator',
+    'taoQtiItem/qtiCommonRenderer/helpers/patternMask',
     'polyfill/placeholders'
-], function($, _, __, Promise, tpl, containerHelper, instructionMgr, ckEditor, ckConfigurator){
+], function($, _, __, Promise, tpl, containerHelper, instructionMgr, ckEditor, ckConfigurator, patternMaskHelper){
     'use strict';
 
 
@@ -50,7 +51,6 @@ define([
             var $el, expectedLength, minStrings, expectedLines, patternMask, placeholderType, editor;
             var $container = containerHelper.get(interaction);
 
-            var response = interaction.getResponseDeclaration();
             var multiple = _isMultiple(interaction);
             var limiter  = inputLimiter(interaction);
 
@@ -80,7 +80,7 @@ define([
                         reject('Unable to instantiate ckEditor');
                     }
 
-                    editor.on('loaded', function(){
+                    editor.on('instanceReady', function(){
                         //it seems there's still something done after loaded, so resolved must be defered
                         _.delay(resolve, 300);
                     });
@@ -345,8 +345,8 @@ define([
             $wordsCounter   = $('.count-words',$container);
 
             if (patternMask !== "") {
-                maxWords = _parsePattern(patternMask, 'words');
-                maxLength = _parsePattern(patternMask, 'chars');
+                maxWords = patternMaskHelper.parsePattern(patternMask, 'words');
+                maxLength = patternMaskHelper.parsePattern(patternMask, 'chars');
                 maxWords = (_.isNaN(maxWords)) ? undefined : maxWords;
                 maxLength = (_.isNaN(maxLength) ? undefined : maxLength);
             }
@@ -370,32 +370,54 @@ define([
 
                 var ignoreKeyCodes = [
                     8, // backspace
-                    222832, // Shift + backspace in ckEditor
-                    1114120, // Ctrl + backspace in ckEditor
-                    1114177, // Ctrl + a in ckEditor
-                    1114202, // Ctrl + z in ckEditor
-                    1114200, // Ctrl + x in ckEditor
+                    16, // shift
+                    17, // control
+                    46, // delete
+                    37, // arrow left
+                    38, // arrow up
+                    39, // arrow right
+                    40, // arrow down
+                    35, // home
+                    36, // end
+
+                    // ckeditor specific:
+                    1114177, // home
+                    3342401, // Shift + home
+                    1114181, // end
+                    3342405, // Shift + end
+
+                    2228232, // Shift + backspace
+                    2228261, // Shift + arrow left
+                    4456485, // Alt   + arrow left
+                    2228262, // Shift + arrow up
+                    2228263, // Shift + arrow right
+                    4456487, // Alt   + arrow right
+                    2228264, // Shift + arrow down
+
+                    1114120, // Ctrl + backspace
+                    1114177, // Ctrl + a
+                    1114202, // Ctrl + z
+                    1114200  // Ctrl + x
                 ];
                 var triggerKeyCodes = [
                     32, // space
                     13, // enter
-                    2228237, // shift + enter in ckEditor
+                    2228237 // shift + enter in ckEditor
                 ];
 
 
                 var limitHandler = function limitHandler(e){
                     var keyCode = e && e.data ? e.data.keyCode : e.which ;
                     if ( (!_.contains(ignoreKeyCodes, keyCode) ) &&
-                         (maxWords && self.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode)) ||
-                         (maxLength && self.getCharsCount() >= maxLength)){
-
+                         (maxWords && self.getWordsCount() >= maxWords && _.contains(triggerKeyCodes, keyCode) ||
+                         (maxLength && self.getCharsCount() >= maxLength))){
                         if (e.cancel){
                             e.cancel();
                         } else {
                             e.preventDefault();
                             e.stopImmediatePropagation();
                         }
-                        return setText(interaction, _getTextareaValue(interaction, true));
+                        return false;
                     }
                     _.defer(function(){
                         self.updateCounter();
@@ -467,7 +489,7 @@ define([
      * @param {string} pattern
      */
     var _setPattern = function _setPattern($element, pattern){
-        var patt = new RegExp('^'+pattern+'$');
+        var patt = new RegExp(pattern);
 
         //test when some data is entering in the input field
         //@todo plug the validator + tooltip
@@ -580,39 +602,6 @@ define([
         return 'plain';
     };
 
-    /**
-     * parse the pattern (idealy from patternMask) and return the max words / chars from the pattern
-     * @param  {String} pattern String from patternMask
-     * @param  {String} type    the type of information you want : words / chars
-     * @returns {Number|null}    the number extracted of the pattern, or null if not found
-     */
-    var _parsePattern = function _parsePattern(pattern,type){
-        if (pattern === undefined){return null;}
-
-        var regexChar = /\^\[\\s\\S\]\{\d+\,(\d+)\}\$/,
-        regexWords =  /\^\(\?\:\(\?\:\[\^\\s\\:\\!\\\?\\\;\\\…\\\€\]\+\)\[\\s\\:\\!\\\?\\;\\\…\\\€\]\*\)\{\d+\,(\d+)\}\$/,
-        result;
-
-        if (type === "words") {
-            result = pattern.match(regexWords);
-            if (result !== null && result.length > 1) {
-                return parseInt(result[1],10);
-            }else{
-                return null;
-            }
-        }else if (type === "chars"){
-            result = pattern.match(regexChar);
-
-            if (result !== null && result.length > 1) {
-                return parseInt(result[1],10);
-            }else{
-                return null;
-            }
-        }else{
-            return null;
-        }
-    };
-
     var enable = function(interaction) {
         var $container = containerHelper.get(interaction);
         var editor;
@@ -655,7 +644,6 @@ define([
 
     var setText = function(interaction, text) {
         var limiter = inputLimiter(interaction);
-
         if ( _getFormat(interaction) === 'xhtml') {
             try{
             _getCKEditor(interaction).setData(text, function(){
@@ -735,8 +723,8 @@ define([
 
     var getCustomData = function(interaction, data){
         var pattern = interaction.attr('patternMask'),
-            maxWords = parseInt(_parsePattern(pattern,'words')),
-            maxLength = parseInt(_parsePattern(pattern, 'chars')),
+            maxWords = parseInt(patternMaskHelper.parsePattern(pattern,'words')),
+            maxLength = parseInt(patternMaskHelper.parsePattern(pattern, 'chars')),
             expectedLength = parseInt(interaction.attr('expectedLines'),10);
         return _.merge(data || {}, {
             maxWords : (! isNaN(maxWords)) ? maxWords : undefined,

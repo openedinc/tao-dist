@@ -20,6 +20,8 @@
  */
 
 namespace oat\taoQtiItem\model\flyExporter\extractor;
+use League\Flysystem\FileNotFoundException;
+use oat\taoQtiItem\model\qti\Service;
 
 /**
  * Extract all given columns of item qti data
@@ -95,16 +97,21 @@ class QtiExtractor implements Extractor
      */
     private function loadXml(\core_kernel_classes_Resource $item)
     {
-        $itemService = \taoItems_models_classes_ItemsService::singleton();
-        if (!$itemService->hasItemContent($item)) {
-            throw new ExtractorException('No content found for item ' . $item->getUri());
+        $itemService = Service::singleton();
+
+        try {
+            $xml = $itemService->getXmlByRdfItem($item);
+            if (empty($xml)) {
+                throw new ExtractorException('No content found for item ' . $item->getUri());
+            }
+        } catch (FileNotFoundException $e) {
+            throw new ExtractorException('qti.xml file was not found for item '. $item->getUri() .'; The item might be empty.');
         }
-        $xml = $itemService->getItemContent($item);
 
         $this->dom   = new \DOMDocument();
         $this->dom->loadXml($xml);
         $this->xpath = new \DOMXpath($this->dom);
-        $this->xpath->registerNamespace('qti', 'http://www.imsglobal.org/xsd/imsqti_v2p1');
+        $this->xpath->registerNamespace('qti', $this->dom->documentElement->namespaceURI);
 
         return $this;
     }
@@ -145,7 +152,8 @@ class QtiExtractor implements Extractor
                     if (isset($config['callbackParameters'])) {
                         $params = $config['callbackParameters'];
                     }
-                    $callbackValue = $this->$config['callback']($interaction, $params);
+                    $functionCall = $config['callback'];
+                    $callbackValue = call_user_func(array($this, $functionCall), $interaction, $params);
                     if (isset($config['valuesAsColumns'])) {
                         $line[$interaction['id']] = array_merge($line[$interaction['id']], $callbackValue);
                     } else {
@@ -156,7 +164,6 @@ class QtiExtractor implements Extractor
         }
         $this->data = $line;
         $this->columns = $this->interactions = [];
-
         return $this;
     }
 
@@ -220,6 +227,10 @@ class QtiExtractor implements Extractor
                 'xpathChoice'      => 'descendant::*[@class="qti-choice"]'
             ],
 
+            // Custom PCI interactions; Proper interaction type name will be determined by an xpath query
+            'Custom Interaction' => [
+                'domInteraction' => 'customInteraction'
+            ],
 
             // Simple interaction
             'Extended text' => ['domInteraction' => 'extendedTextInteraction'],
@@ -257,16 +268,26 @@ class QtiExtractor implements Extractor
                 $interaction['choices'] = [];
                 $interaction['responses'] = [];
 
+                if ($parser['domInteraction'] == 'customInteraction') {
+                    // figure out the proper type name of a custom interaction
+                    $portableCustomNode = $this->xpath->query('./pci:portableCustomInteraction', $interactionNode->item($i));
+                    if ($portableCustomNode->length) {
+                        $interaction['type'] = ucfirst(str_replace('Interaction', '', $portableCustomNode->item(0)->getAttribute('customInteractionTypeIdentifier')));
+                    }
+                }
+
                 /**
                  * Interaction right answers
                  */
                 $interaction['responseIdentifier'] = $interactionNode->item($i)->getAttribute('responseIdentifier');
                 $rightAnswer = $this->xpath->query('./qti:responseDeclaration[@identifier="' . $interaction['responseIdentifier'] . '"]');
                 if ($rightAnswer->length > 0) {
-                    $answers = trim($rightAnswer->item(0)->textContent);
+                    $answers = $rightAnswer->item(0)->textContent;
                     if (!empty($answers)) {
                         foreach(explode(PHP_EOL, $answers) as $answer) {
-                            $interaction['responses'][] = trim($answer);
+                            if (trim($answer)!=='') {
+                                $interaction['responses'][] = $answer;
+                            }
                         }
                     }
                 }
@@ -284,7 +305,8 @@ class QtiExtractor implements Extractor
                 if (!empty($choiceNode) && $choiceNode->length > 0) {
                     for($j=0 ; $j < $choiceNode->length ; $j++) {
                         $identifier = $choiceNode->item($j)->getAttribute('identifier');
-                        $value = preg_replace('/\s+/', '', $choiceNode->item($j)->nodeValue);
+                        $value = $this->sanitizeNodeToValue($this->dom->saveHtml($choiceNode->item($j)));
+
                         //Image
                         if ($value==='') {
                             $imgNode = $this->xpath->query('./qti:img/@src', $choiceNode->item($j));
@@ -303,6 +325,22 @@ class QtiExtractor implements Extractor
     }
 
     /**
+     * Remove first and last xml tag from string
+     * Transform variable to string value
+     *
+     * @param $value
+     * @return string
+     */
+    protected function sanitizeNodeToValue($value)
+    {
+        $first = strpos($value, '>')+1;
+        $last = strrpos($value, '<')-$first;
+        $value = substr($value, $first, $last);
+        $value = str_replace('"', "'", $value);
+        return trim($value);
+    }
+
+    /**
      * Callback to retrieve right answers
      * Find $responses & resolve identifier with $choices
      *
@@ -311,21 +349,26 @@ class QtiExtractor implements Extractor
      */
     public function getRightAnswer($interaction, $params)
     {
-        $return = [];
+        $return = ['BR_identifier' => [], 'BR_label'=>[]];
         if (isset($interaction['responses'])) {
             foreach ($interaction['responses'] as $response) {
-                $allResponses = explode(' ', $response);
-                $returnResponse = [];
+
+                $allResponses = explode(' ', trim($response));
+                $returnLabel = [];
+                $returnIdentifier = [];
 
                 foreach ($allResponses as $partialResponse) {
                     if (isset($interaction['choices'][$partialResponse])
                         && $interaction['choices'][$partialResponse]!=='') {
-                        $returnResponse[] = $interaction['choices'][$partialResponse];
+                        $returnLabel[] = $interaction['choices'][$partialResponse];
                     } else {
-                        $returnResponse[] = $partialResponse;
+                        $returnLabel[] = '';
                     }
+                    $returnIdentifier[] = $partialResponse;
                 }
-                $return[] = implode(' ', $returnResponse);
+
+                $return['BR_identifier'][] = implode(' ', $returnIdentifier);
+                $return['BR_label'][] = implode(' ', $returnLabel);
             }
         }
         if (isset($params['delimiter'])) {
@@ -333,7 +376,11 @@ class QtiExtractor implements Extractor
         } else {
             $delimiter = self::DEFAULT_PROPERTY_DELIMITER;
         }
-        return implode($delimiter, $return);
+
+        $return['BR_identifier'] = implode($delimiter, $return['BR_identifier']);
+        $return['BR_label'] = implode($delimiter, $return['BR_label']);
+
+        return $return;
     }
 
     /**
@@ -364,21 +411,14 @@ class QtiExtractor implements Extractor
         if (isset($interaction['choices'])) {
             $i = 1;
             foreach ($interaction['choices'] as $identifier => $choice) {
-                \common_Logger::d($interaction['type']);
-                \common_Logger::d($choice);
-
-                if (!$choice!=='') {
-                    $return['choice_' . $i] = $choice;
-                } else {
-                    $return['choice_' . $i] = $identifier;
-                }
-                \common_Logger::d($return['choice_' . $i]);
-                \common_Logger::d('---------    ');
+                $return['choice_identifier_' . $i] = $identifier;
+                $return['choice_label_' . $i] = ($choice) ?: '';
                 $i++;
             }
             if ($this->headerChoice > count($return)) {
                 while ($this->headerChoice > count($return)) {
-                    $return['choice_' . $i] = '';
+                    $return['choice_identifier_' . $i] = '';
+                    $return['choice_label_' . $i] = '';
                     $i++;
                 }
             } else {
@@ -402,6 +442,17 @@ class QtiExtractor implements Extractor
         } else {
             throw new ExtractorException('Interaction malformed: missing type.');
         }
+    }
+
+    /**
+     * Callback to retrieve interaction response identifier
+     *
+     * @param $interaction
+     * @return mixed
+     */
+    public function getResponseIdentifier($interaction)
+    {
+        return $interaction['responseIdentifier'];
     }
 
     /**

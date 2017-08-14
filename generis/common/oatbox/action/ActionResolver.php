@@ -19,35 +19,17 @@
  */
 namespace oat\oatbox\action;
 
-
 use oat\oatbox\service\ConfigurableService;
-use oat\oatbox\service\ServiceNotFoundException;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-
+/**
+ * @deprecated
+ */
 class ActionResolver extends ConfigurableService
 {
     /**
-     * 
-     * @param unknown $string
-     * @return Action
+     * @deprecated please use ActionService
      */
     public function resolve($actionIdentifier)
     {
-        $action = null;
-        try {
-            $action = $this->getServiceManager()->get($actionIdentifier);
-        } catch (ServiceNotFoundException $e) {
-            if (class_exists($actionIdentifier)) {
-                $action = new $actionIdentifier();
-                if ($action instanceof ServiceLocatorAwareInterface) {
-                    $action->setServiceLocator($this->getServiceLocator());
-                }
-            }
-        }
-        if (!is_null($action) && $action instanceof Action) {
-            return $action;
-        } else {
-            throw new ResolutionException('Unknown action '.$actionIdentifier);
-        }
+        return $this->getServiceManager()->get(ActionService::SERVICE_ID)->resolve($actionIdentifier);
     }
 }

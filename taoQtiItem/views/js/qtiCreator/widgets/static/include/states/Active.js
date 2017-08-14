@@ -1,3 +1,21 @@
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014-2017 (original work) Open Assessment Technlogies SA
+ *
+ */
 define([
     'jquery',
     'lodash',
@@ -7,8 +25,10 @@ define([
     'tpl!taoQtiItem/qtiCreator/tpl/forms/static/include',
     'taoQtiItem/qtiCreator/widgets/helpers/formElement',
     'taoQtiItem/qtiCreator/helper/xincludeRenderer',
-    'ui/resourcemgr'
+    'ui/resourcemgr',
+    'ui/tooltip'
 ], function($, _, __, stateFactory, Active, formTpl, formElement, xincludeRenderer){
+    'use strict';
 
     var IncludeStateActive = stateFactory.extend(Active, function(){
 
@@ -70,19 +90,20 @@ define([
                     if(files && files.length){
 
                         file = files[0].file;
+                        $href.val(file);
                         
                         //set the selected file as the new href and refresh rendering
                         xincludeRenderer.render(widget, options.baseUrl, file);
 
                         _.defer(function(){
-                            $href.val(file).trigger('change');
+                            $href.trigger('change');
                         });
                     }
                 },
                 open : function(){
                     //hide tooltip if displayed
-                    if($href.hasClass('tooltipstered')){
-                        $href.blur().tooltipster('hide');
+                    if($href.data('qtip')){
+                        $href.blur().qtip('hide');
                     }
                 },
                 close : function(){

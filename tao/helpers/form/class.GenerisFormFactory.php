@@ -19,6 +19,7 @@
  *
  */
 use oat\tao\helpers\form\elements\TreeAware;
+use oat\tao\helpers\form\ValidationRuleRegistry;
 
 /**
  * The GenerisFormFactory enables you to create Forms using rdf data and the
@@ -93,7 +94,7 @@ class tao_helpers_form_GenerisFormFactory
 					$options = array();
 
 					if($element instanceof TreeAware){
-						$sortedOptions = $element->rangeToTree(
+                        $sortedOptions = $element->rangeToTree(
 							$property->getUri() === RDFS_RANGE ? new core_kernel_classes_Class( RDFS_RESOURCE ) : $range
 						);
 					}
@@ -123,6 +124,11 @@ class tao_helpers_form_GenerisFormFactory
 					$element->setOptions($sortedOptions);
 				}
 			}
+
+			foreach (ValidationRuleRegistry::getRegistry()->getValidators($property) as $validator) {
+			    $element->addValidator($validator);
+			}
+
 			$returnValue = $element;
 		}
 

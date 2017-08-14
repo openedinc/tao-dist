@@ -1,8 +1,6 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoQtiItem/config/header/simpleExporter.conf.php
+ * Default config header created during install
  */
 
 return new oat\taoQtiItem\model\flyExporter\simpleExporter\ItemExporter(array(
@@ -31,13 +29,20 @@ return new oat\taoQtiItem\model\flyExporter\simpleExporter\ItemExporter(array(
                 'callback' => 'getNumberOfChoices'
             )
         ),
+        'responseIdentifier' => array(
+            'extractor' => 'QtiExtractor',
+            'parameters' => array(
+                'callback' => 'getResponseIdentifier'
+            )
+        ),
         'BR' => array(
             'extractor' => 'QtiExtractor',
             'parameters' => array(
                 'callback' => 'getRightAnswer',
                 'callbackParameters' => array(
                     'delimiter' => '|'
-                )
+                ),
+                'valuesAsColumns' => true
             )
         ),
         'choiceInteraction' => array(

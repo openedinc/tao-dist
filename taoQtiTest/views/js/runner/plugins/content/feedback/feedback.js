@@ -83,13 +83,16 @@ define([
 
                     currentFeedback = feedback().error(message);
                 })
+                .on('danger', function(message){
+                    currentFeedback = feedback().danger(message);
+                })
                 .on('warning', function(message){
                     currentFeedback = feedback().warning(message);
                 })
                 .on('info', function(message){
                     currentFeedback = feedback().info(message);
                 })
-                .on('alert confirm unloaditem', closeCurrent);
+                .on('alert.* confirm.* unloaditem', closeCurrent);
         }
     });
 });

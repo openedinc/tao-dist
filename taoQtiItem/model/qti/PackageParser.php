@@ -21,12 +21,12 @@
 
 namespace oat\taoQtiItem\model\qti;
 
-use oat\taoQtiItem\model\qti\PackageParser;
 use \tao_models_classes_Parser;
 use \Exception;
 use \tao_helpers_File;
 use \ZipArchive;
 use \common_exception_Error;
+use \oat\oatbox\filesystem\File;
 
 /**
  * Enables you to parse and validate a QTI Package.
@@ -42,12 +42,15 @@ use \common_exception_Error;
 class PackageParser
     extends tao_models_classes_Parser
 {
+    protected $extracted;
+
     /**
      * Short description of method validate
      *
      * @access public
      * @author Jerome Bogaerts, <jerome.bogaerts@tudor.lu>
      * @param  string schema
+     * @throws Exception if file or archive is not valid
      * @return boolean
      */
     public function validate($schema = '')
@@ -72,6 +75,16 @@ class PackageParser
 			   		if(!tao_helpers_File::securityCheck($this->source)){
 			    		throw new Exception("{$this->source} seems to contain some security issues");
 			    	}
+			    	break;
+                case self::SOURCE_FLYFILE:
+                    //check file
+                    if (!$this->source->exists()) {
+                        throw new Exception("File {$this->source->getBasename()} not found.");
+                    }
+                    if (!preg_match("/\.zip$/", $this->source->getBasename())) {
+                        throw new Exception("Wrong file extension in {$this->source}, zip extension is expected");
+                    }
+                    $this->extract();
 			    	break;
         		default:
 	        		throw new Exception("Only regular files are allowed as package source");
@@ -136,32 +149,41 @@ class PackageParser
      * Short description of method extract
      *
      * @access public
+     * @throws \common_exception_Error
      * @author Jerome Bogaerts, <jerome.bogaerts@tudor.lu>
-     * @return string
+     * @return string|null
      */
     public function extract()
     {
-        
-    	if(!is_file($this->source)){	//ultimate verification
-        	throw new common_exception_Error("source ".$this->source." not a file");
-        }
-        
-        $sourceFile = basename($this->source);
-        $folder = tao_helpers_File::createTempDir();
-		
-		if(!is_dir($folder)){
-        	mkdir($folder);
-        }
-        
-	    $zip = new ZipArchive();
-		if ($zip->open($this->source) === true) {
-		    if($zip->extractTo($folder)){
-		    	$returnValue = $folder;
-		    }
-		    $zip->close();
-		}
-        
-        return (string) $returnValue;
-    }
+        if ($this->extracted === null) {
+            if ($this->source instanceof File) {
+                $archiveFolder = tao_helpers_File::createTempDir();
+                if (!is_dir($archiveFolder)) {
+                    mkdir($archiveFolder);
+                }
+                $filename = $archiveFolder . basename($this->source->getPrefix());
+                file_put_contents($filename, $this->source->read());
+                $this->source = $filename;
+            }
 
+            if(!is_file($this->source)){	//ultimate verification
+                throw new common_exception_Error("source ".$this->source." not a file");
+            }
+
+            $folder = tao_helpers_File::createTempDir();
+            if (!is_dir($folder)) {
+                mkdir($folder);
+            }
+
+            $zip = new ZipArchive();
+            if ($zip->open($this->source) === true) {
+                if($zip->extractTo($folder)){
+                    $this->extracted = $folder;
+                }
+                $zip->close();
+            }
+        }
+
+        return (string) $this->extracted;
+    }
 }

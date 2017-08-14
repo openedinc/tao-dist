@@ -33,20 +33,13 @@ use oat\tao\model\ClientLibRegistry;
  */
 abstract class CreatorRegistry
 {
-
-    /**
-     * constructor
-     */
-    public function __construct(){
-    }
-
     /**
      * @return string - e.g. DIR_VIEWS/js/pciCreator/dev/
      */
     abstract protected function getBaseDevDir();
 
     /**
-     * @return string - e.g. BASE_WWW/js/pciCreator/dev/
+     * @return string - e.g. base_www/js/pciCreator/dev/
      */
     abstract protected function getBaseDevUrl();
 

@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2017 (original work) Open Assessment Technlogies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -23,15 +23,28 @@
  */
 define([
     'lodash',
-    'context',
     'core/promise',
+    'core/logger',
     'tpl!taoQtiItem/qtiCommonRenderer/tpl/interactions/customInteraction',
     'taoQtiItem/qtiCommonRenderer/helpers/container',
     'taoQtiItem/qtiCommonRenderer/helpers/PortableElement',
     'qtiCustomInteractionContext',
-    'taoQtiItem/qtiItem/helper/util'
-], function(_, context, Promise, tpl, containerHelper, PortableElement, qtiCustomInteractionContext, util){
+    'taoQtiItem/qtiItem/helper/util',
+    'taoQtiItem/portableElementRegistry/ciRegistry'
+], function(_, Promise, loggerFactory, tpl, containerHelper, PortableElement, qtiCustomInteractionContext, util, ciRegistry){
     'use strict';
+
+    var logger = loggerFactory('taoQtiItem/qtiCommonRenderer/renderers/interactions/PortableCustomInteraction');
+
+    var pciReadyCallback = function pciReadyCallback(pci, state){
+        //standard callback function to be implemented in a future story
+        logger.info('pciReadyCallback called on PCI '+pci.typeIdentifier);
+    }
+
+    var pciDoneCallback = function pciDoneCallback(pci, response, state, status){
+        //standard callback function to be implemented in a future story
+        logger.info('pciDoneCallback called on PCI '+pci.typeIdentifier);
+    }
 
     /**
      * Get the PCI instance associated to the interaction object
@@ -40,7 +53,7 @@ define([
      * @param {Object} interaction - the js object representing the interaction
      * @returns {Object} PCI instance
      */
-    var _getPci = function(interaction){
+    var _getPci = function _getPci(interaction, model){
 
         var pciTypeIdentifier,
             pci = interaction.data('pci') || undefined;
@@ -56,6 +69,10 @@ define([
                 interaction.data('pci', pci);
                 pci._taoCustomInteraction = interaction;
 
+                if(model){
+                    interaction.data('pci-model', model);
+                }
+
             }else{
                 throw 'no custom interaction hook found for the type ' + pciTypeIdentifier;
             }
@@ -63,6 +80,10 @@ define([
 
         return pci;
     };
+
+    var _isPciModel = function _isPciModel(interaction, model){
+        return (model && interaction.data('pci-model') === model);
+    }
 
     /**
      * Execute javascript codes to bring the interaction to life.
@@ -77,55 +98,114 @@ define([
      *
      * @param {Object} interaction
      */
-    var render = function(interaction, options){
+    var render = function render(interaction, options){
         var self = this;
 
         options = options || {};
         return new Promise(function(resolve, reject){
-            var runtimeLocation;
-            var state              = {}; //@todo pass state and response to renderer here:
-            var localRequireConfig = { paths : {} };
-            var response           = { base : null};
+
             var id                 = interaction.attr('responseIdentifier');
+
             var typeIdentifier     = interaction.typeIdentifier;
-            var runtimeLocations   = options.runtimeLocations ? options.runtimeLocations : self.getOption('runtimeLocations');
-            var config             = _.clone(interaction.properties); //pass a clone instead
+            var properties         = _.clone(interaction.properties);//clone properties to prevent modification
             var $dom               = containerHelper.get(interaction).children();
-            var entryPoint         = interaction.entryPoint.replace(/\.js$/, '');   //ensure it's an AMD module
+            var assetManager       = self.getAssetManager();
 
-            //update config with runtime paths
-            if(runtimeLocations && runtimeLocations[typeIdentifier]){
-                runtimeLocation = runtimeLocations[typeIdentifier];
-            } else{
-                runtimeLocation = self.getAssetManager().resolveBy('portableElementLocation', typeIdentifier);
+            //restore state and response to renderer here:
+            var state;
+            var response = {};
+
+            if(options.state && options.state[id]){
+                state = options.state[id];
             }
-            if(runtimeLocation){
-                localRequireConfig.paths[typeIdentifier] = runtimeLocation;
-                require.config(localRequireConfig);
-            }
+            response[id] = {base : null};
 
-            //load the entrypoint
-            require([entryPoint], function(){
+            ciRegistry.loadRuntimes().then(function(){
 
-                var pci = _getPci(interaction);
-                if(pci){
-                    //call pci initialize() to render the pci
-                    pci.initialize(id, $dom[0], config);
-                    //restore context (state + response)
-                    pci.setSerializedState(state);
-                    pci.setResponse(response);
+                var config = {};
+                var requireEntries = [];
+                var runtime = ciRegistry.getRuntime(typeIdentifier);
 
-                    //forward internal PCI event responseChange
-                    interaction.onPci('responseChange', function(){
-                        containerHelper.triggerResponseChangeEvent(interaction);
-                    });
-
-                    return resolve();
+                if(!runtime){
+                    return reject('The runtime for the pci cannot be found : ' + typeIdentifier);
                 }
 
-                return reject('Unable to initiliaze pci : ' + id);
+                //load hook if applicable
+                if(runtime.hook){
+                    requireEntries.push(runtime.hook.replace(/\.js$/, ''));
+                }
 
-            }, reject);
+                //load libs
+                _.forEach(runtime.libraries, function(lib) {
+                    requireEntries.push(lib.replace(/\.js$/, ''));
+                });
+
+                //load libs
+                _.forEach(runtime.libraries, function(lib) {
+                    requireEntries.push(lib.replace(/\.js$/, ''));
+                });
+
+                //load modules
+                _.forEach(runtime.modules, function(module, id){
+                    requireEntries.push(id);
+                });
+
+                //load stylesheets
+                _.forEach(runtime.stylesheets, function(stylesheet){
+                    requireEntries.push('css!'+stylesheet.replace(/\.css$/, ''));
+                });
+
+                //console.log(requireEntries);
+
+                //load the entrypoint+stylesheets
+                require(requireEntries, function(){
+
+                    var pci = _getPci(interaction, runtime.model);
+                    var pciAssetManager = {
+                        resolve : function resolve(url){
+                            var resolved = assetManager.resolveBy('portableElementLocation', url);
+                            if(resolved === url || _.isUndefined(resolved)){
+                                return assetManager.resolve(url);
+                            }else{
+                                return resolved;
+                            }
+                        }
+                    };
+
+                    if(pci){
+
+                        if(_isPciModel(interaction, 'IMSPCI')){
+                            config = {
+                                properties : properties,
+                                templateVariables : {},//not supported yet
+                                boundTo : response,
+                                onready : pciReadyCallback,
+                                ondone : pciDoneCallback,
+                                status : 'interacting',//only support interacting state currently(TODO: solution, review),
+                                assetManager : pciAssetManager
+                            };
+
+                            pci.getInstance($dom[0], config, state);
+                        }else{
+                            //call pci initialize() to render the pci
+                            pci.initialize(id, $dom[0], properties, pciAssetManager);
+                        }
+
+                        //forward internal PCI event responseChange
+                        interaction.onPci('responseChange', function(){
+                            containerHelper.triggerResponseChangeEvent(interaction);
+                        });
+
+                        return resolve();
+                    }
+
+                    return reject('Unable to initialize pci "' + id + '": '+error);
+
+                }, reject);
+
+            }).catch(function(error){
+                reject('Error loading runtime "' + id + '": '+error);
+            });
         });
     };
 
@@ -178,8 +258,10 @@ define([
      * @param {Object} interaction
      * @param {Object} serializedState - json format
      */
-    var setSerializedState = function(interaction, serializedState){
-        _getPci(interaction).setSerializedState(serializedState);
+    var setState = function(interaction, serializedState){
+        if(!_isPciModel(interaction, 'IMSPCI')){
+            _getPci(interaction).setSerializedState(serializedState);
+        }
     };
 
     /**
@@ -189,8 +271,12 @@ define([
      * @param {Object} interaction
      * @returns {Object} json format
      */
-    var getSerializedState = function(interaction){
-        return _getPci(interaction).getSerializedState();
+    var getState = function(interaction){
+        if(_isPciModel(interaction, 'IMSPCI')){
+            return _getPci(interaction).getState();
+        }else{
+            return _getPci(interaction).getSerializedState();
+        }
     };
 
     return {
@@ -212,7 +298,7 @@ define([
         getResponse : getResponse,
         resetResponse : resetResponse,
         destroy : destroy,
-        getSerializedState : getSerializedState,
-        setSerializedState : setSerializedState
+        getState : getState,
+        setState : setState
     };
 });

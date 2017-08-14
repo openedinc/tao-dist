@@ -8,17 +8,18 @@ define([
     'context',
     'core/store',
     'layout/actions',
+    'layout/section',
     'ui/feedback',
     'uri',
     'jquery.tree',
     'lib/jsTree/plugins/jquery.tree.contextmenu'
-], function($, _, __, context, store, actionManager, feedback, uri){
+], function($, _, __, context, store, actionManager, sectionManager, feedback, uri){
     'use strict';
 
     var pageRange = 30;
 
     /**
-     * The tree factory helps you to intantiate a new tree from the TAO ontology
+     * The tree factory helps you to instantiate a new tree from the TAO ontology
      * @exports layout/tree
      *
      * @param {jQueryElement} $elt - that will contain the tree
@@ -57,7 +58,6 @@ define([
             limit           : pageRange
         });
 
-        var treeStore = store('taotree');
         var lastSelected;
 
         /**
@@ -65,7 +65,7 @@ define([
          * @private
          */
         var setUpTree  = function setUpTree(){
-
+            var treeSectionId = context.section;
             //try to load the action instance from the options
             options.actions = _.transform(options.actions, function(result, value, key){
                 if(value && value.length){
@@ -76,20 +76,27 @@ define([
             //bind events from the definition below
             _.forEach(events, function(callback, name){
                 $elt.off(name + '.taotree')
-                    .on(name + '.taotree', function(e){
-                    callback.apply(this, Array.prototype.slice.call(arguments, 1));
-                });
+                    .on(name + '.taotree', function(){
+                        callback.apply(this, Array.prototype.slice.call(arguments, 1));
+                    });
             });
 
             // workaround to fix dublicate tree bindings on multiple page loads
             if (!$elt.hasClass('tree')) {
 
-                treeStore.getItem(context.section).then(function(node){
-                    if(node){
-                        lastSelected = node;
-                    }
-                    //create the tree
-                    $elt.tree(treeOptions);
+                store('taotree').then(function(treeStore){
+                    treeStore.getItem(context.section).then(function(node){
+                        if(node){
+                            lastSelected = node;
+                        }
+                        //create the tree
+                        $elt.tree(treeOptions);
+                        sectionManager.on('show.section', function (section) {
+                            if (treeSectionId === section.id) {
+                                $elt.trigger('refresh.taotree');
+                            }
+                        });
+                    });
                 });
             }
         };
@@ -150,7 +157,7 @@ define([
                         params.classUri = $node.data('uri');
                     }
                     if(lastSelected){
-                    	params.selected = lastSelected;
+                        params.selected = lastSelected;
                     }
 
                     //check for additionnal parameters in tree state
@@ -182,7 +189,7 @@ define([
                  * @param {Object} tree - the tree instance
                  * @returns {Object} data the modified data
                  */
-                ondata: function(data, tree) {
+                ondata: function(data) {
 
                     if(data.error){
                         feedback().error(data.error);
@@ -221,13 +228,18 @@ define([
                     var treeState       = $elt.data('tree-state') || {};
                     var selectNode      = treeState.selectNode || options.selectNode;
                     var nodeSelection   = function nodeSelection(){
+
                         //the node to select is given
                         if(selectNode){
-                             $selectNode = $('#' + selectNode, $elt);
-                             if($selectNode.length && !$selectNode.hasClass('private')){
+                            $selectNode = $('#' + selectNode, $elt);
+                            if($selectNode.length && !$selectNode.hasClass('private')){
                                 return tree.select_branch($selectNode);
-                             }
+                            }
+                        } else if(tree.selected !== undefined) {//after refreshing tree previously node will be already selected.
+                            return tree.selected;
                         }
+
+                        //if selectNode was not given and there is no selected node on the tree then try to find node to select:
 
                         //try to select the last one
                         if(lastSelected){
@@ -237,7 +249,6 @@ define([
                                 return tree.select_branch($lastSelected);
                             }
                         }
-
                         //or the 1st instance
                         if ($firstInstance.length) {
                             return tree.select_branch($firstInstance);
@@ -340,8 +351,10 @@ define([
                         nodeContext.context = ['instance', 'resource'];
 
                         //the last selected node is stored
-                        treeStore.setItem(context.section, nodeId).then(function(){
-                            executePossibleAction(options.actions, nodeContext, ['moveInstance', 'delete']);
+                        store('taotree').then(function(treeStore){
+                            treeStore.setItem(context.section, nodeId).then(function(){
+                                executePossibleAction(options.actions, nodeContext, ['moveInstance', 'delete']);
+                            });
                         });
                     }
 
@@ -371,6 +384,11 @@ define([
 
                     if (type === 'after' || type === 'before') {
                         refNode = tree.parent(refNode);
+                    }
+
+                    if (!(refNode instanceof $) && !(refNode instanceof window.HTMLElement)) {
+                        $.tree.rollback(rollback);
+                        return false;
                     }
 
                     //set the rollback data
@@ -416,14 +434,15 @@ define([
                     //update the state with data to be used later (ie. filter value, etc.)
                     treeState = _.merge($elt.data('tree-state') || {}, data);
 
-
-
-
                     if (data && data.loadNode) {
                         tree.deselect_branch(tree.selected);
                         tree.settings.selected = false;
                         treeState.selectNode = data.loadNode;
+                    } else if (data && data.selectNode) { //node will be selected in `onload` function
+                        tree.deselect_branch(tree.selected);
+                        tree.settings.selected = false;
                     }
+
                     $elt.data('tree-state', treeState);
                     tree.refresh();
                 }
@@ -465,7 +484,7 @@ define([
             'addnode' : function (data) {
 
                 var tree =  $.tree.reference($elt);
-            	var parentNode = tree.get_node($('#' + uri.encode(data.parent), $elt).get(0));
+                var parentNode = tree.get_node($('#' + uri.encode(data.parent), $elt).get(0));
 
                 var params = _.clone(serverParams);
 
@@ -506,7 +525,7 @@ define([
                 var tree =  $.tree.reference($elt);
                 var node = tree.get_node($('#' + data.id, $elt).get(0));
                 tree.remove(node);
-           },
+            },
 
             /**
              * Select a node
@@ -566,8 +585,8 @@ define([
             }
             if(node.type && node.permissions){
                 addClassToNode(node, getPermissionClass(node));
-             }
-             if(node.type){
+            }
+            if(node.type){
                 if (!hasAccessTo('moveInstance', node)) {
                     addClassToNode(node, 'node-undraggable');
                 }
@@ -583,24 +602,24 @@ define([
 		 * @param {Object} node - the tree node
 		 * @returns {String} the CSS class
 		 */
-		function getPermissionClass(node){
-			var actions = _.pluck(_.filter(options.actions, function (val) {
-				return val.context === node.type || val.context === 'resource';
-			}), 'id');
-			var keys = _.intersection(_.keys(node.permissions), actions);
-			var values = _.filter(node.permissions, function (val, key) {
-				return _.contains(keys, key);
-			});
-			var containsTrue = _.contains(values, true),
-				containsFalse = _.contains(values, false);
+        function getPermissionClass(node){
+            var actions = _.pluck(_.filter(options.actions, function (val) {
+                return val.context === node.type || val.context === 'resource';
+            }), 'id');
+            var keys = _.intersection(_.keys(node.permissions), actions);
+            var values = _.filter(node.permissions, function (val, key) {
+                return _.contains(keys, key);
+            });
+            var containsTrue = _.contains(values, true),
+                containsFalse = _.contains(values, false);
 
-			if (containsTrue && !containsFalse) {
-			   return 'permissions-full';
-			} else if (containsTrue && containsFalse) {
-			   return 'permissions-partial';
-			}
-			return 'permissions-none';
-		}
+            if (containsTrue && !containsFalse) {
+                return 'permissions-full';
+            } else if (containsTrue && containsFalse) {
+                return 'permissions-partial';
+            }
+            return 'permissions-none';
+        }
 
         /**
          * Add a title attribute to the nodes
@@ -641,9 +660,9 @@ define([
 
 
         var needMore = function needMore(node){
-           if(_.isArray(node) && lastOpened && lastOpened.length && lastOpened.data('count') > pageRange){
-               node.push(moreNode);
-           } else {
+            if(_.isArray(node) && lastOpened && lastOpened.length && lastOpened.data('count') > pageRange){
+                node.push(moreNode);
+            } else {
                 if(node.count){
                     node.attributes['data-count'] = node.count;
 
@@ -655,21 +674,21 @@ define([
                     _.forEach(node.children, needMore);
                 }
                 if(_.isArray(node)){
-                   _.forEach(node, needMore);
+                    _.forEach(node, needMore);
                 }
-           }
+            }
         };
 
         var loadMore = function loadMore($node, $parentNode, tree){
             var current     = $parentNode.children('ul').children('li.node-instance').length;
             var count       = $parentNode.data('count');
             var left        = count - current;
-			var params      = _.defaults({
-				'classUri'      : $parentNode.attr('id'),
-				'subclasses'    : 0,
-				'offset'        : current,
-				'limit'         : left < pageRange ? left : pageRange
-			}, serverParams);
+            var params      = _.defaults({
+                'classUri'      : $parentNode.attr('id'),
+                'subclasses'    : 0,
+                'offset'        : current,
+                'limit'         : left < pageRange ? left : pageRange
+            }, serverParams);
 
             $.ajax(tree.settings.data.opts.url, {
                 type        : tree.settings.data.opts.method,
@@ -681,16 +700,16 @@ define([
                     response = response.children;
                 }
                 if(_.isArray(response)){
-                   _.forEach(response, function(newNode){
+                    _.forEach(response, function(newNode){
                         if(newNode.type === 'instance'){   //yes the server send also the class, even though I ask him gently...
                             tree.create(newNode, $parentNode);
                         }
-                   });
-                   tree.deselect_branch($node);
-                   tree.remove($node);
-                   if(left - response.length > 0){
+                    });
+                    tree.deselect_branch($node);
+                    tree.remove($node);
+                    if(left - response.length > 0){
                         tree.create(moreNode, $parentNode);
-                   }
+                    }
                 }
             });
         };
@@ -733,22 +752,6 @@ define([
 
         return setUpTree();
     };
-
-    /**
-     * Add a css class to a list of nodes and their children, recursilvely.
-     * @param {Array} nodes - the nodes to add the class to
-     * @param {String} clazz - the css class
-     */
-    function addClassToNodes(nodes, clazz) {
-        if(nodes.length){
-           _.forEach(nodes, function(node){
-                addClassToNode(node, clazz);
-                if (node.children) {
-                    addClassToNodes(node.children, clazz);
-                }
-            });
-        }
-    }
 
     function addClassToNode(node, clazz){
         if(node && node.attributes){

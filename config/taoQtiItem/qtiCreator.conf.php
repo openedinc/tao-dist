@@ -1,10 +1,10 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file taoQtiItem/config/header/qtiCreator.conf.php
+ * Default config header created during install
  */
 
-return array(
-    'multi-column' => false
-);
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => array(
+        'multi-column' => false
+    )
+));

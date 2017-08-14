@@ -26,8 +26,9 @@ define([
     'core/polling',
     'core/timer',
     'core/store',
+    'core/promise',
     'taoTests/runner/plugin',
-], function (_, pollingFactory, timerFactory, store, pluginFactory) {
+], function (_, pollingFactory, timerFactory, store, Promise, pluginFactory) {
     'use strict';
 
     /**
@@ -51,78 +52,116 @@ define([
 
             var self = this;
             var testRunner   = this.getTestRunner();
+            var initContext  = testRunner.getTestContext();
+            var initItemAttemptId = initContext.itemIdentifier + '#' + initContext.attempt;
 
             //where the duration of attempts are stored
-            var durationStore = store('duration-' + testRunner.getConfig().serviceCallId);
-
-            //one stopwatch to count the time
-            this.stopwatch = timerFactory({
-                autoStart : false
-            });
-
-            //update the duration on a regular basis
-            this.polling = pollingFactory({
-
-                action : function updateDuration() {
-
-                    //how many time elapsed from the last tick ?
-                    var elapsed = self.stopwatch.tick();
-                    var context = testRunner.getTestContext();
-
-                    //store by attempt
-                    var itemAttemptId = context.itemIdentifier + '#' + context.attempt;
-
-                    durationStore.getItem(itemAttemptId).then(function(duration){
-                        duration = _.isNumber(duration) ? duration : 0;
-                        elapsed  = _.isNumber(elapsed) && elapsed > 0 ? (elapsed / 1000) : 0;
-
-                        //store the last duration
-                        durationStore.setItem(itemAttemptId, duration + elapsed);
-                    });
-                },
-                interval : refresh,
-                autoStart : false
-            });
-
-            //change plugin state
-            testRunner
-
-                .after('renderitem enableitem', function(){
-                    self.enable();
-                })
-
-                .before('move disableitem skip error', function(e){
-                    if (self.getState('enabled')) {
-                        self.disable();
-                    }
-                })
+            return store('duration-' + testRunner.getConfig().serviceCallId).then(function(durationStore){
 
                 /**
-                 * @event duration.get
+                 * Gets the duration of a particular item from the store
                  * @param {String} attemptId - the attempt id to get the duration for
-                 * @param {getDuration} getDuration - a receiver callback
+                 * @returns {Promise}
                  */
-                .on('plugin-get.duration', function(e, attemptId, getDuration){
-                    if(_.isFunction(getDuration)){
-                        if(!/^(.*)+#+\d+$/.test(attemptId)){
-                            return getDuration(Promise.reject(new Error('Is it really an attempt id, like "itemid#attempt"')));
-                        }
-
-                        /**
-                        * @callback getDuration
-                        * @param {Promise} p - that resolve with the duration value
-                        */
-                        getDuration(durationStore.getItem(attemptId));
+                function getItemDuration(attemptId){
+                    if(!/^(.*)+#+\d+$/.test(attemptId)){
+                        return Promise.reject(new Error('Is it really an attempt id, like "itemid#attempt"'));
                     }
-                })
 
-                .before('finish', function(e){
-                    var done = e.done();
+                    return durationStore.getItem(attemptId);
+                }
 
-                    self.storage.clear()
-                        .then(done)
-                        .catch(done);
+                //one stopwatch to count the time
+                self.stopwatch = timerFactory({
+                    autoStart : false
                 });
+
+                return durationStore.getItem(initItemAttemptId)
+                    .then(function(initDuration){
+                        initDuration = _.isNumber(initDuration) ? initDuration : 0;
+
+                        // if the current item attempt duration is empty in the client storage,
+                        // the test has probably been started in another browser or computer and a crash occurred,
+                        // so take the server provided duration to take care of elapsed time on the same attempt
+                        if (!initDuration && initContext.attemptDuration) {
+                            return durationStore.setItem(initItemAttemptId, initContext.attemptDuration || 0);
+                        }
+                    })
+                    .then(function(){
+                        //update the duration on a regular basis
+                        self.polling = pollingFactory({
+
+                            action : function updateDuration() {
+
+                                //how many time elapsed from the last tick ?
+                                var elapsed = self.stopwatch.tick();
+                                var context = testRunner.getTestContext();
+
+                                //store by attempt
+                                var itemAttemptId = context.itemIdentifier + '#' + context.attempt;
+
+                                durationStore.getItem(itemAttemptId).then(function(duration){
+                                    duration = _.isNumber(duration) ? duration : 0;
+                                    elapsed  = _.isNumber(elapsed) && elapsed > 0 ? (elapsed / 1000) : 0;
+
+                                    //store the last duration
+                                    durationStore.setItem(itemAttemptId, duration + elapsed);
+                                });
+                            },
+                            interval : refresh,
+                            autoStart : false
+                        });
+
+                        //change plugin state
+                        testRunner
+
+                            .after('renderitem enableitem', function(){
+                                self.enable();
+                            })
+
+                            .before('move disableitem skip error', function(){
+                                if (self.getState('enabled')) {
+                                    self.disable();
+                                }
+                            })
+
+                            .before('move skip exit timeout', function(){
+                                var context = testRunner.getTestContext();
+                                var itemAttemptId = context.itemIdentifier + '#' + context.attempt;
+                                return getItemDuration(itemAttemptId).then(function(duration) {
+                                    var params = {
+                                        itemDuration: 0
+                                    };
+                                    if(_.isNumber(duration) && duration > 0){
+                                        params.itemDuration = duration;
+                                    }
+
+                                    // the duration will be sent to the server with the next request,
+                                    // usually submitItem() or callItemAction()
+                                    testRunner.getProxy().addCallActionParams(params);
+                                });
+                            })
+
+                            /**
+                             * @event duration.get
+                             * @param {String} attemptId - the attempt id to get the duration for
+                             * @param {getDuration} getDuration - a receiver callback
+                             */
+                            .on('plugin-get.duration', function(e, attemptId, getDuration){
+                                if(_.isFunction(getDuration)){
+                                    getDuration(getItemDuration(attemptId));
+                                }
+                            })
+
+                            .before('finish', function(){
+                                return new Promise(function(resolve) {
+                                    durationStore.removeStore()
+                                        .then(resolve)
+                                        .catch(resolve);
+                                });
+                            });
+                    });
+            });
         },
 
         /**

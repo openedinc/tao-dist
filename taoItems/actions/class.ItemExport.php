@@ -21,6 +21,9 @@
  */
 ?>
 <?php
+use oat\oatbox\event\EventManagerAwareTrait;
+use oat\taoItems\model\event\ItemExportEvent;
+
 /**
  * This controller provide the actions to export items 
  * 
@@ -31,6 +34,8 @@
  *
  */
 class taoItems_actions_ItemExport extends tao_actions_Export {
+
+    use EventManagerAwareTrait;
 
     /**
      * overwrite the parent index to add the requiresRight for Items only
@@ -45,15 +50,9 @@ class taoItems_actions_ItemExport extends tao_actions_Export {
 
 	protected function getAvailableExportHandlers() {
 		$returnValue = parent::getAvailableExportHandlers();
-		
-		$resources = $this->getResourcesToExport();
-		$itemModels = array();
-		foreach ($resources as $resource) {
-			$model = taoItems_models_classes_ItemsService::singleton()->getItemModel($resource);
-			if (!is_null($model)) {
-				$itemModels[$model->getUri()] = $model;
-			}
-		}
+
+        $itemModelClass = new core_kernel_classes_Class(TAO_ITEM_MODEL_CLASS);
+        $itemModels = $itemModelClass->getInstances();
 		foreach ($itemModels as $model) {
 			$impl = taoItems_models_classes_ItemsService::singleton()->getItemModelImplementation($model);
 			if (in_array('tao_models_classes_export_ExportProvider', class_implements($impl))) {
@@ -81,6 +80,16 @@ class taoItems_actions_ItemExport extends tao_actions_Export {
         });
         
         return $resources;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function sendFileToClient($file, $test)
+    {
+        $this->getEventManager()->trigger(new ItemExportEvent($test->getUri()));
+
+        parent::sendFileToClient($file, $test);
     }
 
 }

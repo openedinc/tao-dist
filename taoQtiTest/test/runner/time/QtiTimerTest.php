@@ -24,7 +24,11 @@ use oat\taoQtiTest\models\runner\time\QtiTimeLine;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use oat\taoTests\models\runner\time\TimePoint;
 use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\taoTests\models\runner\time\Timer;
+use oat\taoTests\models\runner\time\TimeStorage;
+use Prophecy\Argument;
 use ReflectionClass;
+use Prophecy\Prophet;
 
 /**
  * Test the {@link \oat\taoQtiTest\models\runner\time\QtiTimer}
@@ -47,9 +51,9 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
     public function testConstructor()
     {
         $timer = new QtiTimer();
-        $this->assertInstanceOf('oat\taoTests\models\runner\time\Timer', $timer);
+        $this->assertInstanceOf(Timer::class, $timer);
         $timeLine = $this->getTimeLine($timer);
-        $this->assertInstanceOf('oat\taoQtiTest\models\runner\time\QtiTimeLine', $timeLine);
+        $this->assertInstanceOf(QtiTimeLine::class, $timeLine);
     }
 
     /**
@@ -150,13 +154,16 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
         $this->assertEquals(TimePoint::TARGET_SERVER, $timePoints[1]->getTarget());
         $this->assertEquals(TimePoint::TYPE_END, $timePoints[1]->getType());
     }
-
+    
     /**
-     * @expectedException \oat\taoTests\models\runner\time\InconsistentRangeException
+     * Test the QtiTimer::end()
      */
     public function testEndInconsistentRangeException()
     {
         $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timePoints = $timeLine->getPoints();
+        $this->assertTrue(empty($timePoints));
         $tags = [
             'test_fake_id',
             'test_part_fake_id',
@@ -169,6 +176,13 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
         $timer->start($tags, 1459335000.0000);
         $timer->end($tags, 1459335010.0000);
         $timer->end($tags, 1459335011.0000);
+        
+        $timePoints = $timeLine->getPoints();
+
+        $this->assertEquals(2, count($timePoints));
+        $this->assertEquals(1459335010.0000, $timePoints[1]->getTimestamp());
+        $this->assertEquals(TimePoint::TARGET_SERVER, $timePoints[1]->getTarget());
+        $this->assertEquals(TimePoint::TYPE_END, $timePoints[1]->getType());
     }
 
     /**
@@ -181,6 +195,72 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
     {
         $timer = new QtiTimer();
         $timer->end($tags, $timestamp);
+    }
+
+    /**
+     * Test the QtiTimer::getFirstTimestamp()
+     */
+    public function testGetFirstTimestamp()
+    {
+        $startTimestamp = 1459335000.0000;
+        $endTimestamp = 1459335010.0000;
+
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timePoints = $timeLine->getPoints();
+        $this->assertTrue(empty($timePoints));
+        $tags = [
+            'test_fake_id',
+            'test_part_fake_id',
+            'section_fake_id',
+            'item_fake_id',
+            'item_fake_id#0',
+            'item_fake_id#0-1',
+            'item_fake_href',
+        ];
+        $timer->start($tags, $startTimestamp);
+
+        $timer->end($tags, $endTimestamp);
+        $timePoints = $timeLine->getPoints();
+
+        $this->assertEquals(2, count($timePoints));
+        $this->assertEquals(1459335010.0000, $timePoints[1]->getTimestamp());
+        $this->assertEquals(TimePoint::TARGET_SERVER, $timePoints[1]->getTarget());
+        $this->assertEquals(TimePoint::TYPE_END, $timePoints[1]->getType());
+        $this->assertEquals($timer->getFirstTimestamp($tags), $startTimestamp);
+    }
+
+    /**
+     * Test the QtiTimer::getLastTimestamp()
+     */
+    public function testGetLastTimestamp()
+    {
+        $startTimestamp = 1459335000.0000;
+        $endTimestamp = 1459335010.0000;
+
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timePoints = $timeLine->getPoints();
+        $this->assertTrue(empty($timePoints));
+        $tags = [
+            'test_fake_id',
+            'test_part_fake_id',
+            'section_fake_id',
+            'item_fake_id',
+            'item_fake_id#0',
+            'item_fake_id#0-1',
+            'item_fake_href',
+        ];
+        $timer->start($tags, $startTimestamp);
+
+        $timer->end($tags, $endTimestamp);
+        $timePoints = $timeLine->getPoints();
+
+        $this->assertEquals(2, count($timePoints));
+        $this->assertEquals(1459335010.0000, $timePoints[1]->getTimestamp());
+        $this->assertEquals(TimePoint::TARGET_SERVER, $timePoints[1]->getTarget());
+        $this->assertEquals(TimePoint::TYPE_END, $timePoints[1]->getType());
+        $this->assertEquals($timer->getLastTimestamp($tags), $endTimestamp);
     }
 
     /**
@@ -218,10 +298,52 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
         $clientEndPoint = $clientTimePoints[1];
 
         $serverDuration = $endTimestamp - $startTimestamp;
-        if (is_null($duration)) {
-            $duration = $serverDuration;
-        }
-        $delay = ($serverDuration - $duration) / 2;
+        $delay = max(0, ($serverDuration - $expectedDuration) / 2);
+
+        $this->assertEquals($startTimestamp + $delay, $clientStartPoint->getTimestamp());
+        $this->assertEquals(TimePoint::TARGET_CLIENT, $clientStartPoint->getTarget());
+        $this->assertEquals(TimePoint::TYPE_START, $clientStartPoint->getType());
+
+        $this->assertEquals($endTimestamp - $delay, $clientEndPoint->getTimestamp());
+        $this->assertEquals(TimePoint::TARGET_CLIENT, $clientEndPoint->getTarget());
+        $this->assertEquals(TimePoint::TYPE_END, $clientEndPoint->getType());
+
+        $this->assertEquals($expectedDuration, $timer->compute(null, TimePoint::TARGET_CLIENT));
+    }
+
+    /**
+     * Test the QtiTimer::adjust()
+     * * @dataProvider adjustExistingDataProvider
+     */
+    public function testAdjustExisting($timer, $tags, $startTimestamp, $endTimestamp, $duration, $expectedDuration)
+    {
+        $timeLine = $this->getTimeLine($timer);
+
+        $timePoints = $timeLine->getPoints();
+        $this->assertFalse(empty($timePoints));
+
+        $serverTimePoints = $timeLine->find(null, TimePoint::TARGET_SERVER);
+        $this->assertEquals(0, count($serverTimePoints));
+
+        $clientTimePoints = $timeLine->find(null, TimePoint::TARGET_CLIENT);
+        $this->assertNotEquals(0, count($clientTimePoints));
+
+        $timer->start($tags, $startTimestamp);
+        $timer->end($tags, $endTimestamp);
+
+        $timePoints = $timeLine->find(null, TimePoint::TARGET_SERVER);
+        $this->assertEquals(2, count($timePoints));
+
+        $timer->adjust($tags, $duration);
+
+        $clientTimePoints = $timeLine->find(null, TimePoint::TARGET_CLIENT);
+        $this->assertEquals(2, count($clientTimePoints));
+
+        $clientStartPoint = $clientTimePoints[0];
+        $clientEndPoint = $clientTimePoints[1];
+
+        $serverDuration = $endTimestamp - $startTimestamp;
+        $delay = ($serverDuration - $expectedDuration) / 2;
 
         $this->assertEquals($startTimestamp + $delay, $clientStartPoint->getTimestamp());
         $this->assertEquals(TimePoint::TARGET_CLIENT, $clientStartPoint->getTarget());
@@ -244,18 +366,6 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
     {
         $timer = new QtiTimer();
         $timer->adjust($tags, $timestamp);
-    }
-
-    /**
-     * @dataProvider adjustInconsistentRangeProvider
-     * @param $timer
-     * @param $tags
-     * @param $duration
-     * @expectedException \oat\taoTests\models\runner\time\InconsistentRangeException
-     */
-    public function testAdjustInconsistentRangeException($timer, $tags, $duration)
-    {
-        $timer->adjust($tags, $duration);
     }
 
     /**
@@ -322,7 +432,9 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
      */
     public function testSetStorage()
     {
-        $storage = new QtiTimeStorage('fake_session_id');
+        $dataStorage = null;
+        $storage = $this->getTimeStorage($dataStorage);
+
         $timer = new QtiTimer();
         $this->assertEquals(null, $timer->getStorage());
         $timer->setStorage($storage);
@@ -334,7 +446,9 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
      */
     public function testGetStorage()
     {
-        $storage = new QtiTimeStorage('fake_session_id');
+        $dataStorage = null;
+        $storage = $this->getTimeStorage($dataStorage);
+        
         $timer = new QtiTimer();
         $this->assertEquals(null, $timer->getStorage());
         $timer->setStorage($storage);
@@ -358,7 +472,10 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
         ];
         $timer->start($tags, 1459335000.0000);
         $timer->end($tags, 1459335020.0000);
-        $storage = new QtiTimeStorage('fake_session_id');
+
+        $dataStorage = null;
+        $storage = $this->getTimeStorage($dataStorage);
+
         $timer->setStorage($storage);
         $result = $timer->save();
         $this->assertEquals($timer, $result);
@@ -404,20 +521,32 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
         ];
         $timer->start($tags, 1459335000.0000);
         $timer->end($tags, 1459335020.0000);
-        $storage = new QtiTimeStorage('fake_session_id');
+
+        $extraTime = 20;
+        $consumedTime = 4;
+        $timer->setExtraTime($extraTime);
+        $timer->consumeExtraTime($consumedTime, $tags);
+
+        $dataStorage = null;
+        $storage = $this->getTimeStorage($dataStorage);
         $timer->setStorage($storage);
         $timer->save();
 
         $newTimer = new QtiTimer();
-        $newStorage = new QtiTimeStorage('fake_session_id');
         $timeLine = $this->getTimeLine($newTimer);
         $this->assertEquals([], $timeLine->getPoints());
+        $this->assertEquals(0, $newTimer->getExtraTime());
+        $this->assertEquals(0, $newTimer->getConsumedExtraTime());
 
+        $newStorage = $this->getTimeStorage($dataStorage);
         $newTimer->setStorage($newStorage);
         $newTimer = $newTimer->load();
         $timeLine = $this->getTimeLine($newTimer);
 
         $timePoints = $timeLine->getPoints();
+        $this->assertEquals($extraTime, $newTimer->getExtraTime());
+        $this->assertEquals($consumedTime, $newTimer->getConsumedExtraTime());
+        $this->assertEquals($consumedTime, $newTimer->getConsumedExtraTime($tags));
         $this->assertEquals(2, count($timePoints));
         $this->assertEquals(1459335000.0000, $timePoints[0]->getTimestamp());
         $this->assertEquals(TimePoint::TARGET_SERVER, $timePoints[0]->getTarget());
@@ -425,6 +554,36 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
         $this->assertEquals(1459335020.0000, $timePoints[1]->getTimestamp());
         $this->assertEquals(TimePoint::TARGET_SERVER, $timePoints[1]->getTarget());
         $this->assertEquals(TimePoint::TYPE_END, $timePoints[1]->getType());
+    }
+
+    /**
+     * Test the QtiTimer::load() when stored data has been serialized using PHP serialize()
+     * @dataProvider linearTestPointsProvider
+     */
+    public function testLoadPhpSerialized($regularPoints, $extraPoints)
+    {
+        $timer = new QtiTimer();
+        
+        $extraTime = 10;
+        $consumedTime = 5;
+        $timeLine = new QtiTimeLine($regularPoints);
+        $extraTimeLine = new QtiTimeLine($extraPoints);
+        
+        $dataStorage = serialize([
+            QtiTimer::STORAGE_KEY_TIME_LINE => $timeLine,
+            QtiTimer::STORAGE_KEY_EXTRA_TIME => $extraTime,
+            QtiTimer::STORAGE_KEY_EXTRA_TIME_LINE => $extraTimeLine,
+            QtiTimer::STORAGE_KEY_CONSUMED_EXTRA_TIME => $consumedTime,
+        ]);
+        $storage = $this->getTimeStorage($dataStorage);
+        $timer->setStorage($storage);
+        $timer->load();
+
+        $this->assertEquals($extraTime, $timer->getExtraTime());
+        $this->assertEquals($consumedTime, $timer->getConsumedExtraTime());
+        
+        $this->assertEquals($timeLine->getPoints(), $this->getTimeLine($timer)->getPoints());
+        $this->assertEquals($extraTimeLine->getPoints(), $this->getExtraTimeLine($timer)->getPoints());
     }
 
     /**
@@ -442,11 +601,75 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
     public function testLoadInvalidDataException()
     {
         $timer = new QtiTimer();
-        $storage = new QtiTimeStorage('fake_session_id');
+        $dataStorage = serialize([
+            QtiTimer::STORAGE_KEY_TIME_LINE => new \stdClass(),
+            QtiTimer::STORAGE_KEY_EXTRA_TIME_LINE => new \stdClass(),
+        ]);
+        $storage = $this->getTimeStorage($dataStorage);
         $timer->setStorage($storage);
-        $this->setTimeLine($timer, new \stdClass());
-        $timer->save();
         $timer->load();
+    }
+
+    /**
+     * Test the QtiTimer::setExtraTime()
+     */
+    public function testSetExtraTime()
+    {
+        $timer = new QtiTimer();
+        $this->assertEquals(0, $timer->getExtraTime());
+        
+        $extraTime1 = 17;
+        $timer->setExtraTime($extraTime1);
+        $this->assertEquals($extraTime1, $timer->getExtraTime());
+
+        $extraTime2 = 11;
+        $timer->setExtraTime($extraTime2);
+        $this->assertEquals($extraTime2, $timer->getExtraTime());
+    }
+    
+    /**
+     * Test the QtiTimer::consumeExtraTime()
+     */
+    public function testConsumeExtraTime()
+    {
+        $timer = new QtiTimer();
+        $this->assertEquals(0, $timer->getExtraTime());
+        
+        $extraTime = 77;
+        $timer->setExtraTime($extraTime);
+        $this->assertEquals($extraTime, $timer->getExtraTime());
+
+        $consume = 6;
+        $consumedTime = $consume;
+        $timer->consumeExtraTime($consume);
+        $this->assertEquals($extraTime, $timer->getExtraTime());
+        $this->assertEquals($consumedTime, $timer->getConsumedExtraTime());
+        
+        $remainingTime = $extraTime - $consumedTime;
+        $this->assertEquals($remainingTime, $timer->getRemainingExtraTime());
+
+        $consume = 5;
+        $consumedTime += $consume;
+        $timer->consumeExtraTime($consume);
+        $this->assertEquals($extraTime, $timer->getExtraTime());
+        $this->assertEquals($consumedTime, $timer->getConsumedExtraTime());
+
+        $remainingTime = $extraTime - $consumedTime;
+        $this->assertEquals($remainingTime, $timer->getRemainingExtraTime());
+
+        $tags = ['test', 'part1'];
+        $consume = 2;
+        $consumedTime += $consume;
+        $timer->consumeExtraTime($consume, $tags);
+        $this->assertEquals($extraTime, $timer->getExtraTime());
+        $this->assertEquals($consumedTime, $timer->getConsumedExtraTime());
+        $this->assertEquals($consume, $timer->getConsumedExtraTime($tags));
+        $this->assertEquals($consume, $timer->getConsumedExtraTime($tags[0]));
+        $this->assertEquals($consume, $timer->getConsumedExtraTime($tags[1]));
+        $this->assertEquals(0, $timer->getConsumedExtraTime('unknown'));
+
+        $remainingTime = $extraTime - $consumedTime;
+        $this->assertEquals($remainingTime, $timer->getRemainingExtraTime());
     }
 
 
@@ -502,19 +725,130 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
     public function adjustDataProvider()
     {
         return [
+            // the provided duration will be translated to a client range inserted in the middle of the server range
             [
                 1459335000.0000,
                 1459335020.0000,
                 10,
                 10
             ],
+
+            // the missing duration will be replaced by the server range
             [
                 1459335000.0000,
                 1459335020.0000,
                 null,
                 20
-            ]
+            ],
+
+            // the provided duration is larger than the server range and will be truncated
+            [
+                1459335000.0000,
+                1459335020.0000,
+                30,
+                20
+            ],
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function adjustExistingDataProvider()
+    {
+        $tags = [
+            'test_fake_id',
+            'test_part_fake_id',
+            'section_fake_id',
+            'item_fake_id',
+            'item_fake_id#0',
+            'item_fake_id#0-1',
+            'item_fake_href',
+        ];
+
+        $data = [];
+
+        // existing client range will be replaced by new duration
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timeLine->add(new TimePoint($tags, 1459335005.0000, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT));
+        $timeLine->add(new TimePoint($tags, 1459335010.0000, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT));
+        $data[] = [
+            $timer,
+            $tags,
+            1459335000.0000,
+            1459335020.0000,
+            10,
+            10,
+        ];
+
+        // existing partial client range will be replaced by new duration
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timeLine->add(new TimePoint($tags, 1459335005.0000, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT));
+        $data[] = [
+            $timer,
+            $tags,
+            1459335000.0000,
+            1459335020.0000,
+            10,
+            10,
+        ];
+
+        // existing partial client range will be replaced by new duration
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timeLine->add(new TimePoint($tags, 1459335010.0000, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT));
+        $data[] = [
+            $timer,
+            $tags,
+            1459335000.0000,
+            1459335020.0000,
+            10,
+            10,
+        ];
+
+        // existing client range will be kept if no new duration is provided
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timeLine->add(new TimePoint($tags, 1459335005.0000, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT));
+        $timeLine->add(new TimePoint($tags, 1459335010.0000, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT));
+        $data[] = [
+            $timer,
+            $tags,
+            1459335000.0000,
+            1459335020.0000,
+            null,
+            5,
+        ];
+
+        // existing partial client range will be replaced by server duration if no duration is provided
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timeLine->add(new TimePoint($tags, 1459335005.0000, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT));
+        $data[] = [
+            $timer,
+            $tags,
+            1459335000.0000,
+            1459335020.0000,
+            null,
+            20
+        ];
+
+        // existing partial client range will be replaced by server duration if no duration is provided
+        $timer = new QtiTimer();
+        $timeLine = $this->getTimeLine($timer);
+        $timeLine->add(new TimePoint($tags, 1459335010.0000, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT));
+        $data[] = [
+            $timer,
+            $tags,
+            1459335000.0000,
+            1459335020.0000,
+            null,
+            20,
+        ];
+
+        return $data;
     }
 
     /**
@@ -542,39 +876,57 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
     /**
      * @return array
      */
-    public function adjustInconsistentRangeProvider()
+    public function linearTestPointsProvider()
     {
-        $emptyTimer = new QtiTimer();
-        $timer = new QtiTimer();
-        $tags = [
-            'test_fake_id',
-            'test_part_fake_id',
-            'section_fake_id',
-            'item_fake_id',
-            'item_fake_id#0',
-            'item_fake_id#0-1',
-            'item_fake_href',
-        ];
-        $timer->start($tags, 1459335000.0000);
-        $timer->end($tags, 1459335010.0000);
-
         return [
             [
-                $emptyTimer, //timer with empty time line
-                $tags,
-                1,
-            ],
-            [
-                $timer, //timer with only one time point in time line
-                $tags,
-                11,
+                'regular' => [
+                    //item-a
+                    new TimePoint(['test-a', 'item-a'], 1459519500.2422, TimePoint::TYPE_START, TimePoint::TARGET_SERVER),
+                    new TimePoint(['test-a', 'item-a'], 1459519502.2422, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-a'], 1459519510.2422, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-a'], 1459519512.2422, TimePoint::TYPE_END, TimePoint::TARGET_SERVER),
+                    //item-b
+                    new TimePoint(['test-a', 'item-b'], 1459519600.2422, TimePoint::TYPE_START, TimePoint::TARGET_SERVER),
+                    new TimePoint(['test-a', 'item-b'], 1459519602.2422, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-b'], 1459519610.2422, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-b'], 1459519612.2422, TimePoint::TYPE_END, TimePoint::TARGET_SERVER),
+                    //item-b
+                    new TimePoint(['test-a', 'item-c'], 1459519700.2422, TimePoint::TYPE_START, TimePoint::TARGET_SERVER),
+                    new TimePoint(['test-a', 'item-c'], 1459519702.2422, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-c'], 1459519710.2422, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-c'], 1459519712.2422, TimePoint::TYPE_END, TimePoint::TARGET_SERVER),
+                ],
+                'extra' => [
+                    //item-b
+                    new TimePoint(['test-a', 'item-c'], 1459519700.2422, TimePoint::TYPE_START, TimePoint::TARGET_SERVER),
+                    new TimePoint(['test-a', 'item-c'], 1459519702.2422, TimePoint::TYPE_START, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-c'], 1459519710.2422, TimePoint::TYPE_END, TimePoint::TARGET_CLIENT),
+                    new TimePoint(['test-a', 'item-c'], 1459519712.2422, TimePoint::TYPE_END, TimePoint::TARGET_SERVER),
+                ],
             ],
         ];
     }
 
 
-
     //MOCKS
+
+    /**
+     * @param $buffer
+     * @return QtiTimeStorage
+     */
+    private function getTimeStorage(&$buffer)
+    {
+        $prophet = new Prophet();
+        $prophecy = $prophet->prophesize(TimeStorage::class);
+        $prophecy->load()->will(function () use (&$buffer) {
+            return $buffer;
+        });
+        $prophecy->store(Argument::type('string'))->will(function ($args) use (&$buffer) {
+            $buffer = $args[0];
+        });
+        return $prophecy->reveal();
+    }
 
     /**
      * @param QtiTimer $timer
@@ -582,23 +934,22 @@ class QtiTimerTest extends TaoPhpUnitTestRunner
      */
     private function getTimeLine(QtiTimer $timer)
     {
-        $reflectionClass = new ReflectionClass('oat\taoQtiTest\models\runner\time\QtiTimer');
+        $reflectionClass = new ReflectionClass(QtiTimer::class);
         $reflectionProperty = $reflectionClass->getProperty('timeLine');
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty->getValue($timer);
     }
-
+    
     /**
      * @param QtiTimer $timer
-     * @param mixed $timeLine
      * @return QtiTimeLine
      */
-    private function setTimeLine(QtiTimer $timer, $timeLine)
+    private function getExtraTimeLine(QtiTimer $timer)
     {
-        $reflectionClass = new ReflectionClass('oat\taoQtiTest\models\runner\time\QtiTimer');
-        $reflectionProperty = $reflectionClass->getProperty('timeLine');
+        $reflectionClass = new ReflectionClass(QtiTimer::class);
+        $reflectionProperty = $reflectionClass->getProperty('extraTimeLine');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($timer, $timeLine);
+        return $reflectionProperty->getValue($timer);
     }
 
 }

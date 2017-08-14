@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-22T15:28:50\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T15:00:22\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -97,10 +97,6 @@ msgstr ""
 msgid "Excluded test-takers"
 msgstr ""
 
-#, tao-public
-msgid "Export"
-msgstr ""
-
 msgid "Exported %1$s to %2$s"
 msgstr ""
 
@@ -112,10 +108,6 @@ msgid "Filter"
 msgstr ""
 
 msgid "Guest access"
-msgstr ""
-
-#, tao-public
-msgid "Import"
 msgstr ""
 
 msgid "Importing %1$s files into \'%2$s\"

@@ -19,16 +19,14 @@
  */
 namespace oat\generis\test\model\persistence\smoothsql;
 
-use oat\generis\test\GenerisPhpUnitTestRunner;
 use Prophecy\Promise\ReturnPromise;
 use Prophecy\Argument;
 
-class SmoothModelIteratorTest extends GenerisPhpUnitTestRunner
+class SmoothModelIteratorTest extends \PHPUnit_Framework_TestCase
 {
 
     public function setUp()
     {
-        GenerisPhpUnitTestRunner::initTest();
     }
 
    
@@ -44,7 +42,8 @@ class SmoothModelIteratorTest extends GenerisPhpUnitTestRunner
             "predicate" => '#predicate',
             "object" => 'obb',
             "id" => 898,
-            "l_language" => 'en-US'
+            "l_language" => 'en-US',
+            "author" => 'testauthor'
         );
         $statementValue2 = array(
             "modelid" => 1,
@@ -52,8 +51,8 @@ class SmoothModelIteratorTest extends GenerisPhpUnitTestRunner
             "predicate" => '#predicate2',
             "object" => 'ob2',
             "id" =>899,
-            "l_language" => 'en-US'
-        
+            "l_language" => 'en-US',
+            "author" => 'testauthor'
         );
         $return = new ReturnPromise(array(
             $statementValue,
@@ -127,5 +126,3 @@ class SmoothModelIteratorTest extends GenerisPhpUnitTestRunner
     
 
 }
-
-?>

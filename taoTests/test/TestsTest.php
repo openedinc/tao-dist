@@ -19,10 +19,11 @@
  *               2014 (update and modification) Open Assessment Technologies SA
  *               
  */
-namespace oat\taoTestTaker\test;
+namespace oat\taoTests\test;
 
+use oat;
 use oat\tao\test\TaoPhpUnitTestRunner;
-use \tao_models_classes_Service;
+use Prophecy\Prediction\CallTimesPrediction;
 use \taoTests_models_classes_TestsService;
 use \core_kernel_classes_Class;
 use \core_kernel_classes_Resource;
@@ -108,6 +109,65 @@ class TestsTestCase extends TaoPhpUnitTestRunner {
             $this->testsService->setTestModel($test, $model);        
             $this->assertEquals($this->testsService->getTestModel($test)->getUri(),$uri);
         }
+    }
+    
+    
+    /**
+     * @expectedException \common_exception_Error
+     * @expectedExceptionMessage Test model service FakeTestModelClass not found
+     */
+    public function testGetTestModelImplementationBackwardCompatibleFakeClass(){
+        $testModelProphecy = $this->prophesize('\core_kernel_classes_Resource');
+        $testModelProphecy->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TESTMODEL_IMPLEMENTATION))->willReturn('FakeTestModelClass');
+
+        $this->testsService->getTestModelImplementation($testModelProphecy->reveal());
+
+    }
+
+    public function testGetTestModelImplementationBackwardCompatible(){
+        $testModelProphecy = $this->prophesize('\core_kernel_classes_Resource');
+        $testModelProphecy->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TESTMODEL_IMPLEMENTATION))->willReturn('oat\\taoTests\\test\\TestModelUnit');
+
+        $testModelImp = $this->testsService->getTestModelImplementation($testModelProphecy->reveal());
+
+        $this->assertInstanceOf('oat\\taoTests\\test\\TestModelUnit', $testModelImp);
+    }
+
+
+    /**
+     * @expectedException \common_exception_NoImplementation
+     * @expectedExceptionMessage No implementation found for testmodel testModelUri
+     */
+    public function testGetTestModelImplementationNullTestModelImplementation(){
+        $testModelProphecy = $this->prophesize('\core_kernel_classes_Resource');
+        $testModelProphecy->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TESTMODEL_IMPLEMENTATION))->willReturn('');
+        $testModelProphecy->getUri()->willReturn('testModelUri');
+        $testModelProphecy->getUri()->should(new CallTimesPrediction(1));
+
+        $this->testsService->getTestModelImplementation($testModelProphecy->reveal());
+    }
+
+    public function testGetTestModelImplementationService(){
+        $serviceManagerProphecy = $this->prophesize('oat\\oatbox\\service\\ServiceManager');
+        $serviceManagerProphecy->get('testModelServiceId')->willReturn(new TestModelUnit());
+
+
+        $testServiceMock = $this->getMockBuilder('taoTests_models_classes_TestsService')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getServiceManager'))
+            ->getMock();
+
+        $testServiceMock->expects($this->once())
+            ->method('getServiceManager')
+            ->willReturn($serviceManagerProphecy->reveal());
+        $testModelProphecy = $this->prophesize('\core_kernel_classes_Resource');
+        $testModelProphecy->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TESTMODEL_IMPLEMENTATION))->willReturn('testModelServiceId');
+
+
+        $testModelImp = $testServiceMock->getTestModelImplementation($testModelProphecy->reveal());
+
+        $this->assertInstanceOf('oat\\taoTests\\test\\TestModelUnit', $testModelImp);
+
     }
     
     
@@ -215,90 +275,6 @@ class TestsTestCase extends TaoPhpUnitTestRunner {
     }
 
     /**
-     * @param $test
-     * @return \core_kernel_file_File
-     */
-    public function testGetTestContent() {
-       
-        $testContentProperty = new core_kernel_classes_Property(TEST_TESTCONTENT_PROP);
-
-        $prophet = new Prophet();
-        $testProphecy = $prophet->prophesize('core_kernel_classes_Resource');
-        $testContentProphcy = $prophet->prophesize('core_kernel_classes_Resource');
-        $testContentProphcy->getUri()->willReturn('#fakeUri');
-        $testContent = $testContentProphcy->reveal();
-        
-        $testProphecy->getUniquePropertyValue($testContentProperty)->willReturn($testContent);
-        
-        $test = $testProphecy->reveal();
-        
-        $result = $this->testsService->getTestContent($test);
-        
-		$this->assertInstanceOf('core_kernel_file_File', $result);
-		$this->assertEquals('#fakeUri', $result->getUri());
-		
-		$testProphecy = $prophet->prophesize('core_kernel_classes_Resource');
-		$testProphecy->getUniquePropertyValue($testContentProperty)->willReturn(null);
-		$testProphecy->getUri()->willReturn('#fakeUri');
-		$test = $testProphecy->reveal();
-		$result = $this->testsService->getTestContent($test);
-		$this->assertNull($result);
-	
-		
-    }
-    /**
-     * 
-     * @author Lionel Lecaque, lionel@taotesting.com
-     */
-    public function testGetTestContentEmtpty() 
-    {
-        $testContentProperty = new core_kernel_classes_Property(TEST_TESTCONTENT_PROP);
-        
-        $prophet = new Prophet();
-        $testProphecy = $prophet->prophesize('core_kernel_classes_Resource');
-        $testProphecy
-        ->getUniquePropertyValue($testContentProperty)
-        ->willThrow('\core_kernel_classes_EmptyProperty');
-        $testProphecy->getUri()->willReturn('#fakeUri');
-        $test = $testProphecy->reveal();
-        
-        try {
-            $result = $this->testsService->getTestContent($test);
-        }
-        catch(\Exception $e){
-            $this->assertInstanceOf('common_exception_Error', $e);
-            $this->assertEquals("Test '#fakeUri' has no content.", $e->getMessage());
-        }
-        
-    }
-    
-    /**
-     *
-     * @author Lionel Lecaque, lionel@taotesting.com
-     */
-    public function testGetTestContentNoContent()
-    {
-        $testContentProperty = new core_kernel_classes_Property(TEST_TESTCONTENT_PROP);
-    
-        $prophet = new Prophet();
-        $testProphecy = $prophet->prophesize('core_kernel_classes_Resource');
-        $testProphecy
-        ->getUniquePropertyValue($testContentProperty)
-        ->willThrow('\common_Exception');
-        $testProphecy->getUri()->willReturn('#fakeUri');
-        $test = $testProphecy->reveal();
-    
-        try {
-            $result = $this->testsService->getTestContent($test);
-        }
-        catch(\Exception $e){
-            $this->assertInstanceOf('common_exception_Error', $e);
-            $this->assertEquals("Multiple contents found for test '#fakeUri'.", $e->getMessage());
-        }
-    
-    }
-
-    /**
      * @depends testSubTest
      * @param $subTest
      * @return \core_kernel_classes_Resource
@@ -366,6 +342,66 @@ class TestsTestCase extends TaoPhpUnitTestRunner {
     public function testDeleteTest($tests) {
 		$testInstance = $this->testsService->createInstance($tests);
 		$this->assertTrue($this->testsService->deleteTest($testInstance));
+    }
+
+}
+
+
+class TestModelUnit implements \taoTests_models_classes_TestModel{
+    /**
+     * @inheritDoc
+     */
+    public function prepareContent(core_kernel_classes_Resource $test, $items = array())
+    {
+        // TODO: Implement prepareContent() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteContent(core_kernel_classes_Resource $test)
+    {
+        // TODO: Implement deleteContent() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getItems(core_kernel_classes_Resource $test)
+    {
+        // TODO: Implement getItems() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAuthoringUrl(core_kernel_classes_Resource $test)
+    {
+        // TODO: Implement getAuthoringUrl() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cloneContent(core_kernel_classes_Resource $source, core_kernel_classes_Resource $destination)
+    {
+        // TODO: Implement cloneContent() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCompilerClass()
+    {
+        // TODO: Implement getCompilerClass() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPackerClass()
+    {
+        // TODO: Implement getPackerClass() method.
     }
 
 }

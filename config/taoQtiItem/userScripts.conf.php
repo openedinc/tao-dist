@@ -7,5 +7,7 @@
  *   
  */
 
-return array(
-);
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => array(
+    )
+));

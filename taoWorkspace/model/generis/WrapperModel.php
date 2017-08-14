@@ -36,8 +36,8 @@ class WrapperModel extends ConfigurableService
     implements Model
 {
     
-    static public function wrap(Model $original, Model $workspace) {
-        return new self(array('inner' => $original, 'workspace' => $workspace));
+    static public function wrap(Model $original, Model $workspace ) {
+        return new self(array('inner' => $original, 'workspace' => $workspace ));
     }
     
     /**
@@ -50,22 +50,22 @@ class WrapperModel extends ConfigurableService
      */
     private $rdfs;
     
-    /**
-     * Constructor of the smooth model, expects a persistence in the configuration
-     * 
-     * @param array $configuration
-     * @throws common_exception_MissingParameter
-     */
-    public function __construct($options = array()) {
-        if (!isset($options['inner'])) {
-            throw new common_exception_MissingParameter('inner', __CLASS__);
-        }
-        parent::__construct($options);
-        
-        $inner = $this->getInnerModel();
-        
-        $this->rdf = new WrapperRdf($inner->getRdfInterface(), $this);
-        $this->rdfs = new WrapperRdfs($inner->getRdfsInterface(), $this->getWorkspaceModel()->getRdfsInterface());
+    function getResource($uri) {
+        $resource = new \core_kernel_classes_Resource($uri);
+        $resource->setModel($this);
+        return $resource;
+    }
+
+    function getClass($uri) {
+        $class = new \core_kernel_classes_Class($uri);
+        $class->setModel($this);
+        return $class;
+    }
+
+    function getProperty($uri) {
+        $property = new \core_kernel_classes_Property($uri);
+        $property->setModel($this);
+        return $property;
     }
     
     /**
@@ -73,12 +73,12 @@ class WrapperModel extends ConfigurableService
      */
     public function getInnerModel()
     {
-        return $this->getOption('inner');
+        return $this->getSubService('inner');
     }
     
     public function getWorkspaceModel()
     {
-        return $this->getOption('workspace');
+        return $this->getSubService('workspace');
     }
     
     /**
@@ -87,6 +87,9 @@ class WrapperModel extends ConfigurableService
      */
     public function getRdfInterface()
     {
+        if (is_null($this->rdf)) {
+            $this->rdf = new WrapperRdf($this->getInnerModel()->getRdfInterface(), $this);
+        }
         return $this->rdf;
     }
     
@@ -96,9 +99,19 @@ class WrapperModel extends ConfigurableService
      */
     public function getRdfsInterface()
     {
+        if (is_null($this->rdfs)) {
+            $this->rdfs = new WrapperRdfs(
+                $this->getInnerModel()->getRdfsInterface(),
+                $this->getWorkspaceModel()->getRdfsInterface()
+            );
+        }
         return $this->rdfs;
     }
     
+    public function getSearchInterface() {
+        return $this->getInnerModel()->getSearchInterface();
+    }
+
     public function getReadableModels()
     {
         return $this->getInnerModel()->getReadableModels();

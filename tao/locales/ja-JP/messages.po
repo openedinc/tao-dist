@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T12:01:55\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T14:32:46\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -127,9 +127,6 @@ msgstr "アクセスが拒否されました。あなたの認証を更新して
 msgid "Action"
 msgstr "操作"
 
-msgid "Action \"%s\" not found."
-msgstr "操作\"%s\"が見つかりません"
-
 msgid "Actions"
 msgstr "操作"
 
@@ -176,6 +173,9 @@ msgstr "eメールを送信しました"
 msgid "An error occured during user deletion"
 msgstr "ユーザーの削除中にエラーが発生しました"
 
+msgid "An error occurred!"
+msgstr ""
+
 msgid "An exception occured while running \"%s"
 msgstr ""
 
@@ -215,14 +215,14 @@ msgstr "リストへ戻る"
 msgid "Beta version"
 msgstr "Beta version"
 
-msgid "Browse"
-msgstr "参照..."
-
 msgid "Browse folders:"
 msgstr "フォルダーを参照"
 
 msgid "Browse..."
 msgstr "参照..."
+
+msgid "Calculator"
+msgstr ""
 
 msgid "Calendar"
 msgstr "カレンダー"
@@ -239,6 +239,9 @@ msgstr "操作をキャンセルする"
 msgid "Cannot be edited"
 msgstr "編集できません"
 
+msgid "Cannot divide by zero"
+msgstr ""
+
 #, tao-public
 msgid "Change password"
 msgstr "パスワードを変更"
@@ -246,10 +249,10 @@ msgstr "パスワードを変更"
 msgid "Change the password"
 msgstr "パスワードを変更"
 
-msgid "Check All"
+msgid "Check all"
 msgstr "すべてチェック"
 
-msgid "Check all"
+msgid "Check All"
 msgstr "すべてチェック"
 
 msgid "Check-in"
@@ -263,6 +266,9 @@ msgstr "インポート形式の選択"
 
 msgid "class selected"
 msgstr "選択されたクラス"
+
+msgid "close"
+msgstr ""
 
 msgid "Close tab"
 msgstr "タブを閉じる"
@@ -286,7 +292,7 @@ msgid "Confirm"
 msgstr "確認"
 
 msgid "Connect to the TAO platform"
-msgstr "TAO プラットホームへ接続"
+msgstr "CBT プラットホームへ接続"
 
 msgid "Continue"
 msgstr "次へ"
@@ -305,6 +311,9 @@ msgstr "CSVオプション"
 
 msgid "Current language"
 msgstr "現在の言語"
+
+msgid "Current playback position"
+msgstr ""
 
 msgid "Data imported"
 msgstr "データインポート"
@@ -332,9 +341,6 @@ msgstr "日付"
 
 msgid "Default search"
 msgstr "デフォルト検索"
-
-msgid "Default user cannot be deleted"
-msgstr "デフォルトのユーザは削除できません"
 
 msgid "Define the default values"
 msgstr "デフォルト値を定義します"
@@ -487,6 +493,9 @@ msgstr "強制リリース"
 msgid "Forgot your password?"
 msgstr "パスワードをお忘れですか?"
 
+msgid "From"
+msgstr ""
+
 msgid "Fuzzy Matching"
 msgstr "あいまい検索"
 
@@ -525,6 +534,15 @@ msgstr "メタデータをCSVからインポート"
 
 msgid "Import Metadata from RDF file"
 msgstr "メタデータをRDFからインポート"
+
+msgid "Imported %1$d/%2$d. Some records are invalid."
+msgstr ""
+
+msgid "Imported %d resources"
+msgstr ""
+
+msgid "Imported resource \"%s"
+msgstr ""
 
 msgid "Inclusive (AND)"
 msgstr "包括（AND)"
@@ -586,6 +604,9 @@ msgstr "無効なファイルサイズ（最小%1$sバイト、最大%2$sバイ�
 msgid "Invalid file type!"
 msgstr "不正なファイルタイプです"
 
+msgid "Invalid input for function"
+msgstr ""
+
 msgid "Invalid login or password. Please try again."
 msgstr "無効なログイン名或はパスワードです。やり直してください"
 
@@ -629,7 +650,7 @@ msgid "Loading"
 msgstr "読み込み中"
 
 msgid "Log in"
-msgstr "ログイン"
+msgstr "ログインID"
 
 msgid "Log Out"
 msgstr "ログアウト"
@@ -660,6 +681,9 @@ msgstr "ヴァージョンファイル管理"
 msgid "Map the properties to the CSV columns"
 msgstr "CSVの列にプロパティをマップ"
 
+msgid "Maximum selection reached"
+msgstr ""
+
 msgid "Message"
 msgstr "メッセージ"
 
@@ -687,6 +711,9 @@ msgstr "複数の値の区切り文字"
 
 msgid "must be numeric"
 msgstr "数値でなければなりません"
+
+msgid "Mute"
+msgstr ""
 
 #, tao-public
 msgid "My settings"
@@ -759,10 +786,10 @@ msgstr "要素数"
 msgid "of"
 msgstr "の"
 
-msgid "Ok"
+msgid "OK"
 msgstr "OK"
 
-msgid "OK"
+msgid "Ok"
 msgstr "OK"
 
 msgid "Old Password"
@@ -801,6 +828,12 @@ msgstr "パスワードの変更は成功しました"
 msgid "Passwords are not matching"
 msgstr "パスワードが一致しません"
 
+msgid "Pause"
+msgstr ""
+
+msgid "Play"
+msgstr ""
+
 msgid "Please confirm deletion"
 msgstr "削除の確認をしてください"
 
@@ -815,6 +848,12 @@ msgstr "ユーザーの削除を確認してください"
 
 msgid "Please contact %s or an administrator to release it"
 msgstr "それを解放するには、%s或は、管理者にお問い合わせください"
+
+msgid "Please download the track and listen offline."
+msgstr ""
+
+msgid "Please download the video and view offline."
+msgstr ""
 
 msgid "Please give a message to your commit"
 msgstr "あなたのコミットにメッセージをお願いします"
@@ -846,6 +885,9 @@ msgstr "プロパティ\\'sは、ラベルフィールドが必要です"
 
 msgid "Provided URL is not valid"
 msgstr "指定されたURLは有効ではありません"
+
+msgid "Range field is required"
+msgstr ""
 
 msgid "RDF"
 msgstr "RDF"
@@ -903,6 +945,9 @@ msgstr "リソースは保存されました"
 
 msgid "Responsive mode"
 msgstr "レスポンシブモード"
+
+msgid "Restore sound"
+msgstr ""
 
 msgid "Return to sign in page"
 msgstr "ログインページに戻る"
@@ -1084,6 +1129,9 @@ msgstr "これは必須です"
 msgid "This Login is already in use"
 msgstr "このログインは既に使用されています"
 
+msgid "This media cannot be played!"
+msgstr ""
+
 msgid "This password reset link is no longer valid. It may have already been used. If you still wish to reset your password please request a new link"
 msgstr "このパスワードのリセットリンクは、有効ではありません。これは、すでに使用されています。まだパスワードをリセットしたい場合は、新しいリンクをリクエストしてください"
 
@@ -1102,6 +1150,9 @@ msgstr "これは、%sと等しくてはいけません"
 msgid "Time zone"
 msgstr "タイムゾーン"
 
+msgid "to"
+msgstr ""
+
 msgid "To reset your password, click the link below, or paste it into your browser. You will then be prompted to create a new password."
 msgstr "パスワードをリセットするには、下記リンクをクリックしてください。或はリンクをブラウザにペーストしてください。新しいパスワード作成のページが表示されます。"
 
@@ -1113,6 +1164,9 @@ msgstr "トークナイザ"
 
 msgid "Too many suggestions match your query. Only a few are listed"
 msgstr "候補が多すぎます。候補のうちのいくつかを表示します"
+
+msgid "Total duration"
+msgstr ""
 
 msgid "Translate"
 msgstr "翻訳"
@@ -1177,6 +1231,9 @@ msgstr "全て無効"
 msgid "Undo"
 msgstr "取り消し"
 
+msgid "Unexpected error. Please contact administrator"
+msgstr ""
+
 msgid "Uninstall of %s failed"
 msgstr "%sのアンインストールに失敗しました"
 
@@ -1197,9 +1254,6 @@ msgstr "アップロード"
 
 msgid "Upload a new content"
 msgstr "新しいコンテンツをアップロード"
-
-msgid "Upload File"
-msgstr "ファイルをアップロード"
 
 msgid "Upload into:"
 msgstr "アップロード先:"
@@ -1268,6 +1322,15 @@ msgstr ""
 
 msgid "You must activate JavaScript in your browser to run this application."
 msgstr "このアプリケーションを実行するには、ブラウザのJavaScriptを有効にする必要があります"
+
+msgid "Your browser does not meet the technical requirements to run TAO."
+msgstr ""
+
+msgid "Your browser doesn’t support the audio player."
+msgstr ""
+
+msgid "Your browser doesn’t support the video player."
+msgstr ""
 
 msgid "Your mail"
 msgstr "メールアドレス"

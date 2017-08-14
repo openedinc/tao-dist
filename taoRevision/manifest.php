@@ -21,13 +21,13 @@
 
 return array(
     'name' => 'taoRevision',
-	'label' => 'Data Revision Control',
-	'description' => '',
+    'label' => 'Data Revision Control',
+    'description' => '',
     'license' => 'GPL-2.0',
-    'version' => '2.0.1',
-	'author' => 'Open Assessment Technologies SA',
-	'requires' => array(
-	   'tao' => '>=2.7.4',
+    'version' => '3.0.0',
+    'author' => 'Open Assessment Technologies SA',
+    'requires' => array(
+	   'tao' => '>=9.0.0',
 	   'taoItems' => '*',
 	   'taoTests' => '*',
 	   'taoMediaManager' => '*'
@@ -53,9 +53,6 @@ return array(
 	    
 		#BASE URL (usually the domain root)
 		'BASE_URL' => ROOT_URL.'taoRevision/',
-	    
-	    #BASE WWW required by JS
-	    'BASE_WWW' => ROOT_URL.'taoRevision/views/'
 	),
     'extra' => array(
         'structures' => dirname(__FILE__).DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'structures.xml',

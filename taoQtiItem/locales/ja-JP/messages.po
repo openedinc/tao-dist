@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T12:02:58\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T14:33:58\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -15,6 +15,9 @@ msgstr ""
 
 msgid " Fill in the gaps in a text from a set of choices."
 msgstr " 空欄に当てはまる回答を選択肢から選んでください"
+
+msgid " or "
+msgstr ""
 
 msgid "%d Item(s) of %d imported from the given IMS QTI Package."
 msgstr "IMS QTI パッケージから%dの%dアイテムをインポートします"
@@ -40,14 +43,11 @@ msgstr "追加"
 msgid "Add a modal feedback"
 msgstr "モーダルフィードバックを追加"
 
-msgid "Add a QTI XML file"
-msgstr "QTI XMLファイルを追加"
+msgid "Add a QTI/APIP XML Item Document"
+msgstr ""
 
-msgid "Add a zip file containing APIP items"
-msgstr "APIPアイテムを含むzipファイルを追加します"
-
-msgid "Add a zip file containing QTI items"
-msgstr "QTIアイテムを含むzipファイルを追加します"
+msgid "Add a ZIP file containing QTI/APIP items"
+msgstr ""
 
 msgid "Add another option"
 msgstr "他のオプションを追加"
@@ -103,9 +103,6 @@ msgstr "シェアドスティムラスをロード中にエラーが発生しま
 msgid "An error occured while parsing IMS QTI data."
 msgstr "IMS QTIデータを解析中にエラーが発生しました"
 
-msgid "An unexpected error occured during the import of the IMS APIP Item Package."
-msgstr "予期しないエラーがIMS APIPアイテムパッケージのインポート中に発生しました"
-
 msgid "An unexpected error occured during the import of the IMS QTI Item Package."
 msgstr "予期しないエラーが、IMS QTIアイテムパッケージのインポート中に発生しました"
 
@@ -118,14 +115,8 @@ msgstr "応答処理中に予期しないエラーが発生しました"
 msgid "An unknown error occured while importing the IMS QTI Package."
 msgstr "IMS QTIパッケージのインポート中に不明なエラーが発生しました"
 
-msgid "APIP data"
+msgid "APIP Content Package"
 msgstr ""
-
-msgid "APIP Package"
-msgstr "APIPパッケージ"
-
-msgid "APIP Package 1.0"
-msgstr "APIP　パッケージ1.0"
 
 msgid "Arrange a list of choices in the correct order."
 msgstr "正しい順序で選択項目のリストを並べます"
@@ -144,6 +135,9 @@ msgstr "最低"
 
 msgid "Autostart"
 msgstr "自動起動"
+
+msgid "Back to Manage Items"
+msgstr ""
 
 msgid "Background color"
 msgstr "背景色"
@@ -166,10 +160,10 @@ msgstr "コンピュータを参照し、適切なファイルを選択します
 msgid "Browse..."
 msgstr "参照..."
 
-msgid "cancel"
+msgid "Cancel"
 msgstr "キャンセル"
 
-msgid "Cancel"
+msgid "cancel"
 msgstr "キャンセル"
 
 msgid "chars"
@@ -187,11 +181,11 @@ msgstr "操作の選択"
 msgid "Choice Properties"
 msgstr "選択肢プロパティ"
 
-msgid "choices"
-msgstr ""
-
 msgid "Choices"
 msgstr "選択肢"
+
+msgid "choices"
+msgstr ""
 
 msgid "Click again to remove"
 msgstr "削除するには、もう一度クリックします"
@@ -217,14 +211,11 @@ msgstr "制約事項"
 msgid "Control the playing parameters (auto-start, loop) of a video or audio file and report the number of time it has been played."
 msgstr "ビデオまたはオーディオファイルの再生パラメータ（オートスタート、ループ）を制御し、それが再生された時間数を報告します"
 
-msgid "Correct"
-msgstr "正しい"
-
 msgid "correct"
 msgstr "正しい"
 
-msgid "Could not create language specific directory for item \'%s\"
-msgstr "\\'%s\\アイテムのための言語固有のディレクトリを作成できませんでした"
+msgid "Correct"
+msgstr "正しい"
 
 msgid "Create assocations and fill the score in the form below"
 msgstr "アソシエーションを作成し、以下のフォームにスコアを記入"
@@ -370,6 +361,9 @@ msgstr "エンドアテンプトインタラクション"
 msgid "Enlarge font size"
 msgstr "フォントサイズを拡大"
 
+msgid "Enter a select MIME-type"
+msgstr ""
+
 msgid "Enter choices…"
 msgstr ""
 
@@ -378,6 +372,13 @@ msgstr "エクスポート"
 
 msgid "Export APIP 1.0 Package"
 msgstr "APIP 1.0 パッケージをエクスポート"
+
+#, tao-public
+msgid "Export metadata"
+msgstr ""
+
+msgid "Export metadata item"
+msgstr ""
 
 msgid "Export QTI 2.1 Package"
 msgstr "QTI 2.1 パッケージをエクスポート"
@@ -481,10 +482,10 @@ msgstr "どのように数式を編集できるのでしょうか"
 msgid "identical pair already exists"
 msgstr "同一のペアがすでに存在しています"
 
-msgid "identifier"
+msgid "Identifier"
 msgstr "識別"
 
-msgid "Identifier"
+msgid "identifier"
 msgstr "識別"
 
 msgid "If given, the pattern mask specifies a regular expression that the candidate's response must match in order to be considered valid"
@@ -499,14 +500,11 @@ msgstr "文字列入力が数値応答変数にバインドされている場合
 msgid "Import"
 msgstr "インポート"
 
-msgid "Import a QTI 2.X Package"
-msgstr "QTI 2.Xパッケージのインポート"
+msgid "Import a QTI/APIP Content Package"
+msgstr ""
 
-msgid "Import an APIP 1.0 Package"
-msgstr "APIP 1.0パッケージのインポート"
-
-msgid "Import QTI 2.X Item"
-msgstr "QTI 2.Xアイテムのインポート"
+msgid "Import a QTI/APIP XML Item Document"
+msgstr ""
 
 msgid "IMS QTI Item referenced as \"%s\" in the IMS Manifest file could not be imported."
 msgstr "IMSマニフェストファイル \"%s\"のIMS QTIアイテムはインポートできませんでした"
@@ -550,10 +548,10 @@ msgstr "アイテム\"%s\"は、どの言語でもご利用いただけません
 msgid "Item \'%s\' has no model"
 msgstr "アイテム\\'%s\\' はモデルがありません"
 
-msgid "Item Properties"
+msgid "Item properties"
 msgstr "アイテムプロパティ"
 
-msgid "Item properties"
+msgid "Item Properties"
 msgstr "アイテムプロパティ"
 
 msgid "Item width"
@@ -860,8 +858,14 @@ msgstr "CSS準備中、お待ちください..."
 msgid "Preview"
 msgstr "CSSを準備中、お待ちください..."
 
+msgid "Preview the item"
+msgstr ""
+
 msgid "Print"
 msgstr "印刷"
+
+msgid "Print the item"
+msgstr ""
 
 msgid "Provides a hint to the candidate as to the expected number of lines of input required. A line is expected to have about 72 characters."
 msgstr "必要な入力行数の例としてヒントを提供します。ラインは約72文字が必要です"
@@ -872,14 +876,8 @@ msgstr "回答に求められる文字数を受験者にヒントとして提供
 msgid "Published %s"
 msgstr "%s パブリッシュ"
 
-msgid "QTI Item"
-msgstr "QTIアイテム"
-
 msgid "QTI Item Runner"
 msgstr "QTI アイテムランナ"
-
-msgid "QTI Package"
-msgstr "QTI パッケージ"
 
 msgid "QTI Package 2.0"
 msgstr "QTI パッケージ 2.0"
@@ -887,8 +885,17 @@ msgstr "QTI パッケージ 2.0"
 msgid "QTI Package 2.1"
 msgstr "QTI パッケージ 2.1"
 
+msgid "QTI Package 2.2"
+msgstr ""
+
 msgid "QTI-XML error at line %1$d \"%2$s\"."
 msgstr "%1$d行でQTI-XMLのエラー\"%2$s\""
+
+msgid "QTI/APIP Content Package"
+msgstr ""
+
+msgid "QTI/APIP XML Item Document"
+msgstr ""
 
 msgid "Question"
 msgstr "問題"
@@ -967,6 +974,9 @@ msgstr "戻す..."
 
 msgid "Save"
 msgstr "保存"
+
+msgid "Save the item"
+msgstr ""
 
 msgid "score"
 msgstr "スコア"
@@ -1264,9 +1274,6 @@ msgid "The validation of the imported QTI item failed. The system returned the f
 msgstr "QTIアイテムのインポートに失敗しました。エラー内容:%s\n"
 ""
 
-msgid "The ZIP archive containing the IMS APIP Item cannot be extracted."
-msgstr "IMS APIPアイテムを含むZIPアーカイブを抽出することはできません"
-
 msgid "The ZIP archive containing the IMS QTI Item cannot be extracted."
 msgstr "IMS QTI アイテムを含むZIPアーカイブを抽出できません"
 
@@ -1351,8 +1358,14 @@ msgstr "語数"
 msgid "Would you like to replace the alt text"
 msgstr "代替えテキストを変更したいですか"
 
+msgid "Wrong type of file. Expected %s"
+msgstr ""
+
 msgid "XHTML"
 msgstr "XHTML"
+
+msgid "XML error \"%1$s\"."
+msgstr ""
 
 msgid "XML error at line %1$d \"%2$s\"."
 msgstr "%1$d \"行のXML エラー %2$s\""

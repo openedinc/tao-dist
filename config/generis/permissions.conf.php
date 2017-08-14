@@ -1,8 +1,6 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file generis/config/header/permissions.conf.php
+ * Default config header created during install
  */
 
 return new oat\generis\model\data\permission\implementation\FreeAccess();

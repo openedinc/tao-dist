@@ -34,7 +34,7 @@ return array(
     'label' => 'Groups core extension',
 	'description' => 'TAO Groups extension',
     'license' => 'GPL-2.0',
-    'version' => '2.9.1',
+    'version' => '3.0.1',
 	'author' => 'Open Assessment Technologies, CRP Henri Tudor',
 	'requires' => array(
 	    'taoTestTaker' => '>=2.6',
@@ -51,9 +51,7 @@ return array(
     'update' => 'oat\\taoGroups\\models\\update\\Updater',
 	'managementRole' => 'http://www.tao.lu/Ontologies/TAOGroup.rdf#GroupsManagerRole',
     'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/TAOGroup.rdf#GroupsManagerRole', array('ext'=>'taoGroups')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole',array('ext'=>'taoGroups','mod' => 'Api'))
-        
+        array('grant', 'http://www.tao.lu/Ontologies/TAOGroup.rdf#GroupsManagerRole', array('ext'=>'taoGroups'))
     ),
     'routes' => array(
         '/taoGroups' => 'oat\\taoGroups\\controller'
@@ -79,9 +77,6 @@ return array(
 	
 		#BASE URL (usually the domain root)
 		'BASE_URL'				=> ROOT_URL .'taoGroups/',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL .'taoGroups/views/',
 	),
     'extra' => array(
         'structures' => dirname(__FILE__).DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'structures.xml',

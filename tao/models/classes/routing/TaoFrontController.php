@@ -39,12 +39,15 @@ class TaoFrontController
         $pRequest = \common_http_Request::currentRequest();
         $this->legacy($pRequest, $response);
     }
-    
+
     /**
      * Run the controller
-     *
+     * 
      * @param common_http_Request $pRequest
-     * @param ResponseInterface $response
+     * @throws \ActionEnforcingException
+     * @throws \Exception
+     * @throws \common_exception_Error
+     * @throws \common_ext_ExtensionException
      */
     public function legacy(common_http_Request $pRequest) {
         $resolver = new Resolver($pRequest);
@@ -60,15 +63,22 @@ class TaoFrontController
         //if the controller is a rest controller we try to authenticate the user
         $controllerClass = $resolver->getControllerClass();
 
-        if(is_subclass_of($controllerClass,'tao_actions_CommonRestModule')){
+        if (is_subclass_of($controllerClass, \tao_actions_RestController::class)) {
             $authAdapter = new \tao_models_classes_HttpBasicAuthAdapter(common_http_Request::currentRequest());
             try {
                 $user = $authAdapter->authenticate();
                 $session = new \common_session_RestSession($user);
                 \common_session_SessionManager::startSession($session);
             } catch (\common_user_auth_AuthFailedException $e) {
-                $class = new $controllerClass();
-                $class->requireLogin();
+                $data['success']	= false;
+                $data['errorCode']	= '401';
+                $data['errorMsg']	= 'You are not authorized to access this functionality.';
+                $data['version']	= TAO_VERSION;
+
+                header('HTTP/1.0 401 Unauthorized');
+                header('WWW-Authenticate: Basic realm="' . GENERIS_INSTANCE_NAME . '"');
+                echo json_encode($data);
+                exit(0);
             }
         }
 

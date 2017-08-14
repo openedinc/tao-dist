@@ -22,16 +22,17 @@ define([
     'jquery',
     'lodash',
     'ui/component'
-], function($, _, component) {
+], function($, _, componentFactory) {
     'use strict';
 
     QUnit.module('component');
 
 
-    QUnit.test('module', 3, function(assert) {
-        assert.equal(typeof component, 'function', "The component module exposes a function");
-        assert.equal(typeof component(), 'object', "The component factory produces an object");
-        assert.notStrictEqual(component(), component(), "The component factory provides a different object on each call");
+    QUnit.test('module', function(assert) {
+        QUnit.expect(3);
+        assert.equal(typeof componentFactory, 'function', "The component module exposes a function");
+        assert.equal(typeof componentFactory(), 'object', "The component factory produces an object");
+        assert.notStrictEqual(componentFactory(), componentFactory(), "The component factory provides a different object on each call");
     });
 
 
@@ -39,6 +40,7 @@ define([
         { name : 'init', title : 'init' },
         { name : 'destroy', title : 'destroy' },
         { name : 'render', title : 'render' },
+        { name : 'setSize', title : 'setSize' },
         { name : 'show', title : 'show' },
         { name : 'hide', title : 'hide' },
         { name : 'enable', title : 'enable' },
@@ -54,8 +56,9 @@ define([
     QUnit
         .cases(testReviewApi)
         .test('instance API ', function(data, assert) {
-            var instance = component();
-            assert.equal(typeof instance[data.name], 'function', 'The component instance exposes a "' + data.title + '" function');
+            var instance = componentFactory();
+            QUnit.expect(1);
+            assert.equal(typeof instance[data.name], 'function', 'The component instance exposes a "' + data.name + '" function');
         });
 
 
@@ -74,7 +77,9 @@ define([
             dummy: null,
             title: 'My Title'
         };
-        var instance = component(specs, defaults).init(config);
+        var instance = componentFactory(specs, defaults).init(config);
+
+        QUnit.expect(10);
 
         assert.notEqual(instance, specs, 'The component instance must not be the same obect as the list of specs');
         assert.notEqual(instance.config, config, 'The component instance must duplicate the config set');
@@ -101,12 +106,14 @@ define([
         var $container3 = $('#fixture-3');
         var instance;
 
+        QUnit.expect(30);
+
         // auto render at init
         assert.equal($container1.children().length, 1, 'The container1 already contains an element');
         assert.equal($container1.children().get(0), $dummy1.get(0), 'The container1 contains the dummy element');
         assert.equal($container1.find('.dummy').length, 1, 'The container1 contains an element of the class dummy');
 
-        instance = component().init({
+        instance = componentFactory().init({
             renderTo: $container1,
             replace: true
         });
@@ -127,7 +134,7 @@ define([
         assert.equal($container2.children().get(0), $dummy2.get(0), 'The container2 contains the dummy element');
         assert.equal($container2.find('.dummy').length, 1, 'The container2 contains an element of the class dummy');
 
-        instance = component().init();
+        instance = componentFactory().init();
         instance.render($container2);
 
         assert.equal($container2.find('.dummy').length, 1, 'The container2 contains an element of the class dummy');
@@ -142,7 +149,7 @@ define([
         assert.equal($container2.find('.dummy').length, 1, 'The container2 contains an element of the class dummy');
         assert.equal(instance.getElement(), null, 'The component instance has removed its rendered content');
 
-        instance = component().init();
+        instance = componentFactory().init();
         instance.setTemplate(template);
 
         assert.equal(typeof instance.getTemplate(), 'function', 'The template used to render the component is a function');
@@ -163,12 +170,203 @@ define([
     });
 
 
+    QUnit.test('setSize', function(assert) {
+        var $dummy1 = $('<div class="dummy" />');
+        var $dummy2 = $('<div class="dummy" />');
+        var template = '<div class="my-component">TEST</div>';
+        var renderedTemplate = '<div class="my-component rendered">TEST</div>';
+        var $container1 = $('#fixture-1').append($dummy1);
+        var $container2 = $('#fixture-2').append($dummy2);
+        var $container3 = $('#fixture-3');
+        var expectedWidth = 200;
+        var expectedHeight = 100;
+        var instance;
+        var getSizeResult;
+
+        QUnit.expect(42);
+
+        // auto render at init
+        assert.equal($container1.children().length, 1, 'The container1 already contains an element');
+        assert.equal($container1.children().get(0), $dummy1.get(0), 'The container1 contains the dummy element');
+        assert.equal($container1.find('.dummy').length, 1, 'The container1 contains an element of the class dummy');
+
+        instance = componentFactory().init({
+            renderTo: $container1,
+            replace: true,
+            width: expectedWidth,
+            height: expectedHeight
+        });
+
+        assert.equal($container1.find('.dummy').length, 0, 'The container1 does not contain an element of the class dummy');
+        assert.equal(instance.is('rendered'), true, 'The component instance must be rendered');
+        assert.equal(typeof instance.getElement(), 'object', 'The component instance returns the rendered content as an object');
+        assert.equal(instance.getElement().length, 1, 'The component instance returns the rendered content');
+        assert.equal(instance.getElement().parent().get(0), $container1.get(0), 'The component instance is rendered inside the right container');
+
+        assert.equal(instance.getElement().width(), expectedWidth, 'The expected width has been set');
+        assert.equal(instance.getElement().height(), expectedHeight, 'The expected height has been set');
+
+        getSizeResult = instance.getSize();
+        assert.equal(getSizeResult.width, expectedWidth, '.getSize() returns the expected width');
+        assert.equal(getSizeResult.height, expectedHeight, '.getSize() returns the expected height');
+
+        instance.destroy();
+
+        assert.equal($container1.children().length, 0, 'The container1 is now empty');
+        assert.equal(instance.getElement(), null, 'The component instance has removed its rendered content');
+
+        // explicit render
+        assert.equal($container2.children().length, 1, 'The container2 already contains an element');
+        assert.equal($container2.children().get(0), $dummy2.get(0), 'The container2 contains the dummy element');
+        assert.equal($container2.find('.dummy').length, 1, 'The container2 contains an element of the class dummy');
+
+        expectedWidth = 250;
+        expectedHeight = 150;
+        $container2.width(expectedWidth);
+        $container2.height(expectedHeight);
+
+        instance = componentFactory().init({
+            width: 'auto',
+            height: 'auto'
+        });
+        instance.render($container2);
+
+        assert.equal($container2.find('.dummy').length, 1, 'The container2 contains an element of the class dummy');
+        assert.equal(instance.is('rendered'), true, 'The component instance must be rendered');
+        assert.equal(typeof instance.getElement(), 'object', 'The component instance returns the rendered content as an object');
+        assert.equal(instance.getElement().length, 1, 'The component instance returns the rendered content');
+        assert.equal(instance.getElement().parent().get(0), $container2.get(0), 'The component instance is rendered inside the right container');
+
+        assert.equal(instance.getElement().width(), expectedWidth, 'The expected width has been set');
+        assert.equal(instance.getElement().height(), expectedHeight, 'The expected height has been set');
+
+        getSizeResult = instance.getSize();
+        assert.equal(getSizeResult.width, expectedWidth, '.getSize() returns the expected width');
+        assert.equal(getSizeResult.height, expectedHeight, '.getSize() returns the expected height');
+
+        instance.destroy();
+
+        assert.equal($container2.children().length, 1, 'The component has beend removed from the container2');
+        assert.equal($container2.find('.dummy').length, 1, 'The container2 contains an element of the class dummy');
+        assert.equal(instance.getElement(), null, 'The component instance has removed its rendered content');
+
+        expectedWidth = 200;
+        expectedHeight = 100;
+
+        instance = componentFactory().init();
+        instance.setTemplate(template);
+
+        assert.equal(typeof instance.getTemplate(), 'function', 'The template used to render the component is a function');
+        assert.equal((instance.getTemplate())(), template, 'The built template is the same as the provided one');
+
+        instance.render($container3);
+
+        assert.equal(instance.is('rendered'), true, 'The component instance must be rendered');
+        assert.equal(typeof instance.getElement(), 'object', 'The component instance returns the rendered content as an object');
+        assert.equal(instance.getElement().length, 1, 'The component instance returns the rendered content');
+        assert.equal(instance.getElement().parent().get(0), $container3.get(0), 'The component instance is rendered inside the right container');
+        assert.equal($container3.html(), renderedTemplate, 'The component instance has rendered the right content');
+
+        instance.setSize(expectedWidth, expectedHeight);
+        assert.equal(instance.getElement().width(), expectedWidth, 'The expected width has been set');
+        assert.equal(instance.getElement().height(), expectedHeight, 'The expected height has been set');
+
+        getSizeResult = instance.getSize();
+        assert.equal(getSizeResult.width, expectedWidth, '.getSize() returns the expected width');
+        assert.equal(getSizeResult.height, expectedHeight, '.getSize() returns the expected height');
+
+        instance.destroy();
+
+        assert.equal($container3.children().length, 0, 'The container1 is now empty');
+        assert.equal(instance.getElement(), null, 'The component instance has removed its rendered content');
+    });
+
+    QUnit
+        .cases([
+            {
+                title: 'content-box, no extra size, margin not included',
+                boxSizing: 'content-box', width: 100, height: 100, margin: 0, padding: 0, border: 0, includeMargin: false,
+                outerWidth: 100, outerHeight: 100
+            }, {
+                title: 'content-box, with margin, margin not included',
+                boxSizing: 'content-box', width: 100, height: 100, margin: 10, padding: 0, border: 0, includeMargin: false,
+                outerWidth: 100, outerHeight: 100
+            }, {
+                title: 'content-box, with margin, margin included',
+                boxSizing: 'content-box', width: 100, height: 100, margin: 10, padding: 0, border: 0, includeMargin: true,
+                outerWidth: 120, outerHeight: 120
+            }, {
+                title: 'content-box, with margin/padding, margin included',
+                boxSizing: 'content-box', width: 100, height: 100, margin: 10, padding: 10, border: 0, includeMargin: true,
+                outerWidth: 140, outerHeight: 140
+            }, {
+                title: 'content-box, with margin/padding/border, margin included',
+                boxSizing: 'content-box', width: 100, height: 100, margin: 10, padding: 10, border: 10, includeMargin: true,
+                outerWidth: 160, outerHeight: 160
+            }, {
+                title: 'border-box, no extra size, margin not included',
+                boxSizing: 'border-box', width: 100, height: 100, margin: 0, padding: 0, border: 0, includeMargin: false,
+                outerWidth: 100, outerHeight: 100
+            }, {
+                title: 'border-box, with margin, margin not included',
+                boxSizing: 'border-box', width: 100, height: 100, margin: 10, padding: 0, border: 0, includeMargin: false,
+                outerWidth: 100, outerHeight: 100
+            }, {
+                title: 'border-box, with margin, margin included',
+                boxSizing: 'border-box', width: 100, height: 100, margin: 10, padding: 0, border: 0, includeMargin: true,
+                outerWidth: 120, outerHeight: 120
+            }, {
+                title: 'border-box, with margin/padding, margin included',
+                boxSizing: 'border-box', width: 100, height: 100, margin: 10, padding: 10, border: 0, includeMargin: true,
+                outerWidth: 120, outerHeight: 120
+            }, {
+                title: 'border-box, with margin/padding/border, margin included',
+                boxSizing: 'border-box', width: 100, height: 100, margin: 10, padding: 10, border: 10, includeMargin: true,
+                outerWidth: 120, outerHeight: 120
+            }
+        ])
+        .asyncTest('getOuterSize()', function(data, assert) {
+            var template = '<div>TEST</div>',
+                $container1 = $('#fixture-1');
+
+            QUnit.expect(2);
+
+            componentFactory()
+                .setTemplate(template)
+                .on('render', function() {
+                    var $component = this.getElement(),
+                        outerSize;
+
+                    $component.css({
+                        'box-sizing': data.boxSizing,
+                        'padding': data.padding + 'px',
+                        'margin': data.margin + 'px',
+                        'border': data.border + 'px solid black'
+                    });
+
+                    outerSize = this.getOuterSize(data.includeMargin);
+                    assert.equal(outerSize.width, data.outerWidth, 'getOuterSize() returns the correct width');
+                    assert.equal(outerSize.height, data.outerHeight, 'getOuterSize() returns the correct height');
+
+                    QUnit.start();
+                })
+                .init({
+                    renderTo: $container1,
+                    replace: true,
+                    width: data.width,
+                    height: data.height
+                });
+        });
+
+
     QUnit.test('show/hide', function(assert) {
-        var instance = component()
+        var instance = componentFactory()
                         .init()
                         .render();
 
         var $component = instance.getElement();
+
+        QUnit.expect(8);
 
         assert.equal(instance.is('rendered'), true, 'The component instance must be rendered');
         assert.equal($component.length, 1, 'The component instance returns the rendered content');
@@ -191,10 +389,12 @@ define([
 
 
     QUnit.test('enable/disable', function(assert) {
-        var instance = component()
+        var instance = componentFactory()
                         .init()
                         .render();
         var $component = instance.getElement();
+
+        QUnit.expect(8);
 
         assert.equal(instance.is('rendered'), true, 'The component instance must be rendered');
         assert.equal($component.length, 1, 'The component instance returns the rendered content');
@@ -217,10 +417,12 @@ define([
 
 
     QUnit.test('state', function(assert) {
-        var instance = component()
+        var instance = componentFactory()
                         .init()
                         .render();
         var $component = instance.getElement();
+
+        QUnit.expect(8);
 
         assert.equal(instance.is('rendered'), true, 'The component instance must be rendered');
         assert.equal($component.length, 1, 'The component instance returns the rendered content');
@@ -243,10 +445,12 @@ define([
 
 
     QUnit.asyncTest('events', function(assert) {
-        var instance = component();
+        var instance = componentFactory();
+        var expectedWidth = 200;
+        var expectedHeight = 100;
 
-        QUnit.expect(4);
-        QUnit.stop(3);
+        QUnit.expect(7);
+        QUnit.stop(4);
 
         instance.on('custom', function() {
             assert.ok(true, 'The component instance can handle custom events');
@@ -263,6 +467,13 @@ define([
             QUnit.start();
         });
 
+        instance.on('setsize', function(width, height) {
+            assert.ok(true, 'The component instance triggers event when it is resized');
+            assert.equal(width, expectedWidth, 'The right width has been provided');
+            assert.equal(height, expectedHeight, 'The right height has been provided');
+            QUnit.start();
+        });
+
         instance.on('destroy', function() {
             assert.ok(true, 'The component instance triggers event when it is destroyed');
             QUnit.start();
@@ -271,8 +482,24 @@ define([
         instance
             .init()
             .render()
+            .setSize(expectedWidth, expectedHeight)
             .trigger('custom')
             .destroy();
+    });
+
+    QUnit.asyncTest('extends', function (assert) {
+        var expectedValue = 'pouet!';
+        var instance = componentFactory({
+            yolo: function(val) {
+                assert.ok(true, 'The additional method has been called');
+                assert.equal(val, expectedValue, 'The expected value has been provided');
+                QUnit.start();
+            }
+        });
+
+        QUnit.expect(2);
+
+        instance.yolo(expectedValue);
     });
 
 });

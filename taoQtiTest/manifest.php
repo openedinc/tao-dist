@@ -1,43 +1,43 @@
 <?php
-/*  
+/*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *               
- * 
- */
-?>
-<?php
-/*
- * @author CRP Henri Tudor - TAO Team - {@link http://www.tao.lu}
- * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
+ *
+ * Copyright (c) 2013-2017 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
+use oat\taoQtiTest\scripts\install\RegisterQtiFlysystemManager;
+use oat\taoQtiTest\scripts\install\RegisterTestContainer;
+
 $extpath = dirname(__FILE__).DIRECTORY_SEPARATOR;
 $taopath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'tao'.DIRECTORY_SEPARATOR;
 
 return array(
-	'name' => 'taoQtiTest',
-    'label' => 'QTI test model',
-	'description' => 'TAO QTI test implementation',
-    'license' => 'GPL-2.0',
-    'version' => '2.24.2',
-	'author' => 'Open Assessment Technologies',
-    'requires' => array(
-        'taoTests' => '>=2.13',
-        'taoQtiItem' => '>=2.6'
+    'name'        => 'taoQtiTest',
+    'label'       => 'QTI test model',
+    'description' => 'TAO QTI test implementation',
+    'license'     => 'GPL-2.0',
+    'version'     => '11.10.0',
+    'author'      => 'Open Assessment Technologies',
+    'requires'    => array(
+        'taoTests'   => '>=6.4.0',
+        'taoQtiItem' => '>=9.7.0',
+        'tao'        => '>=12.8.0',
+        'generis'    => '>=3.36.0',
+        'taoDelivery' => '>=7.0.0',
+        'taoItems'   => '>=5.1.0'
     ),
 	'models' => array(
 		'http://www.tao.lu/Ontologies/TAOTest.rdf'
@@ -45,13 +45,27 @@ return array(
 	'install' => array(
 		'rdf' => array(
 			dirname(__FILE__) . '/models/ontology/qtitest.rdf',
-		    dirname(__FILE__) . '/models/ontology/taoQtiTestItemRunner.rdf'
+		    dirname(__FILE__) . '/models/ontology/taoQtiTestItemRunner.rdf',
+			dirname(__FILE__) . '/models/ontology/qtiCat.rdf',
 		),
 		'php'	=> array(
 			dirname(__FILE__) . '/scripts/install/addQtiTestFolder.php',
 		    dirname(__FILE__) . '/scripts/install/addQtiTestAcceptableLatency.php',
-		    dirname(__FILE__) . '/scripts/install/addExtraTestRunnerButtons.php',
-		)
+            dirname(__FILE__) . '/scripts/install/addExtraTestRunnerButtons.php',
+            'oat\\taoQtiTest\\scripts\\install\\RegisterTestRunnerPlugins',
+            'oat\\taoQtiTest\\scripts\\install\\RegisterTestMetadataExporter',
+            'oat\\taoQtiTest\\scripts\\install\\CreateTestSessionFilesystem',
+            RegisterQtiFlysystemManager::class,
+            \oat\taoQtiTest\scripts\install\RegisterTestImporters::class,
+            \oat\taoQtiTest\scripts\install\SetupEventListeners::class,
+            \oat\taoQtiTest\scripts\install\RegisterCreatorServices::class,
+            \oat\taoQtiTest\scripts\install\RegisterTestCategoryPresetProviderService::class,
+            \oat\taoQtiTest\scripts\install\RegisterQtiCategoryPresetProviders::class,
+            \oat\taoQtiTest\scripts\install\RegisterSectionPauseService::class,
+            \oat\taoQtiTest\scripts\install\SetSynchronisationService::class,
+            \oat\taoQtiTest\scripts\install\SyncChannelInstaller::class,
+		    RegisterTestContainer::class
+        )
 	),
 	'update' => 'oat\\taoQtiTest\\scripts\\update\\Updater',
     'local'	=> array(
@@ -71,23 +85,23 @@ return array(
 	'constants' => array(
 		# actions directory
 		"DIR_ACTIONS"			=> $extpath."actions".DIRECTORY_SEPARATOR,
-	
+
 		# views directory
 		"DIR_VIEWS"				=> $extpath."views".DIRECTORY_SEPARATOR,
-	
+
 		# default module name
 		'DEFAULT_MODULE_NAME'	=> 'Main',
-	
+
 		#default action name
 		'DEFAULT_ACTION_NAME'	=> 'index',
-	
+
 		#BASE PATH: the root path in the file system (usually the document root)
 		'BASE_PATH'				=> $extpath,
-	
+
 		#BASE URL (usually the domain root)
 		'BASE_URL'				=> ROOT_URL	.'taoQtiTest/',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL	.'taoQtiTest/views/',
-	)
+	),
+    'extra' => array(
+        'structures' => dirname(__FILE__).DIRECTORY_SEPARATOR.'actions'.DIRECTORY_SEPARATOR.'structures.xml',
+    )
 );

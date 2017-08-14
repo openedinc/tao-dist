@@ -1,6 +1,6 @@
 define([
-    'taoQtiItem/qtiItem/core/Element', 
-    'lodash', 
+    'taoQtiItem/qtiItem/core/Element',
+    'lodash',
     'taoQtiItem/qtiItem/helper/rendererConfig',
     'taoQtiItem/qtiItem/helper/util'
 ], function(Element, _, rendererConfig, util){
@@ -201,12 +201,8 @@ define([
          */
         clear : function(){
             var renderer = this.getRenderer();
-            if(renderer){
-                if(_.isFunction(renderer.destroy)){
-                    renderer.destroy(this);
-                }
-            }else{
-                throw 'no renderer found for the interaction ' + this.qtiClass;
+            if(renderer && _.isFunction(renderer.destroy)){
+                renderer.destroy(this);
             }
         },
 
@@ -219,6 +215,11 @@ define([
                 }
             }
             return arr;
+        },
+
+        getNormalMaximum : function getNormalMaximum(){
+            //by default
+            return false;
         }
     });
     return QtiInteraction;

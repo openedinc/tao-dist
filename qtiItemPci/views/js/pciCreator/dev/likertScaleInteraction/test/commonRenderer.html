@@ -11,11 +11,21 @@
         <link rel="stylesheet" type="text/css" href="/tao/views/css/tao-main-style.css" />
         <link rel="stylesheet" type="text/css" href="/taoQtiItem/views/css/qti-runner.css" />
         <link rel="stylesheet" type="text/css" href="/taoQtiItem/views/css/themes/default.css" />
-        
+
         <script  type="text/javascript">
             QUnit.config.autostart = false;
-            require(['/tao/ClientConfig/config'], function(){
-                require(['taoQtiItem/qtiCommonRenderer/test/runner'], function(runner){
+            require(['/tao/ClientConfig/config'], function (){
+                require([
+                    'taoQtiItem/qtiCommonRenderer/test/runner',
+                    'taoQtiItem/portableElementRegistry/ciRegistry',
+                    'taoQtiItem/portableElementRegistry/provider/localManifestProvider'
+                ], function (runner, ciRegistry, pciTestProvider){
+                    pciTestProvider.addManifestPath(
+                            'likertScaleInteraction',
+                            'qtiItemPci/pciCreator/dev/likertScaleInteraction/pciCreator.json');
+                    ciRegistry.resetProviders();
+                    ciRegistry.registerProvider(pciTestProvider.getModuleName());
+
                     QUnit.start();
 
                     runner.run({
@@ -28,7 +38,6 @@
                             responses : []
                         }
                     });
-
                 });
             });
         </script>

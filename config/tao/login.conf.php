@@ -1,10 +1,10 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file tao/config/header/login.conf.php
+ * Default config header created during install
  */
 
-return array(
-    'disableAutocomplete' => false
-);
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => array(
+        'disableAutocomplete' => false
+    )
+));

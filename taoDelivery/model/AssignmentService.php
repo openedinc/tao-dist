@@ -29,6 +29,11 @@ use oat\oatbox\user\User;
  */
 interface AssignmentService
 {
+    const SERVICE_ID = 'taoDelivery/assignment';
+
+    /**
+     * @deprecated please use SERVICE_ID
+     */
     const CONFIG_ID = 'taoDelivery/assignment';
      
     /**
@@ -42,7 +47,7 @@ interface AssignmentService
     /**
      * Returns the ids of users assigned to a delivery
      * 
-     * @param unknown $deliveryId
+     * @param string $deliveryId
      * @return string[] ids of users
      */
     public function getAssignedUsers($deliveryId);

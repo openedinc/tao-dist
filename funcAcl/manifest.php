@@ -30,10 +30,10 @@ return array(
     'label' => 'Functionality ACL',
 	'description' => 'Functionality Access Control Layer',
     'license' => 'GPL-2.0',
-    'version' => '2.7.2',
+    'version' => '4.0.0',
 	'author' => 'Open Assessment Technologies, CRP Henri Tudor',
 	'requires' => array(
-	    'tao' => '>=2.7'
+        'tao' => '>=9.0',
     ),
 	'models' => array(
 		'http://www.tao.lu/Ontologies/taoFuncACL.rdf'
@@ -43,13 +43,16 @@ return array(
 			dirname(__FILE__). '/models/ontology/taofuncacl.rdf'
 		),
 	    'php' => array(
-	        dirname(__FILE__). '/scripts/install/setFuncAclImpl.php'
+            dirname(__FILE__) . '/scripts/install/setFuncAclImpl.php'
 	    ),
 	),
 	'update' => 'oat\\funcAcl\\scripts\\update\\Updater',
 	'managementRole' => 'http://www.tao.lu/Ontologies/taoFuncACL.rdf#FuncAclManagerRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/taoFuncACL.rdf#FuncAclManagerRole', array('ext'=>'funcAcl')),
+    ),
+    'routes' => array(
+        '/funcAcl' => 'oat\\funcAcl\\controller'
     ),
 	'optimizableClasses' => array(
 		'http://www.tao.lu/Ontologies/taoFuncACL.rdf#Extension'
@@ -74,10 +77,11 @@ return array(
 		#BASE URL (usually the domain root)
 		'BASE_URL' => ROOT_URL.'funcAcl/',
 	
-		#BASE WWW the web resources path
-		'BASE_WWW' => ROOT_URL . 'funcAcl/views/',
-	 
 	 	#TPL PATH the path to the templates
 	 	'TPL_PATH'	=> $extpath."views".DIRECTORY_SEPARATOR."templates".DIRECTORY_SEPARATOR,
-	 )
+    ),
+    'extra' => array(
+        'structures' => dirname(__FILE__).DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'structures.xml',
+    ),
+
 );

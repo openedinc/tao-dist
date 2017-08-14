@@ -12,12 +12,14 @@ array(
     'driver' => 'oat\\generis\\model\\user\\AuthAdapter',
 )
 */
-return array(
-    array(
-        'driver' => 'oat\\generis\\model\\user\\AuthAdapter',
-        'hash' => array(
-            'algorithm' => 'sha256',
-            'salt' => 10
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => array(
+        array(
+            'driver' => 'oat\\generis\\model\\user\\AuthAdapter',
+            'hash' => array(
+                'algorithm' => 'sha256',
+                'salt' => 10
+            )
         )
     )
-);
+));

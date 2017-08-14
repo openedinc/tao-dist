@@ -4,19 +4,19 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *               
- * 
+ *
+ *
  */
 
 namespace oat\taoQtiItem\model\qti;
@@ -64,6 +64,8 @@ use \DOMXPath;
 use \DOMElement;
 use \common_Logger;
 use \SimpleXMLElement;
+use oat\oatbox\service\ServiceManager;
+use oat\taoQtiItem\model\portableElement\model\PortableModelRegistry;
 
 /**
  * The ParserFactory provides some methods to build the QTI_Data objects from an
@@ -85,6 +87,14 @@ class ParserFactory
     public function __construct(DOMDocument $data){
         $this->data = $data;
         $this->xpath = new DOMXPath($data);
+    }
+
+    /**
+     * @param \oat\taoQtiItem\model\qti\Item $item
+     */
+    public function setItem(Item $item)
+    {
+        $this->item = $item;
     }
 
     public function load(){
@@ -156,11 +166,11 @@ class ParserFactory
 
         return $this->queryXPath($query, $contextNode);
     }
-    
+
     public function loadContainerStatic(DOMElement $data, Container $container){
         $this->parseContainerStatic($data, $container);
     }
-    
+
     protected function parseContainerStatic(DOMElement $data, Container $container){
 
         //initialize elements array to collect all QTI elements
@@ -198,6 +208,17 @@ class ParserFactory
                 $bodyElements[$img->getSerial()] = $img;
 
                 $this->replaceNode($imgNode, $img);
+            }
+        }
+
+        // parse the remaining tables, those that does not contain any interaction
+        $tableNodes = $this->queryXPath(".//*[name(.)='table']", $data);
+        foreach($tableNodes as $tableNode){
+            $table = $this->buildTable($tableNode);
+            if(!is_null($table)){
+                $bodyElements[$table->getSerial()] = $table;
+
+                $this->replaceNode($tableNode, $table);
             }
         }
 
@@ -284,7 +305,7 @@ class ParserFactory
             }
         }
 
-        //parse for feedback elements interactive! 
+        //parse for feedback elements interactive!
         $feedbackNodes = $this->queryXPath(".//*[not(ancestor::feedbackBlock) and not(ancestor::feedbackInline) and contains(name(.), 'feedback')]", $data);
         foreach($feedbackNodes as $feedbackNode){
             $feedback = $this->buildFeedback($feedbackNode, true);
@@ -343,6 +364,20 @@ class ParserFactory
             }
         }
 
+        // parse for tables, but only the ones containing interactions
+        $tableNodes = $this->queryXPath(".//*[name(.)='table']", $data);
+        foreach($tableNodes as $tableNode){
+            $interactionsNodes = $this->queryXPath(".//*[contains(name(.), 'Interaction')]", $tableNode);
+            if ($interactionsNodes->length > 0) {
+                $table = $this->buildTable($tableNode);
+                if(!is_null($table)){
+                    $bodyElements[$table->getSerial()] = $table;
+                    $this->replaceNode($tableNode, $table);
+                    $this->parseContainerInteractive($tableNode, $table->getBody());
+                }
+            }
+        }
+
         $this->setContainerElements($container, $data, $bodyElements);
 
         return $this->parseContainerInteractive($data, $container);
@@ -386,7 +421,7 @@ class ParserFactory
         return $options;
     }
 
-    protected function findNamespace($nsFragment){
+    public function findNamespace($nsFragment){
         $returnValue = '';
 
         if(is_null($this->item)){
@@ -414,21 +449,25 @@ class ParserFactory
         return $returnValue;
     }
 
-    private function recursivelyFindNamespace($element, $nsFragment) {
+    private function recursivelyFindNamespace($element, $nsFragment)
+    {
+        if (strpos($this->data->saveXML(), $nsFragment) === false) {
+            return '';
+        }
 
         $returnValue = '';
 
         foreach ($element->childNodes as $child) {
 
             if($child->nodeType === XML_ELEMENT_NODE) {
-                    foreach($this->queryXPath('namespace::*', $child) as $node){
-                        $name = preg_replace('/xmlns(:)?/', '', $node->nodeName);
-                        $uri = $node->nodeValue;
-                        if(strpos($uri, $nsFragment) > 0){
-                            $returnValue = $name;
-                            break;
-                        }
+                foreach($this->queryXPath('namespace::*', $child) as $node){
+                    $name = preg_replace('/xmlns(:)?/', '', $node->nodeName);
+                    $uri = $node->nodeValue;
+                    if(strpos($uri, $nsFragment) > 0){
+                        $returnValue = $name;
+                        break;
                     }
+                }
                 $value = $this->recursivelyFindNamespace($child, $nsFragment);
                 if($value !== ''){
                     $returnValue = $value;
@@ -464,11 +503,11 @@ class ParserFactory
 
         //create the item instance
         $this->item = new Item($this->extractAttributes($data));
-                
+
         //load xml ns and schema locations
         $this->loadNamespaces();
         $this->loadSchemaLocations($data);
-        
+
         //load stylesheets
         $styleSheetNodes = $this->queryXPath("*[name(.) = 'stylesheet']", $data);
         foreach($styleSheetNodes as $styleSheetNode){
@@ -527,22 +566,27 @@ class ParserFactory
         //warning: extract the response processing at the latest to make oat\taoQtiItem\model\qti\response\TemplatesDriven::takeOverFrom() work
         $rpNodes = $this->queryXPath("*[name(.) = 'responseProcessing']", $data);
         if($rpNodes->length === 0){
-            common_Logger::i('No responseProcessing found for QTI Item, setting empty custom', array('QTI', 'TAOITEMS'));
-            $customrp = new Custom(array(), '<responseProcessing/>');
-            $this->item->setResponseProcessing($customrp);
+            //no response processing node found: the template for an empty response processing is simply "NONE"
+            $rProcessing = new TemplatesDriven();
+            $rProcessing->setRelatedItem($this->item);
+            foreach($this->item->getInteractions() as $interaction){
+                $rProcessing->setTemplate($interaction->getResponse(), Template::NONE);
+            }
+            $this->item->setResponseProcessing($rProcessing);
         }else{
-            $rpNode = $rpNodes->item(0); //the node should be alone
+            //if there is a response processing node, try parsing it
+            $rpNode = $rpNodes->item(0);
             $rProcessing = $this->buildResponseProcessing($rpNode, $this->item);
             if(!is_null($rProcessing)){
                 $this->item->setResponseProcessing($rProcessing);
             }
         }
-        
+
         $this->buildApipAccessibility($data);
-        
+
         return $this->item;
     }
-    
+
     /**
      * Load xml namespaces into the item model
      */
@@ -559,10 +603,10 @@ class ParserFactory
             $this->item->addNamespace($name, $uri);
         }
     }
-    
+
     /**
      * Load xml schema locations into the item model
-     * 
+     *
      * @param DOMElement $itemData
      * @throws ParsingException
      */
@@ -577,9 +621,9 @@ class ParserFactory
             $this->item->addSchemaLocation($schemaLocToken[$i], $schemaLocToken[$i+1]);
         }
     }
-    
+
     protected function buildApipAccessibility(DOMElement $data){
-        $ApipNodes = $this->queryXPath("*[name(.) = 'apipAccessibility']", $data);
+        $ApipNodes = $this->queryXPath("*[name(.) = 'apipAccessibility']|*[name(.) = 'apip:apipAccessibility']", $data);
         if($ApipNodes->length > 0){
             common_Logger::i('is APIP item', array('QTI', 'TAOITEMS'));
             $apipNode = $ApipNodes->item(0);
@@ -587,7 +631,7 @@ class ParserFactory
             $this->item->setApipAccessibility($apipXml);
         }
     }
-    
+
     /**
      * Build a QTI_Interaction from a DOMElement (the root tag of this is an 'interaction' node)
      *
@@ -784,12 +828,29 @@ class ParserFactory
                 foreach($value->attributes() as $attrName => $attrValue){
                     $response->setAttribute($attrName, strval($attrValue));
                 }
-                $response->setValue(htmlentities($correct));
+                $response->setValue($correct);
                 $responses[] = $response;
             }
             break;
         }
         $myResponse->setCorrectResponses($responses);
+
+        //set the correct responses
+        $defaultValueNodes = $data->xpath("*[name(.) = 'defaultValue']");
+        $defaultValues = array();
+        foreach($defaultValueNodes as $defaultValueNode){
+            foreach($defaultValueNode->value as $value){
+                $default = (string) $value;
+                $defaultValue = new Value();
+                foreach($value->attributes() as $attrName => $attrValue){
+                    $defaultValue->setAttribute($attrName, strval($attrValue));
+                }
+                $defaultValue->setValue($default);
+                $defaultValues[] = $defaultValue;
+            }
+            break;
+        }
+        $myResponse->setDefaultValue($defaultValues);
 
         //set the mapping if defined
         $mappingNodes = $data->xpath("*[name(.) = 'mapping']");
@@ -935,36 +996,30 @@ class ParserFactory
             try{
                 //warning: require to add interactions to the item to make it work
                 $returnValue = TemplatesDriven::takeOverFrom($returnValue, $item);
-                common_Logger::d('Processing is Template converted to TemplateDriven', array('TAOITEMS', 'QTI'));
-            }catch(TakeoverFailedException $e){
-                common_Logger::d('Processing is Template', array('TAOITEMS', 'QTI'));
-            }
+            }catch(TakeoverFailedException $e){}
         }catch(UnexpectedResponseProcessing $e){
 
         }
+
         //try templatedriven
         if(is_null($returnValue)){
             try{
                 $returnValue = $this->buildTemplatedrivenResponse($data, $item->getInteractions());
-                common_Logger::d('Processing is TemplateDriven', array('TAOITEMS', 'QTI'));
-            }catch(UnexpectedResponseProcessing $e){
-
-            }
+            }catch(UnexpectedResponseProcessing $e){}
         }
 
         // build custom
         if(is_null($returnValue)){
             try{
                 $returnValue = $this->buildCustomResponseProcessing($data);
-                common_Logger::d('ResponseProcessing is custom');
             }catch(UnexpectedResponseProcessing $e){
                 // not a Template
-                common_Logger::e('custom response processing failed, should never happen', array('TAOITEMS', 'QTI'));
+                common_Logger::e('custom response processing failed', array('TAOITEMS', 'QTI'));
             }
         }
 
         if(is_null($returnValue)){
-            common_Logger::d('failled to determin ResponseProcessing');
+            common_Logger::w('failed to determine ResponseProcessing');
         }
 
         return $returnValue;
@@ -1046,11 +1101,10 @@ class ParserFactory
         }
 
         if(count(array_diff(array_keys($irps), array_keys($responses))) > 0){
-            throw new UnexpectedResponseProcessing('Not composit, no responses for rules: '.implode(',', array_diff(array_keys($irps), array_keys($responses))));
+            throw new UnexpectedResponseProcessing('Not composite, no responses for rules: '.implode(',', array_diff(array_keys($irps), array_keys($responses))));
         }
         if(count(array_diff(array_keys($responses), array_keys($irps))) > 0){
-            common_Logger::w('Some responses have no processing');
-            throw new UnexpectedResponseProcessing('Not composit, no support for unmatched variables yet');
+            throw new UnexpectedResponseProcessing('Not composite, no support for unmatched variables yet');
         }
 
         //assuming sum is correct
@@ -1177,7 +1231,7 @@ class ParserFactory
         $patternFeedbackMatchChoicesEmptyWithElse  = '/responseCondition [count(./*) = 2 ]'.$subPatternFeedbackMatchChoicesEmpty.$subPatternFeedbackElse;
         $patternFeedbackMatchChoice = '/responseCondition [count(./*) = 1 ]'.$subPatternFeedbackMatchChoice;
         $patternFeedbackMatchChoiceWithElse  = '/responseCondition [count(./*) = 2 ]'.$subPatternFeedbackMatchChoice.$subPatternFeedbackElse;
-        
+
         $rules = array();
         $simpleFeedbackRules = array();
         $data = simplexml_import_dom($data);
@@ -1191,7 +1245,7 @@ class ParserFactory
 
                 $responseIdentifier = (string) $subtree->responseIf->match->variable['identifier'];
                 $rules[$responseIdentifier] = Template::MATCH_CORRECT;
-                
+
             }elseif(count($subtree->xpath($patternMappingTAO)) > 0){
 
                 $responseIdentifier = (string) $subtree->responseIf->not->isNull->variable['identifier'];
@@ -1244,7 +1298,7 @@ class ParserFactory
                 $choices = array((string)$subtree->responseIf->match->baseValue);
                 $feedbackRule = $this->buildSimpleFeedbackRule($subtree, 'choices', $choices);
 
-                
+
             }else{
                 throw new UnexpectedResponseProcessing('Not template driven, unknown rule');
             }
@@ -1272,14 +1326,15 @@ class ParserFactory
             }
         }
 
-        // drop rules that don't have a corresponding response identifier
-        if(count(array_diff($responseIdentifiers, array_keys($rules))) > 0){
+        //all rules must have been previously identified as belonging to one interaction
+        if(count(array_diff(array_keys($rules), $responseIdentifiers)) > 0){
             throw new UnexpectedResponseProcessing('Not template driven, responseIdentifiers are '.implode(',', $responseIdentifiers).' while rules are '.implode(',', array_keys($rules)));
         }
-        
+
         $templatesDrivenRP = new TemplatesDriven();
         foreach($interactions as $interaction){
-            $pattern = $rules[$interaction->getResponse()->getIdentifier()];
+            //if a rule has been found for an interaction, apply it. Default to the template NONE otherwise
+            $pattern = isset($rules[$interaction->getResponse()->getIdentifier()]) ? $rules[$interaction->getResponse()->getIdentifier()] : Template::NONE;
             $templatesDrivenRP->setTemplate($interaction->getResponse(), $pattern);
         }
         $templatesDrivenRP->setRelatedItem($this->item);
@@ -1355,6 +1410,15 @@ class ParserFactory
         return $returnValue;
     }
 
+    private function buildTable(DOMElement $data){
+
+        $attributes = $this->extractAttributes($data);
+        $table = new Table($attributes);
+        $this->parseContainerStatic($data, $table->getBody());
+
+        return $table;
+    }
+
     private function buildMath(DOMElement $data){
 
         $ns = $this->getMathNamespace();
@@ -1426,49 +1490,71 @@ class ParserFactory
         }
 
         $attributes = $this->extractAttributes($data);
-        $myFeedback = new $feedbackClass($attributes, $this->item);
 
         if($data->nodeName == 'modalFeedback'){
             $myFeedback = new $feedbackClass($attributes, $this->item);
             $this->parseContainerStatic($data, $myFeedback->getBody());
-        } elseif ($data->nodeName == 'feedbackInline') {
-            //@todo: to be implemented: <feedbackInline> {@see http://www.imsglobal.org/question/qtiv2p1/imsqti_implv2p1.html#section10008}
-            common_Logger::i('Importing item that contains <feedbackInline> element.');
-            $myFeedback = null;
         } else {
-
-            //@todo: to be implemented: interactive feedback
             throw new UnsupportedQtiElement($data);
-
-            if($interactive){
-                $container = new ContainerFeedbackInteractive();
-                $myFeedback = new $feedbackClass($container, $attributes, $this->item);
-                $this->parseContainerInteractive($data, $myFeedback->getBody());
-            }else{
-                $container = new ContainerStatic();
-                $myFeedback = new $feedbackClass($container, $attributes, $this->item);
-                $this->parseContainerStatic($data, $myFeedback->getBody());
-            }
         }
 
         return $myFeedback;
     }
 
     /**
-     * Check if the node is dom element is a valid portable custom interaction one
-     * 
-     * @param DOMElement $data
-     * @return boolean
+     * Return the list of registered PCI php subclasses
+     * @return array
      */
-    private function isPciNode(DOMElement $data){
+    private function getPciClasses(){
+        $pciClasses = [];
+        foreach(PortableModelRegistry::getRegistry()->getModels() as $model){
+            $portableElementClass = $model->getQtiElementClassName();
+            if(is_subclass_of($portableElementClass, '\\oat\\taoQtiItem\\model\\qti\\interaction\\CustomInteraction')){
+                $pciClasses[] = $portableElementClass;
+            }
+        }
+        return $pciClasses;
+    }
 
-        $ns = $this->getPciNamespace();
-        return (boolean) $this->queryXPathChildren(array('portableCustomInteraction'), $data, $ns)->length;
+    /**
+     * Get the PCI class associated to a dom node based on its namespace
+     * Returns null if not a known PCI model
+     *
+     * @param DOMElement $data
+     * @return null
+     */
+    private function getPciClass(DOMElement $data){
+
+        $pciClasses = $this->getPciClasses();
+
+        //start searching from globally declared namespace
+        foreach($this->item->getNamespaces() as $name => $uri){
+            foreach($pciClasses as $class){
+                if($uri === $class::NS_URI
+                    && $this->queryXPathChildren(array('portableCustomInteraction'), $data, $name)->length){
+                    return $class;
+                }
+            }
+        }
+
+        //not found as a global namespace definition, try local namespace
+        if($this->queryXPathChildren(array('portableCustomInteraction'), $data)->length){
+            $pciNode = $this->queryXPathChildren(array('portableCustomInteraction'), $data)[0];
+            $xmlns = $pciNode->getAttribute('xmlns');
+            foreach($pciClasses as $pciClass){
+                if($pciClass::NS_URI === $xmlns){
+                    return $pciClass;
+                }
+            }
+        }
+
+        //not a known PCI type
+        return null;
     }
 
     /**
      * Parse and build a custom interaction object
-     * 
+     *
      * @param DOMElement $data
      * @return CustomInteraction
      * @throws ParsingException
@@ -1477,16 +1563,25 @@ class ParserFactory
 
         $interaction = null;
 
-        if($this->isPciNode($data)){
+        $pciClass = $this->getPciClass($data);
+
+        if (!empty($pciClass)) {
+
+            $xmlns = '';
+            foreach($this->item->getNamespaces() as $name => $uri){
+                if($pciClass::NS_URI === $uri){
+                    $xmlns = $name;
+                }
+            }
 
             //use tao's implementation of portable custom interaction
-            $interaction = new PortableCustomInteraction($this->extractAttributes($data), $this->item);
-            $interaction->feed($this, $data);
+            $interaction = new $pciClass($this->extractAttributes($data), $this->item);
+            $interaction->feed($this, $data, $xmlns);
         }else{
 
             $ciClass = '';
             $classes = $data->getAttribute('class');
-            $classeNames = split('/\s+/', $classes);
+            $classeNames = preg_split('/\s+/', $classes);
             foreach($classeNames as $classeName){
                 $ciClass = CustomInteractionRegistry::getCustomInteractionByName($classeName);
                 if($ciClass){
@@ -1506,17 +1601,17 @@ class ParserFactory
 
     /**
      * Get the namespace of the portable custom interaction
-     * 
+     *
+     * @deprecated should instead use item name space and registered PciModels like getPciClasses()
      * @return string
      */
     public function getPciNamespace(){
-        //@todo : implement this properly
         return 'pci';
     }
 
     /**
      * Check if the node is dom element is a valid portable info control one
-     * 
+     *
      * @param DOMElement $data
      * @return boolean
      */
@@ -1528,7 +1623,7 @@ class ParserFactory
 
     /**
      * Parse and build a info control
-     * 
+     *
      * @param DOMElement $data
      * @return InfoControl
      * @throws ParsingException
@@ -1538,6 +1633,9 @@ class ParserFactory
         $infoControl = null;
 
         if($this->isPicNode($data)){
+
+            // throws an exception if pic not present
+            PortableModelRegistry::getRegistry()->getModel('PIC');
 
             //use tao's implementation of portable custom interaction
             $infoControl = new PortableInfoControl($this->extractAttributes($data), $this->item);
@@ -1557,7 +1655,7 @@ class ParserFactory
             }
 
             if(!$ciClass){
-                throw new ParsingException('unknown info control to be build');
+                throw new UnsupportedQtiElement($data);
             }
         }
 
@@ -1566,7 +1664,7 @@ class ParserFactory
 
     /**
      * Get the namespace of the portable info control
-     * 
+     *
      * @return string
      */
     public function getPicNamespace(){

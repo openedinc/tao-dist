@@ -19,7 +19,10 @@
  *               2013- (update and modification) Open Assessment Technologies SA 
  */
 
+use oat\oatbox\service\ServiceManager;
 use oat\tao\helpers\data\ValidationException;
+use oat\tao\model\upload\UploadService;
+
 /**
  * Adapter for CSV format
  *
@@ -115,6 +118,10 @@ class tao_helpers_data_GenerisAdapterCsv extends tao_helpers_data_GenerisAdapter
      * @param  string $source
      * @param  core_kernel_classes_Class $destination
      * @return common_report_Report
+     * @throws \BadFunctionCallException
+     * @throws \InvalidArgumentException
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     * @throws \common_Exception
      */
     public function import($source,  core_kernel_classes_Class $destination = null)
     {
@@ -124,11 +131,14 @@ class tao_helpers_data_GenerisAdapterCsv extends tao_helpers_data_GenerisAdapter
         if(is_null($destination)){
         	throw new InvalidArgumentException("${destination} must be a valid core_kernel_classes_Class");
         }
-
-        $csvData = $this->load($source);
+        /** @var UploadService $uploadService */
+        $uploadService = ServiceManager::getServiceManager()->get(UploadService::SERVICE_ID);
+        $file = $uploadService->getUploadedFile($source);
+        $csvData = $this->load($file);
         
         $createdResources = 0;
-        $rangeProperty = new core_kernel_classes_Property(RDFS_RANGE);
+        $toImport = $csvData->count();
+        $report = new common_report_Report(common_report_Report::TYPE_ERROR, __('Data not imported. All records are invalid.'));
 
     	for ($rowIterator = 0; $rowIterator < $csvData->count(); $rowIterator++){
     	    helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::SHORT);
@@ -166,25 +176,32 @@ class tao_helpers_data_GenerisAdapterCsv extends tao_helpers_data_GenerisAdapter
 			        $callback($resource);
 			    }
 			    
+			    $report->add(new common_report_Report(common_report_Report::TYPE_SUCCESS, __('Imported resource "%s"', $resource->getLabel()), $resource));
 			    $createdResources++;
 			    
 			} catch (ValidationException $valExc) {
-                $this->addErrorMessage(
-			        $propUri,
-			        common_report_Report::createFailure(
-			            __('Row %s', $rowIterator) . ' ' .$valExc->getProperty()->getLabel(). ': ' . $valExc->getUserMessage() . ' "' . $valExc->getValue() . '"'
-			        )
-			    );
+			    $failure = common_report_Report::createFailure(
+		            __('Row %s', $rowIterator+1) . ' ' .$valExc->getProperty()->getLabel(). ': ' . $valExc->getUserMessage() . ' "' . $valExc->getValue() . '"'
+		        );
+			    $report->add($failure);
 			}
 			
 			helpers_TimeOutHelper::reset();
 		}
 
-		$this->addOption('to_import', count($csvData));
+		$this->addOption('to_import', $toImport);
 		$this->addOption('imported', $createdResources);
 
-		$report = $this->getResult($createdResources);
+		if ($createdResources == $toImport) {
+		    $report->setType(common_report_Report::TYPE_SUCCESS);
+		    $report->setMessage(__('Imported %d resources', $toImport));
+		} elseif ($createdResources > 0) {
+		    $report->setType(common_report_Report::TYPE_WARNING);
+		    $report->setMessage(__('Imported %1$d/%2$d. Some records are invalid.', $createdResources, $toImport));
+		}
 
+        $uploadService->remove($uploadService->getUploadedFlyFile($source));
+		
 		return $report;
     }
 

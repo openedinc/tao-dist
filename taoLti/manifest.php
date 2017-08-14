@@ -19,6 +19,10 @@
  * 
  */
 
+use oat\tao\model\user\TaoRoles;
+use oat\taoLti\scripts\install\InstallServices;
+use oat\taoLti\scripts\install\RegisterCookieVerifyService;
+
 /**
  * @author CRP Henri Tudor - TAO Team - {@link http://www.tao.lu}
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
@@ -31,10 +35,10 @@ return array(
 	'label' => 'LTI library',
     'description' => 'TAO LTI library and helpers',
     'license' => 'GPL-2.0',
-    'version' => '1.2',
+    'version' => '3.2.4',
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array(
-	   'tao' => '>=2.7.0'
+	   'tao' => '>=10.8.0'
 	),
 	'models' => array(
 	 	'http://www.tao.lu/Ontologies/TAOLTI.rdf',
@@ -47,14 +51,17 @@ return array(
 			dirname(__FILE__). '/models/ontology/roledefinition.rdf',
 			dirname(__FILE__). '/models/ontology/ltiroles_person.rdf',
 			dirname(__FILE__). '/models/ontology/ltiroles_membership.rdf'
-		)
+		),
+        'php' => [
+            InstallServices::class
+        ]
 	),
 	'update' => 'taoLti_scripts_update_Updater',
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOLTI.rdf#LtiManagerRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOLTI.rdf#LtiManagerRole', array('ext'=>'taoLti')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole',array('ext'=>'taoLti','mod' => 'CookieUtils')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#BaseUserRole', array('ext'=>'taoLti','mod' => 'LtiConsumer', 'act' => 'call')),
+        array('grant', TaoRoles::ANONYMOUS, taoLti_actions_CookieUtils::class),
+        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#BaseUserRole', array('ext'=>'taoLti','mod' => 'LtiConsumer', 'act' => 'call'))
     ),
 	'constants' => array(
 		# actions directory
@@ -68,8 +75,5 @@ return array(
 	
 		#BASE URL (usually the domain root)
 		'BASE_URL'				=> ROOT_URL . 'taoLti/',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL . 'taoLti/views/',
 	)
 );

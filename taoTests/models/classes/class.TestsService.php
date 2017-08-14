@@ -19,7 +19,10 @@
  *               2009-2012 (update and modification) Public Research Centre Henri Tudor (under the project TAO-SUSTAIN & TAO-DEV);
  * 
  */
-
+use oat\taoTests\models\event\TestCreatedEvent;
+use oat\taoTests\models\event\TestDuplicatedEvent;
+use oat\taoTests\models\event\TestRemovedEvent;
+use oat\generis\model\fileReference\FileReferenceSerializer;
 /**
  * Service methods to manage the Tests business models using the RDF API.
  *
@@ -31,6 +34,9 @@
 class taoTests_models_classes_TestsService
     extends tao_models_classes_ClassService
 {
+
+    const PROPERTY_TEST_TESTMODEL = 'http://www.tao.lu/Ontologies/TAOTest.rdf#TestTestModel';
+    const TEST_TESTCONTENT_PROP = 'http://www.tao.lu/Ontologies/TAOTest.rdf#TestContent';
     // --- ASSOCIATIONS ---
 
 
@@ -71,7 +77,7 @@ class taoTests_models_classes_TestsService
      *
      * @access public
      * @author Joel Bout, <joel.bout@tudor.lu>
-     * @param  Resource test
+     * @param  core_kernel_classes_Resource $test
      * @return boolean
      */
     public function deleteTest( core_kernel_classes_Resource $test)
@@ -88,11 +94,17 @@ class taoTests_models_classes_TestsService
 			}
 
 			$returnValue = $test->delete();
+            $this->getEventManager()->trigger(new TestRemovedEvent($test->getUri()));
 		}
 
 
 
         return (bool) $returnValue;
+    }
+
+    public function deleteResource(core_kernel_classes_Resource $resource)
+    {
+        return $this->deleteTest($resource);
     }
 
     /**
@@ -201,8 +213,8 @@ class taoTests_models_classes_TestsService
      *
      * @access public
      * @author Joel Bout, <joel.bout@tudor.lu>
-     * @param  Resource instance
-     * @param  Class clazz
+     * @param  core_kernel_classes_Resource $instance
+     * @param  core_kernel_classes_Class $clazz
      * @return core_kernel_classes_Resource
      */
     public function cloneInstance( core_kernel_classes_Resource $instance,  core_kernel_classes_Class $clazz = null)
@@ -217,7 +229,7 @@ class taoTests_models_classes_TestsService
 
 		if(!is_null($clone)){
 			$noCloningProperties = array(
-				TEST_TESTCONTENT_PROP,
+				self::TEST_TESTCONTENT_PROP,
 				RDF_TYPE
 			);
 
@@ -240,8 +252,10 @@ class taoTests_models_classes_TestsService
 			
 			$impl = $this->getTestModelImplementation($this->getTestModel($instance));
 			$impl->cloneContent($instance, $clone);
-			
-			$returnValue = $clone;
+
+            $this->getEventManager()->trigger(new TestDuplicatedEvent($instance->getUri(), $clone->getUri()));
+
+            $returnValue = $clone;
 		}
 
 
@@ -267,15 +281,17 @@ class taoTests_models_classes_TestsService
      *
      * @access public
      * @author Joel Bout, <joel.bout@tudor.lu>
-     * @param  Class clazz
-     * @param  string label
+     * @param  core_kernel_classes_Class $clazz
+     * @param  string $label
      * @return core_kernel_classes_Resource
      */
     public function createInstance( core_kernel_classes_Class $clazz, $label = '')
     {
 		$test = parent::createInstance($clazz, $label);
         $this->setDefaultModel($test);
-		
+
+        $this->getEventManager()->trigger(new TestCreatedEvent($test->getUri()));
+
         return $test;
     }
 
@@ -317,7 +333,7 @@ class taoTests_models_classes_TestsService
 					$former->deleteContent($test);
 				}	
 			}
-			$test->editPropertyValues(new core_kernel_classes_Property(PROPERTY_TEST_TESTMODEL), $testModel);
+			$test->editPropertyValues(new core_kernel_classes_Property(self::PROPERTY_TEST_TESTMODEL), $testModel);
 			$newImpl = $this->getTestModelImplementation($testModel);
 			if (!empty($newImpl)) {
 				$newImpl->prepareContent($test, $items);
@@ -340,7 +356,7 @@ class taoTests_models_classes_TestsService
      * @return core_kernel_classes_Container
      */
     public function getTestModel(core_kernel_classes_Resource $test) {
-		$testModel = $test->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TEST_TESTMODEL));
+		$testModel = $test->getOnePropertyValue(new core_kernel_classes_Property(self::PROPERTY_TEST_TESTMODEL));
 		return $testModel instanceof core_kernel_classes_Resource ? $testModel : null;
     }
 
@@ -351,49 +367,35 @@ class taoTests_models_classes_TestsService
      * @return taoTests_models_classes_TestModel
      */
     public function getTestModelImplementation(core_kernel_classes_Resource $testModel) {
-		if (empty($testModel)) {
-			throw new common_exception_NoImplementation(__FUNCTION__.' called on a NULL testModel');
-		}
-		$classname = (string)$testModel->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TESTMODEL_IMPLEMENTATION));
-		if (empty($classname)) {
+
+		$serviceId = (string)$testModel->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_TESTMODEL_IMPLEMENTATION));
+		if (empty($serviceId)) {
 			throw new common_exception_NoImplementation('No implementation found for testmodel '.$testModel->getUri());
 		}
-		if (!class_exists($classname) || !in_array('taoTests_models_classes_TestModel', class_implements($classname))) {
-			throw new common_exception_Error('Test model service '.$classname.' not found, or not compatible for test model '.$testModel->getUri());
-			
+        try{
+            $testModelService = $this->getServiceManager()->get($serviceId);
+        } catch(\oat\oatbox\service\ServiceNotFoundException $e){
+            if(!class_exists($serviceId)){
+                throw new common_exception_Error('Test model service '.$serviceId.' not found');
+            }
+            // for backward compatibility support classname instead of a serviceid
+            common_Logger::w('Outdated model definition "'.$serviceId.'", please use test model service');
+            $testModelService = new $serviceId();
+
+        }
+		if (!$testModelService instanceof \taoTests_models_classes_TestModel) {
+			throw new common_exception_Error('Test model service '.get_class($testModelService).' not compatible for test model '.$testModel->getUri());
 		}
-		return new $classname();
+		return $testModelService;
     }
 
     /**
-     * Get the core_kernel_file_File object corresponding to the content of $test.
+     * Get serializer to persist filesystem object
      *
-     * @param core_kernel_classes_Resource $test  A resource corresponding to a TAO Test in the Knowledge Base.
-     * @throws common_exception_Error If an error occurs while retrieving the test content.
-     * @return core_kernel_file_File
+     * @return FileReferenceSerializer
      */
-    public function getTestContent(core_kernel_classes_Resource $test)
+    protected function getFileReferenceSerializer()
     {
-        $testContentProperty = new core_kernel_classes_Property(TEST_TESTCONTENT_PROP);
-        try {
-            $testcontent = $test->getUniquePropertyValue($testContentProperty);
-        } catch (common_exception_EmptyProperty $e) {
-                $uri = $test->getUri();
-                $msg = "Test '${uri}' has no content.";
-                throw new common_exception_Error($msg);
-        } catch (common_Exception $e) {
-            $uri = $test->getUri();
-            $msg = "Multiple contents found for test '${uri}'.";
-            throw new common_exception_Error($msg);
-        }
-        if ($testcontent instanceof core_kernel_classes_Resource) {            
-            return new core_kernel_file_File($testcontent->getUri());
-        } else {
-            $uri = $test->getUri();
-            $msg = "Test '${uri}' content is not a resource. " . $testcontent;
-            common_Logger::w($msg);
-            return $testcontent;
-        }
+        return $this->getServiceManager()->get(FileReferenceSerializer::SERVICE_ID);
     }
-    
 }

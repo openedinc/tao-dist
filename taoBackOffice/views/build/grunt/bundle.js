@@ -22,11 +22,14 @@ module.exports = function(grunt) {
             baseUrl : '../js',
             dir : out,
             mainConfigFile : './config/requirejs.build.js',
-            paths : { 'taoBackOffice' : root + '/taoBackOffice/views/js' },
+            paths : {
+                'taoBackOffice' : root + '/taoBackOffice/views/js',
+                'taoBackOfficeCss' : root + '/taoBackOffice/views/css'
+            },
             modules : [{
                 name: 'taoBackOffice/controller/routes',
                 include : ext.getExtensionsControllers(['taoBackOffice']),
-                exclude : ['mathJax', 'taoBackOffice/lib/vis/vis.min'].concat(libs)
+                exclude : ['mathJax', 'taoBackOffice/lib/vis/vis'].concat(libs)
             }]
         }
     };

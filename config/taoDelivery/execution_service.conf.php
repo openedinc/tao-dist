@@ -2,10 +2,10 @@
 /**
  * Tao DeliveryExecution tracking service
  *
- * The following class will be used by taoDelivery_models_classes_execution_ServiceProxy
+ * The following class will be used by \oat\taoDelivery\model\execution\ServiceProxy
  * to track the executions of the deliveries by student
  * 
- * default: taoDelivery_models_classes_execution_OntologyService
+ * default: \oat\taoDelivery\model\execution\OntologyService
  */
 
-return new taoDelivery_models_classes_execution_OntologyService();
+return new oat\taoDelivery\model\execution\OntologyService();

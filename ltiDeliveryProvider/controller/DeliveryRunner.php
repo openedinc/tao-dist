@@ -21,12 +21,19 @@
 
 namespace oat\ltiDeliveryProvider\controller;
 
+use oat\tao\model\theme\ThemeService;
 use oat\taoDelivery\controller\DeliveryServer;
+use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoLti\models\classes\theme\LtiHeadless;
 use \taoLti_models_classes_LtiService;
 use \taoLti_models_classes_LtiLaunchData;
 use oat\ltiDeliveryProvider\helper\ResultServer;
+use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\ltiDeliveryProvider\model\LTIDeliveryTool;
-
+use oat\taoLti\actions\traits\LtiModuleTrait;
+use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoLti\models\classes\LtiMessages\LtiMessage;
 
 /**
  * Called by the DeliveryTool to override DeliveryServer settings
@@ -37,18 +44,26 @@ use oat\ltiDeliveryProvider\model\LTIDeliveryTool;
  */
 class DeliveryRunner extends DeliveryServer
 {
+    use LtiModuleTrait;
+
+    /**
+     * Defines if the top and bottom action menu should be displayed or not
+     *
+     * @return boolean
+     */
     protected function showControls() {
+        $themeService = $this->getServiceManager()->get(ThemeService::SERVICE_ID);
+        if ($themeService instanceof LtiHeadless) {
+            return !$themeService->isHeadless(); 
+        }
         return false;
     }
     
     protected function getReturnUrl() {
-        $launchData = taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
-        
-        if ($launchData->hasVariable(DeliveryTool::PARAM_SKIP_THANKYOU) && $launchData->getVariable(DeliveryTool::PARAM_SKIP_THANKYOU) == 'true'
-            && $launchData->hasVariable(taoLti_models_classes_LtiLaunchData::LAUNCH_PRESENTATION_RETURN_URL)) {
-            return $launchData->getVariable(taoLti_models_classes_LtiLaunchData::LAUNCH_PRESENTATION_RETURN_URL);
-        }
-        return _url('thankYou', 'DeliveryRunner', 'ltiDeliveryProvider');
+        $deliveryExecution = $this->getCurrentDeliveryExecution();
+        return _url('finishDeliveryExecution', 'DeliveryRunner', 'ltiDeliveryProvider',
+            ['deliveryExecution' => $deliveryExecution->getIdentifier()]
+        );
     }
 
     /**
@@ -62,16 +77,20 @@ class DeliveryRunner extends DeliveryServer
     
     public function repeat() {
         $delivery = new \core_kernel_classes_Resource($this->getRequestParameter('delivery'));
-        
-        // is allowed?
-        // is active?
-        
+
         $remoteLink = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLtiLinkResource();
-        $userId = \common_session_SessionManager::getSession()->getUserUri();
-         
-        $newExecution = LTIDeliveryTool::singleton()->startDelivery($delivery, $remoteLink, $userId);
-            
-        $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $newExecution->getIdentifier())));
+        $user = \common_session_SessionManager::getSession()->getUser();
+
+        try {
+            $newExecution = LTIDeliveryTool::singleton()->startDelivery($delivery, $remoteLink, $user);
+            $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $newExecution->getIdentifier())));
+        } catch (\common_exception_Unauthorized $e) {
+            $ltiException = new \taoLti_models_classes_LtiException(
+                $e->getMessage(),
+                LtiErrorMessage::ERROR_LAUNCH_FORBIDDEN
+            );
+            $this->returnLtiError($ltiException);
+        }
     }
     
     public function thankYou() {
@@ -83,8 +102,8 @@ class DeliveryRunner extends DeliveryServer
             $this->setData('consumerLabel', $launchData->getVariable(taoLti_models_classes_LtiLaunchData::TOOL_CONSUMER_INSTANCE_DESCRIPTION));
         }
         
-        if ($launchData->hasVariable(taoLti_models_classes_LtiLaunchData::LAUNCH_PRESENTATION_RETURN_URL)) {
-            $this->setData('returnUrl', $launchData->getVariable(taoLti_models_classes_LtiLaunchData::LAUNCH_PRESENTATION_RETURN_URL));
+        if ($launchData->hasReturnUrl()) {
+            $this->setData('returnUrl', $launchData->getReturnUrl());
         }
         
         if ($launchData->hasVariable(DeliveryTool::PARAM_THANKYOU_MESSAGE)) {
@@ -95,12 +114,48 @@ class DeliveryRunner extends DeliveryServer
         $this->setView('learner/thankYou.tpl');
     }
 
-    protected function initResultServer($compiledDelivery, $executionIdentifier) {
+    /**
+     * Redirect user to return URL
+     */
+    public function finishDeliveryExecution()
+    {
+        $deliveryExecution = null;
+        if ($this->hasRequestParameter('deliveryExecution')) {
+            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution(
+                $this->getRequestParameter('deliveryExecution')
+            );
+        }
+        $redirectUrl = LTIDeliveryTool::singleton()->getFinishUrl($this->getLtiMessage($deliveryExecution), $deliveryExecution);
+        $this->redirect($redirectUrl);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @return LtiMessage
+     */
+    protected function getLtiMessage(DeliveryExecution $deliveryExecution)
+    {
+        $state = $deliveryExecution->getState()->getLabel();
+        return new LtiMessage($state, null);
+    }
+
+    protected function initResultServer($compiledDelivery, $executionIdentifier)
+    {
         //The result server from LTI context depend on call parameters rather than static result server definition
         // lis_outcome_service_url This value should not change from one launch to the next and in general,
         //  the TP can expect that there is a one-to-one mapping between the lis_outcome_service_url and a particular oauth_consumer_key.  This value might change if there was a significant re-configuration of the TC system or if the TC moved from one domain to another.
         $launchData = taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
         ResultServer::initLtiResultServer($compiledDelivery, $executionIdentifier, $launchData);
+        $resultIdentifier = $launchData->hasVariable("lis_result_sourcedid")
+            ? $launchData->getVariable("lis_result_sourcedid")
+            : $executionIdentifier;
+
+        /** @var LtiResultIdStorage $ltiResultIdStorage */
+        $ltiResultIdStorage = $this->getServiceManager()->get(LtiResultAliasStorage::SERVICE_ID);
+        $ltiResultIdStorage->storeResultAlias(
+            $executionIdentifier,
+            $resultIdentifier
+        );
     }
 
 }

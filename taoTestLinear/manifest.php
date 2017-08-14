@@ -18,17 +18,18 @@
  *               
  * 
  */               
+use oat\taoTestLinear\scripts\install\SetupLinearModel;
 
 return array(
     'name' => 'taoTestLinear',
     'label' => 'Linear Test Model',
     'description' => 'A simple linear test model',
     'license' => 'GPL-2.0',
-    'version' => '0.1.5',
+    'version' => '3.0.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=2.14.1',
-        'taoTests' => '>=2.6'
+        'tao' => '>=9.0.0',
+        'taoTests' => '>=4.0.0'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoTestLinearManager',
     'acl' => array(
@@ -40,6 +41,9 @@ return array(
         'rdf' => array(
                 dirname(__FILE__). '/scripts/install/test.rdf'
         ),
+        'php' => array(
+            SetupLinearModel::class
+        )
     ),
     'update' => "oat\\taoTestLinear\\scripts\\update\\Updater",
     'routes' => array(
@@ -51,8 +55,5 @@ return array(
         
         #BASE URL (usually the domain root)
         'BASE_URL' => ROOT_URL.'taoTestLinear/',
-        
-        #BASE WWW required by JS
-        'BASE_WWW' => ROOT_URL.'taoTestLinear/views/'
     )
 );

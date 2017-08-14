@@ -21,20 +21,21 @@
 
 namespace oat\funcAcl\scripts\update;
 
+use oat\funcAcl\models\FuncAcl;
+use oat\tao\model\accessControl\func\AclProxy;
 
-class Updater extends \common_ext_ExtensionUpdater 
+class Updater extends \common_ext_ExtensionUpdater
 {
-
-	/**
-     * 
-     * @param string $currentVersion
-     * @return string $versionUpdatedTo
+    /**
+     * @param string $initialVersion
+     * @return void
      */
     public function update($initialVersion) {
-        
-        $this->skip('0','2.7.2');
+        $this->skip('0', '3.0.0');
 
-
-		return null;
-	}
+        if ($this->isVersion('3.0.0')) {
+            $this->getServiceManager()->register(AclProxy::SERVICE_ID, new FuncAcl());
+            $this->setVersion('4.0.0');
+        }
+    }
 }

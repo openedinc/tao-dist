@@ -1,3 +1,21 @@
+/*
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014-2017 (original work) Open Assessment Technologies SA;
+ *
+ */
 define([
     'lodash',
     'jquery',
@@ -6,6 +24,7 @@ define([
     'taoQtiItem/qtiCreator/model/Item',
     'taoQtiItem/qtiCreator/model/helper/event',
     'taoQtiItem/qtiCreator/model/qtiClasses',
+    'taoQtiItem/qtiCreator/helper/commonRenderer',
     'taoQtiItem/qtiCreator/helper/xmlRenderer',
     'taoQtiItem/qtiItem/helper/simpleParser',
     'taoQtiItem/qtiCreator/helper/creatorRenderer',
@@ -13,14 +32,16 @@ define([
     'taoQtiItem/qtiCreator/editor/gridEditor/content',
     'taoQtiItem/qtiCreator/editor/ckEditor/htmlEditor',
     'tpl!taoQtiItem/qtiCreator/tpl/toolbars/htmlEditorTrigger'
-], function(_, $, Loader, Container, Item, event, qtiClasses, xmlRenderer, simpleParser, creatorRenderer, xincludeRenderer, content, htmlEditor, toolbarTpl){
+], function(_, $, Loader, Container, Item, event, qtiClasses, commonRenderer, xmlRenderer, simpleParser, creatorRenderer, xincludeRenderer, content, htmlEditor, toolbarTpl){
     "use strict";
+
     var _ns = 'containereditor';
 
     var _defaults = {
         change : _.noop,
         markup : '',
-        markupSelector : ''
+        markupSelector : '',
+        qtiMedia : false
     };
 
     function parser($container){
@@ -38,13 +59,13 @@ define([
         if(data.body){
             return data.body;
         }else{
-            throw 'invalid content for qti container';
+            throw new Error('invalid content for qti container');
         }
     }
-    
+
     /**
      * Transform the given dom element into a rich-text editor
-     * 
+     *
      * @param {JQuery} $container - the container of the DOM element that is going to editable
      * @param {Object} [options]
      * @param {String} [options.markup] - the markup to be use as the initial editor content
@@ -55,42 +76,47 @@ define([
      * @param {Function} [options.placeholder] - the placeholder text of the container editor when
      * @param {Function} [options.$toolbarLocation] - the location of the toolbar
      * @param {Function} [options.toolbar] - the ck toolbar
+     * @param {Function} [options.qtiMedia=false] - allow insert media object
      * @returns {undefined}
      */
     function create($container, options){
 
+        var html, htmls, data, loader;
+
         options = _.defaults(options || {}, _defaults);
-        
+
         //assign proper markup
         if(options.markup){
-            var html = options.markup;
+            html = options.markup;
             if(options.markupSelector){
-                var htmls = extractHtmlFromMarkup(html, options.markupSelector);
+                htmls = extractHtmlFromMarkup(html, options.markupSelector);
                 html = htmls[0] || '';
             }
             $container.html(html);
         }
-        
-        var data = parser($container);
-        var loader = new Loader().setClassesLocation(qtiClasses);
+
+        data = parser($container);
+        loader = new Loader().setClassesLocation(qtiClasses);
         loader.loadRequiredClasses(data, function(){
+
+            var item, containerEditors;
 
             //create a new container object
             var container = new Container();
-            
+
             //tag the new container as statelss, which means that its state is not supposed to change
             container.data('stateless', true);
-            
+
             $container.data('container', container);
 
             //need to attach a container to the item to enable innserElement.remove()
             //@todo fix this
-            var item = new Item().setElement(container);
+            item = new Item().setElement(container);
             container.setRelatedItem(item);
 
             //associate it to the interaction?
             if(options.related){
-                var containerEditors = options.related.data('container-editors') || [];
+                containerEditors = options.related.data('container-editors') || [];
                 containerEditors.push(container);
                 options.related.data('container-editors', containerEditors);
             }
@@ -99,25 +125,27 @@ define([
 
             //apply common renderer :
             creatorRenderer.load(['img', 'object', 'math', 'include', '_container'], function(){
-                
+
                 var baseUrl = this.getOption('baseUrl');
                 container.setRenderer(this);
                 $container.html(container.render());
                 container.postRender();
-                
+
                 //resolve xinclude
                 _.each(container.getComposingElements(), function(element){
                     if(element.qtiClass === 'include'){
                         xincludeRenderer.render(element.data('widget'), baseUrl);
                     }
                 });
-                        
+
                 buildContainer($container);
                 createToolbar($container, options.$toolbarLocation);
                 buildEditor($container, container, {
                     hideTriggerOnBlur: !!options.hideTriggerOnBlur,
                     placeholder : options.placeholder || undefined,
-                    toolbar : options.toolbar || undefined
+                    toolbar : options.toolbar || undefined,
+                    qtiMedia : options.qtiMedia,
+                    highlight : options.highlight
                 });
 
                 $container.off('.' + _ns).on(event.getList(_ns + event.getNs() + event.getNsModel()).join(' '), _.throttle(function(e, data){
@@ -127,7 +155,7 @@ define([
                         options.change(html);
                     }
                 }, 600));
-                
+
                 $container.trigger('editorready.containereditor');
             });
 
@@ -146,46 +174,49 @@ define([
             serial : 'serial123456',
             state : 'active'
         }));
-        
+
         if(!$appendTo || !$appendTo.length){
             $appendTo = $container;
         }
-        
+
         $appendTo.append($tlb);
         $tlb.show();
-        
+
         $container.data('editor-toolbar', $tlb);
-        
+
         return this;
     }
 
     function cleanup($container){
+        var $toolbar, container;
 
         //remove the text toolbar
-        var $toolbar = $container.data('editor-toolbar');
+        $toolbar = $container.data('editor-toolbar');
         if($toolbar){
             $toolbar.remove();
         }
 
-        var container = $container.data('container');
+        container = $container.data('container');
         if(container){
             $(document).off('.' + container.serial);
-            $container.html(container.render());
+            commonRenderer.load(['img', 'object', 'math', 'include', '_container'], function(){
+                $container.html(container.render(this));
+            });
         }
 
         $container.removeData('container');
 
     }
-    
+
     /**
      * create a fase widget that is required in html editor
-     * 
+     *
      * @param {JQuery} $editableContainer
      * @param {Object} container
      * @returns {Object} The fake widget object
      */
     function createFakeWidget($editableContainer, container){
-        
+
         var widget = {
             $container : $editableContainer,
             element : container,
@@ -193,7 +224,7 @@ define([
         };
         //associate the widget to the container
         container.data('widget', widget);
-        
+
         return widget;
     }
 
@@ -224,7 +255,7 @@ define([
         destroyEditor($container);
         cleanup($container);
     }
-    
+
     function extractHtmlFromMarkup(markupStr, selector){
         var $found = $('<div>').html(markupStr).find(selector);
         var ret = [];
@@ -233,7 +264,7 @@ define([
         });
         return ret;
     }
-    
+
     return {
         create : create,
         destroy : destroy

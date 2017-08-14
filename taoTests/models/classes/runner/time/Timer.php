@@ -25,7 +25,7 @@ namespace oat\taoTests\models\runner\time;
 /**
  * Interface Timer
  *
- * Describes the API needed yo build and manage a timer.
+ * Describes the API needed to build and manage a timer.
  * A Timer is represented by a TimeLine on which it will apply actions and constraints.
  * The actions are:
  * - add time ranges by setting start and end TimePoints (SERVER)
@@ -59,6 +59,20 @@ interface Timer
      * @throws TimeException
      */
     public function end($tags, $timestamp);
+
+    /**
+     * Gets the first timestamp of the range for the provided tags
+     * @param string|array $tags
+     * @return float $timestamp
+     */
+    public function getFirstTimestamp($tags);
+
+    /**
+     * Gets the last timestamp of the range for the provided tags
+     * @param string|array $tags
+     * @return float $timestamp
+     */
+    public function getLastTimestamp($tags);
 
     /**
      * Adds "client start" and "client end" TimePoint based on the provided duration for particular tags

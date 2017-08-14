@@ -1,14 +1,33 @@
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014-2017 (original work) Open Assessment Technologies SA;
+ *
+ */
 define([
     'jquery',
     'lodash',
     'i18n',
-    'taoQtiItem/qtiCreator/editor/customInteractionRegistry',
+    'ui/hider',
     'tpl!taoQtiItem/qtiCreator/tpl/toolbars/insertInteractionButton',
     'tpl!taoQtiItem/qtiCreator/tpl/toolbars/insertInteractionGroup',
     'tpl!taoQtiItem/qtiCreator/tpl/toolbars/tooltip',
-    'ui/tooltipster'
-], function($, _, __, ciRegistry, insertInteractionTpl, insertSectionTpl, tooltipTpl, tooltip){
-    "use strict";
+    'ui/tooltip'
+], function($, _, __, hider, insertInteractionTpl, insertSectionTpl, tooltipTpl, tooltip){
+    'use strict';
+
     /**
      * String to identify a custom interaction from the authoring data
      * 
@@ -71,12 +90,31 @@ define([
     }
 
     function isReady($sidebar){
-
         return !!$sidebar.data('interaction-toolbar-ready');
     }
 
+    function whenReady($sidebar){
+        return new Promise(function(resolve){
+            if(isReady($sidebar)){
+                resolve();
+            }else{
+                $sidebar.on(_events.interactiontoolbarready, function(){
+                    resolve();
+                });
+            }
+        });
+    }
+
     function remove($sidebar, interactionClass){
-        $sidebar.find('li[data-qti-class="' + interactionClass + '"]:not(.dev)').remove();
+        $sidebar.find('li[data-qti-class="' + interactionClass + '"]').remove();
+    }
+
+    function disable($sidebar, interactionClass){
+        hider.hide($sidebar.find('li[data-qti-class="' + interactionClass + '"]'));
+    }
+
+    function enable($sidebar, interactionClass){
+        hider.show($sidebar.find('li[data-qti-class="' + interactionClass + '"]'));
     }
     
     function exists($sidebar, interactionClass){
@@ -84,7 +122,7 @@ define([
     }
     
     function add($sidebar, interactionAuthoringData){
-        
+
         if(exists($sidebar, interactionAuthoringData.qtiClass)){
             throw 'the interaction is already in the sidebar';
         }
@@ -99,7 +137,7 @@ define([
                 iconFont : /^icon-/.test(interactionAuthoringData.icon),
                 icon : interactionAuthoringData.icon,
                 short : interactionAuthoringData.short,
-                dev : (_customInteractionTag === groupLabel) && ciRegistry.isDev(interactionAuthoringData.qtiClass.replace('customInteraction.', ''))
+                dev : false
             };
 
         if(subGroupId && _subgroups[subGroupId]){
@@ -183,12 +221,11 @@ define([
         $inlineInteractionsPanel.on('mouseenter', '.sub-group-cover', function(){
 
             timer = setTimeout(function(){
-                $tooltip.find('[data-tooltip]').tooltipster('show');
+                $tooltip.find('[data-tooltip]').qtip('show');
             }, 300);
 
         }).on('mouseleave', '.sub-group-cover', function(){
-
-            $tooltip.find('[data-tooltip]').tooltipster('hide');
+            $tooltip.find('[data-tooltip]').qtip('hide');
             clearTimeout(timer);
         });
     }
@@ -202,7 +239,10 @@ define([
         getGroupSectionId : getGroupSectionId,
         getGroup : getGroup,
         isReady : isReady,
+        whenReady : whenReady,
         remove : remove,
+        disable : disable,
+        enable : enable,
         getCustomInteractionTag : function(){
             return _customInteractionTag;
         }

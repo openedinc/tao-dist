@@ -23,11 +23,10 @@ use \common_report_Report;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoQtiItem\model\Export\QTIPackedItemExporter;
 use oat\taoQtiItem\model\qti\ImportService;
+use oat\taoQtiItem\model\QtiItemCompiler;
 use \taoItems_models_classes_ItemsService;
 use \tao_models_classes_service_FileStorage;
-use \taoItems_models_classes_ItemCompiler;
 use \ZipArchive;
-use oat\taoQtiItem\model\Export;
 use oat\taoItems\model\media\LocalItemSource;
 use oat\taoQtiItem\model\ItemModel;
 
@@ -101,7 +100,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
         $itemClass = $this->itemService->getRootClass();
         
         $report = $this->importService->importQTIPACKFile($this->getSamplePath('/package/wrong/MalformedItemXml.zip'),
-            $itemClass, true, null, true);
+            $itemClass, true, true);
         $this->assertEquals(\common_report_Report::TYPE_ERROR, $report->getType());
     }
 
@@ -114,7 +113,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
         $itemClass = $this->itemService->getRootClass();
 
         $report = $this->importService->importQTIPACKFile($this->getSamplePath('/package/wrong/MalformedItemInTheMiddleXml.zip'),
-            $itemClass, true, null, false, true);
+            $itemClass, true, false, true);
         $this->assertEquals(\common_report_Report::TYPE_WARNING, $report->getType());
 
     }
@@ -128,7 +127,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
 
 
         $report = $this->importService->importQTIPACKFile($this->getSamplePath('/package/wrong/MalformedManifest.zip'),
-            $itemClass, true, null, true);
+            $itemClass, true, true);
         $this->assertEquals(\common_report_Report::TYPE_ERROR, $report->getType());
 
 
@@ -142,7 +141,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
         $itemClass = $this->itemService->getRootClass();
 
         $report = $this->importService->importQTIPACKFile($this->getSamplePath('/package/wrong/WrongManifestFileItemHref.zip'),
-            $itemClass, true, null, true);
+            $itemClass, true, true);
         $this->assertEquals(\common_report_Report::TYPE_ERROR, $report->getType());
     }
 
@@ -163,10 +162,9 @@ class ItemImportTest extends TaoPhpUnitTestRunner
             }
         }
         $this->assertEquals(2, count($items));
-        
-        foreach ($items as $item) {
-            $this->itemService->deleteItem($item);    
-        }
+        $this->removeItem($items[1]);
+
+        return $items[0];
     }
     
     public function testImportPCI()
@@ -232,13 +230,15 @@ class ItemImportTest extends TaoPhpUnitTestRunner
 
         $this->assertTrue(isset($data['children']));
         $children = $data['children'];
-        $this->assertEquals(2, count($children));
+        $this->assertEquals(3, count($children));
+        
+        $check = array('/images/','/style/');
 
         $file = null;
         $dir = null;
         foreach ($children as $child) {
             if (isset($child['path'])) {
-                $dir = $child;
+               $this->assertContains($child['path'],$check);
             }
             if (isset($child['name'])) {
                 $file = $child;
@@ -248,9 +248,6 @@ class ItemImportTest extends TaoPhpUnitTestRunner
         $this->assertEquals("qti.xml", $file['name']);
         $this->assertContains("/xml", $file['mime']);
         $this->assertTrue($file['size'] > 0);
-
-        $this->assertEquals("/images/", $dir['path']);
-        $this->assertEquals("/images/", $dir['parent']);
 
 
         return $item;
@@ -263,7 +260,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
     public function testCompile($item)
     {
         $storage = tao_models_classes_service_FileStorage::singleton();
-        $compiler = new taoItems_models_classes_ItemCompiler($item, $storage);
+        $compiler = new QtiItemCompiler($item, $storage);
         $report = $compiler->compile();
         $this->assertEquals($report->getType(), common_report_Report::TYPE_SUCCESS);
         $serviceCall = $report->getData();
@@ -307,7 +304,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
     }
 
     /**
-     * @depends testImport
+     * @depends testImportQti20
      * @depends testExport
      * @param $item
      * @param $manifest
@@ -321,6 +318,7 @@ class ItemImportTest extends TaoPhpUnitTestRunner
     }
 
     /**
+     * @depends testImportQti20
      * @depends testImport
      */
     public function testRemoveItem()

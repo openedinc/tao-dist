@@ -236,7 +236,7 @@ define([
              * @fires itemRunner#statechange the provider is reponsible to trigger this event
              * @fires itemRunner#responsechange  the provider is reponsible to trigger this event
              */
-           render : function(elt){
+           render : function(elt, options){
                 var self = this;
 
                 /**
@@ -270,14 +270,21 @@ define([
                     self.trigger('ready');
                 };
 
+                options = _.defaults(options || {}, {state : {}});
+
                 //check elt
                 if( !(elt instanceof HTMLElement) && !(elt instanceof $) ){
                     return self.trigger('error', 'A valid HTMLElement (or a jquery element) at least is required to render the item');
                 }
 
+                //set item state to restore item state after rendering if the provider enables it
+                if(options.state){
+                    this.setState(options.state);
+                }
+
                 if(flow.init.done === false){
                     flow.init.pending.push(function(){
-                        this.render(elt);
+                        this.render(elt, options);
                     });
                 } else {
 
@@ -297,8 +304,10 @@ define([
                          * @callback RendertItemProvider
                          * @param {HTMLElement} elt - the element to render inside
                          * @param {Function} done - call once the render is done
+                         * @param {Object} [options] - the array of options that the item runner provider may supports
+                         * @param {Object} [options.state] - pass initial item state to method render() in case the item runner provider require initial state to render
                          */
-                        provider.render.call(this, this.container, renderDone);
+                        provider.render.call(this, this.container, renderDone, options);
 
                     } else {
                         renderDone();
@@ -418,7 +427,28 @@ define([
                     responses = provider.getResponses.call(this);
                 }
                 return responses;
-           }
+           },
+
+            /**
+             * Append the modalFeedbacks into the item and create queue of feedbacks that should be displayed to the user
+             *
+             * @param {Object|Array} feedbacks - all feedbacks of the item
+             * @param {Object|Array} itemSession - determine feedbacks which should be displayed
+             * @param {function} done(renderingQueue) - runs after loading feedbacks into the item
+             *      # have parameter {Object|Array} renderingQueue with prepared queue of the feedbacks for displaying to the user
+             *
+             *
+             * Example:
+             *
+             *    this.renderFeedbacks({f1: 'feedback1', f2: 'feedback2', f3: 'feedback3'}, ['f2'], function(renderingQueue){
+             *      renderingQueue; // {'feedback2'}
+             *    });
+             */
+            renderFeedbacks : function renderFeedbacks(feedbacks, itemSession, done){
+                if(_.isFunction(provider.renderFeedbacks)) {
+                    provider.renderFeedbacks.call(this, feedbacks, itemSession, done);
+                }
+            }
         });
     };
 

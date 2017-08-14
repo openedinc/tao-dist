@@ -23,7 +23,9 @@ namespace oat\taoItems\model\pack;
 
 use \InvalidArgumentException;
 use \JsonSerializable;
+use oat\tao\model\media\MediaAsset;
 use oat\taoItems\model\pack\encoders\Encoding;
+use oat\taoMediaManager\model\MediaSource;
 
 /**
  * The Item Pack represents the item package data produced by the compilation.
@@ -38,7 +40,7 @@ class ItemPack implements JsonSerializable
      * The supported assets types
      * @var string[]
      */
-    private static $assetTypes = array('js', 'css', 'font', 'img', 'audio', 'video', 'xinclude');
+    private static $assetTypes = array('html', 'document', 'js', 'css', 'font', 'img', 'audio', 'video', 'xinclude');
 
 
     /**
@@ -65,6 +67,8 @@ class ItemPack implements JsonSerializable
      * @var array
      */
     protected $assetEncoders = array(
+        'html'     => 'none',
+        'document'     => 'none',
         'js'        => 'none',
         'css'       => 'none',
         'font'      => 'none',
@@ -79,7 +83,6 @@ class ItemPack implements JsonSerializable
      * @var bool
      */
     protected $nestedResourcesInclusion = true;
-
 
     /**
      * Creates an ItemPack with the required data.
@@ -125,11 +128,12 @@ class ItemPack implements JsonSerializable
      *
      * @param string $type the assets type, one of those who are supported.
      * @param string[] $assets the list of assets' URL to load
-     * @param string $basePath
+     *
+     * @param \tao_models_classes_service_StorageDirectory $publicDirectory
      *
      * @throw InvalidArgumentException
      */
-    public function setAssets($type, $assets, $basePath)
+    public function setAssets($type, $assets, $publicDirectory)
     {
         if(!in_array($type, self::$assetTypes)){
             throw new InvalidArgumentException('Unknow asset type "' . $type . '", it should be either ' . implode(', ', self::$assetTypes));
@@ -142,9 +146,20 @@ class ItemPack implements JsonSerializable
          * Apply active encoder immediately
          * @var Encoding $encoder
          */
-        $encoder = EncoderService::singleton()->get( $this->assetEncoders[$type], $basePath );
+        $encoder = EncoderService::singleton()->get($this->assetEncoders[$type], $publicDirectory);
         foreach ($assets as $asset) {
-            $this->assets[$type][$asset] = $encoder->encode( $asset );
+            if ($asset instanceof MediaAsset) {
+                $mediaSource = $asset->getMediaSource();
+                if ($mediaSource instanceof MediaSource) {
+                    $assetKey = $asset->getMediaIdentifier();
+                } else {
+                    $assetKey = $mediaSource->getBaseName($asset->getMediaIdentifier());
+                }
+            } else {
+                $assetKey = $asset;
+            }
+
+            $this->assets[$type][$assetKey] = $encoder->encode( $asset );
         }
     }
 

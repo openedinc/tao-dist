@@ -27,11 +27,11 @@ return array(
     'label' => 'extension-tao-mediamanager',
     'description' => 'TAO media manager extension',
     'license' => 'GPL-2.0',
-    'version' => '0.4.3',
+    'version' => '2.0.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=2.16.0',
-        'taoItems' => '>=2.9'
+        'tao' => '>=9.0.0',
+        'taoItems' => '>=2.9.0'
     ),
     'models' => array(
         'http://www.tao.lu/Ontologies/TAOMedia.rdf'
@@ -92,11 +92,7 @@ return array(
         #BASE URL (usually the domain root)
         'BASE_URL' => ROOT_URL . '/taoMediaManager',
 
-        #BASE WWW the web resources path
-        'BASE_WWW' => ROOT_URL . '/taoMediaManager/views/',
-
         #TAO extension Paths
-        'TAOBASE_WWW' => ROOT_URL . '/tao/views/',
         'TAOVIEW_PATH' => $taopath . 'views' . DIRECTORY_SEPARATOR,
         'TAO_TPL_PATH' => $taopath . 'views' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR,
     )

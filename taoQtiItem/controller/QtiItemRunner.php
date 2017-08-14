@@ -23,7 +23,6 @@ namespace oat\taoQtiItem\controller;
 
 use oat\taoQtiItem\helpers\QtiFile;
 use oat\taoQtiItem\controller\AbstractQtiItemRunner;
-use \core_kernel_file_File;
 use \core_kernel_classes_Resource;
 use \common_Exception;
 use \taoQtiCommon_helpers_PciVariableFiller;
@@ -108,7 +107,6 @@ class QtiItemRunner extends AbstractQtiItemRunner
     /**
      * Item's ResponseProcessing.
      * 
-     * @param core_kernel_file_File $itemPath The Item file resource you want to apply ResponseProcessing.
      * @throws RuntimeException If an error occurs while processing responses or transmitting results
      */
     protected function processResponses(core_kernel_classes_Resource $item) {
@@ -116,13 +114,13 @@ class QtiItemRunner extends AbstractQtiItemRunner
         $jsonPayload = taoQtiCommon_helpers_Utils::readJsonPayload();
 
         try {
-            $qtiXmlFilePath = QtiFile::getQtiFilePath($item);
+            $qtiXmlFileContent = QtiFile::getQtiFileContent($item);
             $qtiXmlDoc = new XmlDocument();
-            $qtiXmlDoc->load($qtiXmlFilePath);
+            $qtiXmlDoc->loadFromString($qtiXmlFileContent);
         }
         catch (StorageException $e) {
             $msg = "An error occured while loading QTI-XML file at expected location '${qtiXmlFilePath}'.";
-            throw new RuntimeException($msg, 0, $e);
+            throw new \RuntimeException($msg, 0, $e);
         }
 
         $itemSession = new AssessmentItemSession($qtiXmlDoc->getDocumentComponent(), new SessionManager());
@@ -142,13 +140,13 @@ class QtiItemRunner extends AbstractQtiItemRunner
                     $variables[] = $var;
                 }
             }
-            catch(OutOfRangeException $e) {
+            catch(\OutOfRangeException $e) {
                 // A variable value could not be converted, ignore it.
                 // Developer's note: QTI Pairs with a single identifier (missing second identifier of the pair) are transmitted as an array of length 1,
                 // this might cause problem. Such "broken" pairs are simply ignored.
                 common_Logger::d("Client-side value for variable '${identifier}' is ignored due to data malformation.");
             }
-            catch(OutOfBoundsException $e) {
+            catch(\OutOfBoundsException $e) {
                 // The response identifier does not match any response declaration.
                 common_Logger::d("Uknown item variable declaration '${identifier}.");
             }
@@ -171,11 +169,11 @@ class QtiItemRunner extends AbstractQtiItemRunner
         }
         catch(AssessmentItemSessionException $e) {
             $msg = "An error occured while processing the responses.";
-            throw new RuntimeException($msg, 0, $e);
+            throw new \RuntimeException($msg, 0, $e);
         }
         catch(taoQtiCommon_helpers_ResultTransmissionException $e) {
             $msg = "An error occured while transmitting variable '${identifier}' to the target Result Server.";
-            throw new RuntimeException($msg, 0, $e);
+            throw new \RuntimeException($msg, 0, $e);
         }
     }
 

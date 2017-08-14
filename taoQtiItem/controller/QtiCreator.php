@@ -23,9 +23,14 @@ namespace oat\taoQtiItem\controller;
 
 use common_exception_Error;
 use core_kernel_classes_Resource;
+use oat\oatbox\event\EventManager;
+use oat\oatbox\event\EventManagerAwareTrait;
+use oat\taoItems\model\event\ItemCreatedEvent;
 use oat\taoQtiItem\helpers\Authoring;
 use oat\taoQtiItem\model\CreatorConfig;
+use oat\taoQtiItem\model\event\ItemCreatorLoad;
 use oat\taoQtiItem\model\HookRegistry;
+use oat\taoQtiItem\model\qti\Item;
 use oat\taoQtiItem\model\qti\Service;
 use tao_actions_CommonModule;
 use tao_helpers_File;
@@ -45,9 +50,10 @@ use oat\taoQtiItem\model\qti\exception\QtiModelException;
  */
 class QtiCreator extends tao_actions_CommonModule
 {
+    use EventManagerAwareTrait;
     /**
      * create a new QTI item
-     * 
+     *
      * @requiresRight id WRITE
      */
     public function createItem()
@@ -66,12 +72,13 @@ class QtiCreator extends tao_actions_CommonModule
             }
         }
         $service = \taoItems_models_classes_ItemsService::singleton();
-        
+
         $label = $service->createUniqueLabel($clazz);
         $item = $service->createInstance($clazz, $label);
-        
+
         if(!is_null($item)){
             $service->setItemModel($item, new \core_kernel_classes_Resource(ItemModel::MODEL_URI));
+            $this->getEventManager()->trigger(new ItemCreatedEvent($item->getUri()));
             $response = array(
                 'label'	=> $item->getLabel(),
                 'uri' 	=> $item->getUri()
@@ -85,61 +92,17 @@ class QtiCreator extends tao_actions_CommonModule
     public function index()
     {
 
-        $config = new CreatorConfig();
-
-        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiItem');
-        $creatorConfig = $ext->getConfig('qtiCreator');
-
-        if (is_array($creatorConfig)) {
-            foreach ($creatorConfig as $prop => $value) {
-                $config->setProperty($prop, $value);
-            }
+        if (!$this->hasRequestParameter('instance')) {
+            throw new common_exception_Error('The item creator needs to be opened with an item');
         }
+        $item = new core_kernel_classes_Resource(tao_helpers_Uri::decode($this->getRequestParameter('instance')));
 
-        if ($this->hasRequestParameter('instance')) {
-            //uri:
-            $itemUri = tao_helpers_Uri::decode($this->getRequestParameter('instance'));
-            $config->setProperty('uri', $itemUri);
+        $config = $this->getCreatorConfig($item);
 
-            //get label:
-            $rdfItem = new core_kernel_classes_Resource($itemUri);
-            $config->setProperty('label', $rdfItem->getLabel());
-
-            //set the current data lang in the item content to keep the integrity
-            //@todo : allow preview in a language other than the one in the session
-            $lang = \common_session_SessionManager::getSession()->getDataLanguage();
-            $config->setProperty('lang', $lang);
-
-            //base url:
-            $url = tao_helpers_Uri::url(
-                'getFile',
-                'QtiCreator',
-                'taoQtiItem',
-                array(
-                    'uri' => $itemUri,
-                    'lang' => $lang
-                )
-            );
-            $config->setProperty('baseUrl', $url . '&relPath=');
-        }
-
-        $mediaSourcesUrl = tao_helpers_Uri::url(
-            'getMediaSources',
-            'QtiCreator',
-            'taoQtiItem'
-        );
-
-        $config->setProperty('mediaSourcesUrl', $mediaSourcesUrl);
-        //initialize all registered hooks:
-        $hookClasses = HookRegistry::getRegistry()->getMap();
-        foreach ($hookClasses as $hookClass) {
-            $hook = new $hookClass();
-            $hook->init($config);
-        }
-
-        $config->init();
         $this->setData('config', $config->toArray());
         $this->setView('QtiCreator/index.tpl');
+
+        $this->getEventManager()->trigger(new ItemCreatorLoad());
     }
 
     public function getMediaSources()
@@ -193,17 +156,20 @@ class QtiCreator extends tao_actions_CommonModule
             $uri = urldecode($this->getRequestParameter('uri'));
             $xml = file_get_contents('php://input');
             $rdfItem = new core_kernel_classes_Resource($uri);
-            $itemService = taoItems_models_classes_ItemsService::singleton();
+            /** @var Service $itemService */
+            $itemService = Service::singleton();
 
             //check if the item is QTI item
             if($itemService->hasItemModel($rdfItem, array(ItemModel::MODEL_URI))){
                 try {
-                    $sanitized = Authoring::sanitizeQtiXml($xml);
-                    Authoring::validateQtiXml($sanitized);
-                    //get the QTI xml
-                    $returnValue['success'] = $itemService->setItemContent($rdfItem, $sanitized);
+                    Authoring::checkEmptyMedia($xml);
+                    $returnValue['success'] = $itemService->saveXmlItemToRdfItem($xml, $rdfItem);
                 } catch (QtiModelException $e) {
-                    throw new \RuntimeException($e->getUserMessage(), 0, $e);
+                    $returnValue = array(
+                        'success' => false,
+                        'type' => 'Error',
+                        'message' => $e->getUserMessage()
+                    );
                 }
             }
         }
@@ -214,9 +180,9 @@ class QtiCreator extends tao_actions_CommonModule
     public function getFile()
     {
 
-        if ($this->hasRequestParameter('uri') && $this->hasRequestParameter('lang') && $this->hasRequestParameter(
-                'relPath'
-            )
+        if ($this->hasRequestParameter('uri')
+            && $this->hasRequestParameter('lang')
+            && $this->hasRequestParameter('relPath')
         ) {
             $uri = urldecode($this->getRequestParameter('uri'));
             $rdfItem = new core_kernel_classes_Resource($uri);
@@ -243,4 +209,63 @@ class QtiCreator extends tao_actions_CommonModule
         }
     }
 
+    /**
+     * Get the configuration of the Item Creator
+     * @param core_kernel_classes_Resource $item the selected item
+     * @return CreatorConfig the configration
+     */
+    protected function getCreatorConfig(core_kernel_classes_Resource $item){
+
+        $config = new CreatorConfig();
+
+        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiItem');
+        $creatorConfig = $ext->getConfig('qtiCreator');
+
+        if (is_array($creatorConfig)) {
+            foreach ($creatorConfig as $prop => $value) {
+                $config->setProperty($prop, $value);
+            }
+        }
+
+        $config->setProperty('uri', $item->getUri());
+        $config->setProperty('label', $item->getLabel());
+
+        //set the current data lang in the item content to keep the integrity
+        //@todo : allow preview in a language other than the one in the session
+        $lang = \common_session_SessionManager::getSession()->getDataLanguage();
+        $config->setProperty('lang', $lang);
+
+        //base url:
+        $url = tao_helpers_Uri::url('getFile', 'QtiCreator', 'taoQtiItem', array(
+            'uri' => $item->getUri(),
+            'lang' => $lang,
+            'relPath' => ''
+        ));
+        $config->setProperty('baseUrl', $url);
+
+        //map the multi column config to the plugin
+        //TODO migrate the config
+        if($config->getProperty('multi-column') == true){
+            $config->addPlugin('blockAdder', 'taoQtiItem/qtiCreator/plugins/content/blockAdder', 'content');
+        }
+
+        $mediaSourcesUrl = tao_helpers_Uri::url(
+            'getMediaSources',
+            'QtiCreator',
+            'taoQtiItem'
+        );
+
+        $config->setProperty('mediaSourcesUrl', $mediaSourcesUrl);
+
+        //initialize all registered hooks:
+        $hookClasses = HookRegistry::getRegistry()->getMap();
+        foreach ($hookClasses as $hookClass) {
+            $hook = new $hookClass();
+            $hook->init($config);
+        }
+
+        $config->init();
+
+        return $config;
+    }
 }

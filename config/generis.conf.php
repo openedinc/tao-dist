@@ -44,11 +44,15 @@ define('ROOT_URL', getenv('ROOT_URL'));
 
 # language
 define('DEFAULT_LANG','en-US');
+define('DEFAULT_ANONYMOUS_INTERFACE_LANG','en-US');
 
 #mode
 define('DEBUG_MODE', true);
 
 #application state
+/**
+ * @deprecated Use \oat\tao\model\maintenance\Maintenance instead
+ */
 define('SYS_READY', true);
 
 #the time zone, required since PHP5.3

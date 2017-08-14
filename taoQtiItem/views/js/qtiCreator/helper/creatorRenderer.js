@@ -21,9 +21,8 @@ define([
     'taoQtiItem/qtiCreator/renderers/Renderer',
     'taoItems/assets/manager',
     'taoItems/assets/strategies',
-    'helpers',
     'util/dom'
-], function($, _, Renderer, assetManagerFactory, assetStrategies, helpers, dom){
+], function($, _, Renderer, assetManagerFactory, assetStrategies, dom){
     "use strict";
 
     //configure and instanciate once only:
@@ -39,7 +38,7 @@ define([
      * @param {object} config - the configuration object of the creatorRenderer
      * @returns {module.exports.properties|Function.properties|config.properties}
      */
-    function _extractInteractionsConfig(config){
+    var _extractInteractionsConfig = function _extractInteractionsConfig(config){
         var ret = {};
         if(config && config.properties){
             _.each(_configurableInteractions, function(interactionName){
@@ -49,18 +48,18 @@ define([
             });
         }
         return ret;
-    }
+    };
 
     /**
      * Get a preconfigured renderer singleton
      *
      * @param {Boolean} reset
      * @param {Object} config
+     * @param {Object} areaBroker - the QtiCreator area broker
      * @returns {Object} - a configured instance of creatorRenderer
      */
-    var get = function(reset, config){
-        var assetManager,
-            $bodyEltForm;
+    var get = function(reset, config, areaBroker){
+        var $bodyEltForm;
 
         if(!_creatorRenderer || reset){
 
@@ -84,11 +83,11 @@ define([
                     modalFeedbackOptionForm : $('#item-editor-modal-feedback-property-bar .panel'),
                     mediaManager : {
                         appendContainer : '#mediaManager',
-                        browseUrl : helpers._url('files', 'ItemContent', 'taoItems'),
-                        uploadUrl : helpers._url('upload', 'ItemContent', 'taoItems'),
-                        deleteUrl : helpers._url('delete', 'ItemContent', 'taoItems'),
-                        downloadUrl : helpers._url('download', 'ItemContent', 'taoItems'),
-                        fileExistsUrl : helpers._url('fileExists', 'ItemContent', 'taoItems'),
+                        browseUrl : config.properties.getFilesUrl,
+                        uploadUrl : config.properties.fileUploadUrl,
+                        deleteUrl : config.properties.fileDeleteUrl,
+                        downloadUrl : config.properties.fileDownloadUrl,
+                        fileExistsUrl : config.properties.fileExistsUrl,
                         mediaSourcesUrl : config.properties.mediaSourcesUrl
                     },
                     interactions : _extractInteractionsConfig(config)
@@ -97,6 +96,7 @@ define([
                 //update the resolver baseUrl
                 _creatorRenderer.getAssetManager().setData({baseUrl : config.properties.baseUrl || '' });
 
+                _creatorRenderer.setAreaBroker(areaBroker);
             }
         }
 
@@ -105,9 +105,8 @@ define([
 
 
     return {
-        get : function(reset, config){
-            return get(reset, config);
-        },
+        get : get,
+
         setOption : function(name, value){
             return get().setOption(name, value);
         },

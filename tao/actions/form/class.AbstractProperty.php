@@ -1,5 +1,5 @@
 <?php
-
+use oat\generis\model\OntologyAwareTrait;
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 
 abstract class tao_actions_form_AbstractProperty extends tao_helpers_form_FormContainer
 {
+    use OntologyAwareTrait;
 
     /**
      * @var core_kernel_classes_Property
@@ -35,7 +36,7 @@ abstract class tao_actions_form_AbstractProperty extends tao_helpers_form_FormCo
 
 	public function __construct( core_kernel_classes_Class $clazz,  core_kernel_classes_Resource $instance = null, $options = array(), $data = array())
 	{
-        $this->property = new \core_kernel_classes_Property($instance);
+        $this->property = $this->getProperty($instance);
         return parent::__construct($data, $options);
 	}
 
@@ -84,13 +85,13 @@ abstract class tao_actions_form_AbstractProperty extends tao_helpers_form_FormCo
 
 	/**
 	 * Returns html for property
-	 * @param core_kernel_classes_Property $property
+	 * @param $property
 	 * @return string
 	 */
 	protected function getGroupTitle($property)
 	{
 		if ($this->isParentProperty()){
-			$domainLabel = array();
+
 			foreach ($property->getDomain()->getIterator() as $domain) {
 				$domainLabel[] = $domain->getLabel();
 			}

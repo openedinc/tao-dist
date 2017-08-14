@@ -34,10 +34,11 @@ return array(
 	'label' => 'Open-web item model',
     'description' => 'Open Web Item model allows users to create items with rich HTML content',
     'license' => 'GPL-2.0',
-    'version' => '2.7.1',
+    'version' => '3.0.0',
 	'author' => 'Open Assessment Technologies',
 	'requires' => array(
-	   'taoItems' => '>=2.6'
+        'taoItems' => '>=2.19.0',
+        'tao' => '>=9.0.0',
     ),
 	'models' => array(
 		'http://www.tao.lu/Ontologies/TAOItem.rdf'
@@ -77,8 +78,5 @@ return array(
 	
 		#BASE URL (usually the domain root)
 		'BASE_URL'				=> ROOT_URL	.'taoOpenWebItem/',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL	.'taoOpenWebItem/views/',
 	)
 );

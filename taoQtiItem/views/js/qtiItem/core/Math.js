@@ -7,6 +7,8 @@ define([
 ], function($, _, Element, rendererConfig, NamespacedElement){
     'use strict';
 
+    var Math;
+
     /**
      * Remove the closing MathML tags and remove useless line breaks before and after it
      *
@@ -40,18 +42,20 @@ define([
      * @returns {Boolean}
      */
     function _isEmptyMathML(mathStr){
-
-        var hasContent = false;
+        var $math,
+            mathText,
+            hasContent = false;
 
         if(mathStr && mathStr.trim()){
-            var $math = $($.parseHTML(mathStr));
-            hasContent = !!$math.text();
+            $math = $($.parseHTML(mathStr));
+            mathText = $math.text();
+            hasContent = (_.isString(mathText) && !!mathText.trim());
         }
 
         return !hasContent;
     }
 
-    var Math = Element.extend({
+    Math = Element.extend({
         qtiClass : 'math',
         defaultNsName : 'm',
         defaultNsUri : 'http://www.w3.org/1998/Math/MathML',
@@ -92,9 +96,11 @@ define([
                 raw = this.mathML,
                 body = raw,
                 ns = this.getNamespace(),
-                annotations = '';
+                annotations = '',
+                encoding,
+                defaultData;
 
-            for(var encoding in this.annotations){
+            for(encoding in this.annotations){
                 annotations += '<annotation encoding="' + encoding + '">' + _.escape(this.annotations[encoding]) + '</annotation>';
             }
 
@@ -108,14 +114,13 @@ define([
 
             if (ns && ns.name) {
                 body = raw.replace(/<(\/)?([^!<])/g, '<$1' + ns.name + ':$2');
-                body = body.replace(/(>)([\W]+)(<\/)/g, function (match, p1, p2, p3) {
-                    return [p1, _.escape(p2), p3].join('');
-                });
-
                 tag = ns.name + ':' + tag;
             }
 
-            var defaultData = {
+            body = body.replace(/<!--.*?-->/g, ''); // remove Mathjax-generated comments
+            body = body.replace(/&lt;!--.*?--&gt;/g, ''); // fix for broken items because of Mathjax comments
+
+            defaultData = {
                 block : (this.attr('display') === 'block') ? true : false,
                 body : body,
                 raw : raw,

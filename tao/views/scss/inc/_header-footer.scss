@@ -97,6 +97,13 @@ $navHeight: 64;
                     position: relative;
                     top: 2px;
                 }
+
+                .svg-glyph {
+                    height: 23px;
+                    width: 23px;
+                    display:block;
+                    margin: auto;
+                }
             }
             & > a {
                 &:hover {
@@ -389,12 +396,18 @@ body > footer {
 }
 
 @media (max-width: 1024px) {
-    body:not(.delivery-scope){
-        @include mobile-navi();
+    body {
+        &:not(.delivery-scope), &:not(.small-navi) {
+            @include mobile-navi();
+        }
     }
 }
 
 // works in conjunction with layout/nav.js
-body.oversized-nav:not(.delivery-scope){
-    @include mobile-navi();
+body {
+    &.oversized-nav {
+        &:not(.delivery-scope), &:not(.small-navi) {
+            @include mobile-navi();
+        }
+    }
 }

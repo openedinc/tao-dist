@@ -1,8 +1,6 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file generis/config/header/cache.conf.php
+ * Default config header created during install
  */
 
 return new common_cache_KeyValueCache(array(

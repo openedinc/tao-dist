@@ -41,15 +41,18 @@ define([
          validate: function validate(processor, operands){
 
             var size = 0;
+            var name = processor.name;
+
             var minOperand  = processor.constraints.minOperand;
             var maxOperand  = processor.constraints.maxOperand;
 
             var hasWrongType = function hasWrongType(operand){
-                return !_.contains(processor.constraints.baseType, operand.baseType);
+                return !_.isNull(operand) && !_.contains(processor.constraints.baseType, operand.baseType);
             };
 
             var hasWrongCardinality = function hasWrongCardinality(operand){
-                return !_.contains(processor.constraints.cardinality, operand.cardinality);
+                return !_.isNull(operand) && !_.contains(processor.constraints.cardinality, operand.cardinality);
+
             };
 
             if(!_.isArray(operands)){

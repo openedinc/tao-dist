@@ -5,21 +5,22 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * 
+ *
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ *
  */
 
 namespace oat\taoResultServer\models\classes;
-use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 
 /**
@@ -31,35 +32,48 @@ use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
  */
 class CrudResultsService extends \tao_models_classes_CrudService {
 
+    const GROUP_BY_DELIVERY = 0;
+    const GROUP_BY_TEST = 1;
+    const GROUP_BY_ITEM = 2;
+
     protected $resultClass = null;
-    protected $resultService = null;
 
     public function __construct() {
         parent::__construct();
         $this->resultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $this->resultService = ResultsService::singleton();
     }
 
     public function getRootClass() {
         return $this->resultClass;
     }
 
-    public function get($uri) {
-        $returnData = array();
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($uri);
+    public function get($uri, $groupBy = self::GROUP_BY_DELIVERY) {
+        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($uri);
         $delivery = $deliveryExecution->getDelivery();
+    
+        $resultService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
+        $implementation = $resultService->getResultStorage($delivery->getUri());
+        return $this->format($implementation, $uri);
+    }
+        
+    public function format(\taoResultServer_models_classes_ReadableResultStorage $resultStorage, $resultIdentifier, $groupBy = self::GROUP_BY_DELIVERY) {
+        $returnData = array();
+        
+        if ($groupBy === self::GROUP_BY_DELIVERY || $groupBy === self::GROUP_BY_ITEM) {
+            $calls = $resultStorage->getRelatedItemCallIds($resultIdentifier);
+        } else {
+            $calls = $resultStorage->getRelatedTestCallIds($resultIdentifier);
+        }
 
-        $implementation = $this->getImplementationClass($delivery);
-
-        foreach($implementation->getRelatedItemCallIds($uri) as $callId){
-            $results = $implementation->getVariables($callId);
+        foreach($calls as $callId){
+            $results = $resultStorage->getVariables($callId);
             $resource = array();
                 foreach($results as $result){
                     $result = array_pop($result);
                     if(isset($result->variable)){
                         $resource['value'] = $result->variable->getValue();
                         $resource['identifier'] = $result->variable->getIdentifier();
-                        if(get_class($result->variable) === CLASS_RESPONSE_VARIABLE){
+                        if($result->variable instanceof \taoResultServer_models_classes_ResponseVariable){
                             $type = "http://www.tao.lu/Ontologies/TAOResult.rdf#ResponseVariable";
                         }
                         else{
@@ -71,7 +85,11 @@ class CrudResultsService extends \tao_models_classes_CrudService {
                         $resource['basetype'] = $result->variable->getBaseType();
                     }
 
-                    $returnData[$uri][] = $resource;
+                    if ($groupBy === self::GROUP_BY_DELIVERY) {
+                        $returnData[$resultIdentifier][] = $resource;
+                    } else {
+                        $returnData[$callId][] = $resource;
+                    }
                 }
         }
         return $returnData;
@@ -85,7 +103,8 @@ class CrudResultsService extends \tao_models_classes_CrudService {
             // delivery uri
             $delivery = $assembly->getUri();
 
-            $implementation = $this->getImplementationClass($assembly);
+            $resultService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
+            $implementation = $resultService->getResultStorage($delivery);
 
             // get delivery executions
 
@@ -156,44 +175,4 @@ class CrudResultsService extends \tao_models_classes_CrudService {
         // TODO: Implement getClassService() method.
     }
 
-
-    private function getImplementationClass($delivery){
-
-        if(is_null($delivery)){
-            throw new \common_exception_Error(__('This delivery doesn\'t exists'));
-        }
-
-        $deliveryResultServer = $delivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
-
-        if(is_null($deliveryResultServer)){
-            throw new \common_exception_Error(__('This delivery has no Result Server'));
-        }
-        $resultServerModel = $deliveryResultServer->getPropertyValues(new \core_kernel_classes_Property(TAO_RESULTSERVER_MODEL_PROP));
-
-        if(is_null($resultServerModel)){
-            throw new \common_exception_Error(__('This delivery has no readable Result Server'));
-        }
-
-        foreach($resultServerModel as $model){
-            $model = new \core_kernel_classes_Class($model);
-
-            /** @var $implementationClass \core_kernel_classes_Literal*/
-            $implementationClass = $model->getOnePropertyValue(new \core_kernel_classes_Property(TAO_RESULTSERVER_MODEL_IMPL_PROP));
-
-
-            if (!is_null($implementationClass)
-                && class_exists($implementationClass->literal) && in_array('taoResultServer_models_classes_ReadableResultStorage',class_implements($implementationClass->literal))) {
-                $className = $implementationClass->literal;
-                if (!class_exists($className)) {
-                    throw new \common_exception_Error('readable resultinterface implementation '.$className.' not found');
-                }
-                return new $className();
-            }
-        }
-
-        throw new \common_exception_Error(__('This delivery has no readable Result Server'));
-
-    }
 }
-
-?>

@@ -1,8 +1,8 @@
 <?php
 /**
- * Default config header
- *
- * To replace this add a file tao/config/header/defaultUploadFileSource.conf.php
+ * Default config header created during install
  */
 
-return 'http://tao.local/mytao.rdf#i149696370299861';
+return new oat\oatbox\config\ConfigurationService(array(
+    'config' => 'fileUploadDirectory'
+));

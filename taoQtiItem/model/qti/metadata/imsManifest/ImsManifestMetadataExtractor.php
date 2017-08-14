@@ -32,7 +32,7 @@ use oat\taoQtiItem\model\qti\metadata\MetadataExtractor;
  *
  * @author Antoine Robin <antoine.robin@vesperiagroup.com>
  */
-class ImsManifestMetadataExtractor implements MetadataExtractor 
+class ImsManifestMetadataExtractor implements MetadataExtractor
 {
 
     /**
@@ -91,8 +91,10 @@ class ImsManifestMetadataExtractor implements MetadataExtractor
                                 // Push children on the trail for descending exploration.
                                 $nodesToExplore = $currentElt->childNodes;
                                 
-                                for ($i = ($nodesToExplore->length - 1); $i >= 0; $i--) {
-                                    array_push($trail, $nodesToExplore->item($i));
+                                if ($nodesToExplore) {
+                                    for ($i = ($nodesToExplore->length - 1); $i >= 0; $i--) {
+                                        array_push($trail, $nodesToExplore->item($i));
+                                    }
                                 }
                                 
                                 // Set current as visited.

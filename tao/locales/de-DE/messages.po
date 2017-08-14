@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T11:59:35\n"
+"Project-Id-Version: TAO 3.1.0-sprint33\n"
+"PO-Revision-Date: 2016-08-25T14:35:43\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de-DE\n"
@@ -127,9 +127,6 @@ msgstr "Zugriff verweigert. Bitte neu authentifizieren!"
 msgid "Action"
 msgstr "Aktion"
 
-msgid "Action \"%s\" not found."
-msgstr "Aktion \"%s\" nicht gefunden."
-
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -176,6 +173,9 @@ msgstr "Eine E-Mail wurde versendet"
 msgid "An error occured during user deletion"
 msgstr "Während des Löschvorgangs eines Nutzers ist ein Fehler aufgetreten"
 
+msgid "An error occurred!"
+msgstr ""
+
 msgid "An exception occured while running \"%s"
 msgstr ""
 
@@ -215,14 +215,14 @@ msgstr "Zurück zur Auflistung"
 msgid "Beta version"
 msgstr "Beta-Version"
 
-msgid "Browse"
-msgstr "Durchsuchen"
-
 msgid "Browse folders:"
 msgstr "Ordner durchsuchen:"
 
 msgid "Browse..."
 msgstr "Durchsuchen…"
+
+msgid "Calculator"
+msgstr ""
 
 msgid "Calendar"
 msgstr "Kalender"
@@ -239,6 +239,9 @@ msgstr "Aktion abbrechen"
 msgid "Cannot be edited"
 msgstr "Kann nicht bearbeitet werden"
 
+msgid "Cannot divide by zero"
+msgstr ""
+
 #, tao-public
 msgid "Change password"
 msgstr "Passwort ändern"
@@ -246,11 +249,11 @@ msgstr "Passwort ändern"
 msgid "Change the password"
 msgstr "Passwort ändern"
 
-msgid "Check All"
-msgstr "Alle markieren"
-
 msgid "Check all"
 msgstr "Alles markieren"
+
+msgid "Check All"
+msgstr "Alle markieren"
 
 msgid "Check-in"
 msgstr "Check-In"
@@ -263,6 +266,9 @@ msgstr "Import-Format wählen"
 
 msgid "class selected"
 msgstr "Klasse ausgewählt"
+
+msgid "close"
+msgstr ""
 
 msgid "Close tab"
 msgstr "Tab schließen"
@@ -306,6 +312,9 @@ msgstr "CSV-Optionen"
 msgid "Current language"
 msgstr "Aktuelle Sprache"
 
+msgid "Current playback position"
+msgstr ""
+
 msgid "Data imported"
 msgstr "Daten importiert"
 
@@ -332,9 +341,6 @@ msgstr "Datum"
 
 msgid "Default search"
 msgstr "Standard-Suche"
-
-msgid "Default user cannot be deleted"
-msgstr "Standardbenutzer kann nicht gelöscht werden"
 
 msgid "Define the default values"
 msgstr "Festlegen der Standardwerte"
@@ -487,6 +493,9 @@ msgstr "Veröffentlichung erzwingen"
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
 
+msgid "From"
+msgstr ""
+
 msgid "Fuzzy Matching"
 msgstr "Ungenaue Übereinstimmung"
 
@@ -525,6 +534,15 @@ msgstr "Metadaten aus CSV-Datei importieren"
 
 msgid "Import Metadata from RDF file"
 msgstr "Metadaten aus RDF-Datei importieren"
+
+msgid "Imported %1$d/%2$d. Some records are invalid."
+msgstr ""
+
+msgid "Imported %d resources"
+msgstr ""
+
+msgid "Imported resource \"%s"
+msgstr ""
 
 msgid "Inclusive (AND)"
 msgstr "Inklusiv (UND)"
@@ -585,6 +603,9 @@ msgstr "Ungültige Dateigröße (Minimum %1$s Bytes, Maximal %2$s bytes)"
 
 msgid "Invalid file type!"
 msgstr "Ungültiger Dateityp!"
+
+msgid "Invalid input for function"
+msgstr ""
 
 msgid "Invalid login or password. Please try again."
 msgstr "Falscher Login oder Passwort. Bitte erneut versuchen."
@@ -660,6 +681,9 @@ msgstr "versionierte Dateien verwalten"
 msgid "Map the properties to the CSV columns"
 msgstr "Eigenschaften auf die CSV Spalten abbilden"
 
+msgid "Maximum selection reached"
+msgstr ""
+
 msgid "Message"
 msgstr "Nachricht"
 
@@ -687,6 +711,9 @@ msgstr "Trennsymbol mehrerer Elemente"
 
 msgid "must be numeric"
 msgstr "muss numerisch sein"
+
+msgid "Mute"
+msgstr ""
 
 #, tao-public
 msgid "My settings"
@@ -759,10 +786,10 @@ msgstr "Anzahl der Elemente"
 msgid "of"
 msgstr "von"
 
-msgid "Ok"
+msgid "OK"
 msgstr "OK"
 
-msgid "OK"
+msgid "Ok"
 msgstr "OK"
 
 msgid "Old Password"
@@ -801,6 +828,12 @@ msgstr "Passwort wurde erfolgreich geändert"
 msgid "Passwords are not matching"
 msgstr "Passwörter stimmen nicht überein"
 
+msgid "Pause"
+msgstr ""
+
+msgid "Play"
+msgstr ""
+
 msgid "Please confirm deletion"
 msgstr "Wollen Sie wirklich löschen?"
 
@@ -815,6 +848,12 @@ msgstr "Wollen Sie den Benutzer wirklich löschen?"
 
 msgid "Please contact %s or an administrator to release it"
 msgstr "Zur Freigabe wenden Sie sich an %s oder den Administrator"
+
+msgid "Please download the track and listen offline."
+msgstr ""
+
+msgid "Please download the video and view offline."
+msgstr ""
 
 msgid "Please give a message to your commit"
 msgstr "bitte machen Sie eine Anmerkung zu ihren abgeschickten Daten"
@@ -846,6 +885,9 @@ msgstr "das Beschreibungsfeld der Eigenschaft wird benötigt"
 
 msgid "Provided URL is not valid"
 msgstr "die angegebene URL ist nicht gültig"
+
+msgid "Range field is required"
+msgstr ""
 
 msgid "RDF"
 msgstr "RDF"
@@ -903,6 +945,9 @@ msgstr "Ressource gespeichert"
 
 msgid "Responsive mode"
 msgstr "Antwort Modus"
+
+msgid "Restore sound"
+msgstr ""
 
 msgid "Return to sign in page"
 msgstr "Zurück zum Login"
@@ -1084,6 +1129,9 @@ msgstr "das ist erforderlich"
 msgid "This Login is already in use"
 msgstr "Diese Benutzerkennung ist bereits in Verwendung"
 
+msgid "This media cannot be played!"
+msgstr ""
+
 msgid "This password reset link is no longer valid. It may have already been used. If you still wish to reset your password please request a new link"
 msgstr "Der Link zum Zurücksetzen des Passworts ist nicht länger gültig. Es kann sein, dass er bereits verwendet wurde. Wenn Sie Ihr Passwort immer noch zurücksetzen wollen, fordern Sie bitte einen neuen Link an."
 
@@ -1102,6 +1150,9 @@ msgstr "Sollte nicht gleich %s sein"
 msgid "Time zone"
 msgstr "Zeitzone"
 
+msgid "to"
+msgstr ""
+
 msgid "To reset your password, click the link below, or paste it into your browser. You will then be prompted to create a new password."
 msgstr "Um Ihr Passwort zurückzusetzen, klicken Sie auf den Link unten, oder fügen sie Ihn in die Addresszeile ihres Browsers ein. Anschließend werden Sie dazu aufgefordert ein neues Passwort festzulegen."
 
@@ -1113,6 +1164,9 @@ msgstr "Tokenizer"
 
 msgid "Too many suggestions match your query. Only a few are listed"
 msgstr "Ihre Abfrage liefert zu viele Ergebnisse. Nur einige davon werden angezeigt"
+
+msgid "Total duration"
+msgstr ""
 
 msgid "Translate"
 msgstr "Übersetzen"
@@ -1177,6 +1231,9 @@ msgstr "Nichts auswählen"
 msgid "Undo"
 msgstr "Rückgängig"
 
+msgid "Unexpected error. Please contact administrator"
+msgstr ""
+
 msgid "Uninstall of %s failed"
 msgstr "Deinstallation von %s fehlgeschlagen"
 
@@ -1197,9 +1254,6 @@ msgstr "Hochladen"
 
 msgid "Upload a new content"
 msgstr "Neue Inhalte hochladen"
-
-msgid "Upload File"
-msgstr "Datei hochladen"
 
 msgid "Upload into:"
 msgstr "Hochladen nach:"
@@ -1268,6 +1322,15 @@ msgstr ""
 
 msgid "You must activate JavaScript in your browser to run this application."
 msgstr "Um diese Anwendung auszuführen muss JavaScript in Ihrem Browser aktiviert werden."
+
+msgid "Your browser does not meet the technical requirements to run TAO."
+msgstr ""
+
+msgid "Your browser doesn’t support the audio player."
+msgstr ""
+
+msgid "Your browser doesn’t support the video player."
+msgstr ""
 
 msgid "Your mail"
 msgstr "Ihre Nachrichten"

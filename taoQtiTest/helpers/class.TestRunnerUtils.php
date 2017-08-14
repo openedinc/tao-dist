@@ -21,6 +21,7 @@
 use qtism\data\NavigationMode;
 use qtism\data\SubmissionMode;
 use qtism\data\View;
+use qtism\runtime\common\Container;
 use qtism\runtime\tests\AssessmentTestSession;
 use qtism\runtime\tests\AssessmentTestSessionException;
 use qtism\runtime\tests\AssessmentItemSession;
@@ -29,7 +30,10 @@ use qtism\runtime\tests\AssessmentTestSessionState;
 use qtism\runtime\tests\Jump;
 use qtism\runtime\tests\RouteItem;
 use oat\taoQtiTest\models\ExtendedStateService;
-use qtism\common\datatypes\String;
+use oat\taoQtiTest\models\QtiTestCompilerIndex;
+use oat\taoQtiTest\models\runner\rubric\QtiRunnerRubric;
+use qtism\common\datatypes\QtiString;
+use oat\oatbox\service\ServiceManager;
 
 /**
 * Utility methods for the QtiTest Test Runner.
@@ -40,21 +44,21 @@ use qtism\common\datatypes\String;
 class taoQtiTest_helpers_TestRunnerUtils {
     
     /**
-     * temporary variable until proper servicemanager integration
-     * @var ExtendedStateService
+     * Temporary helper until proper ServiceManager integration
+     * @return ServiceManager
      */
-    private static $extendedStateService;
-
+    static protected function getServiceManager()
+    {
+        return ServiceManager::getServiceManager();
+    }
+    
     /**
-     * temporary helper until proper servicemanager integration
+     * Temporary helper until proper ServiceManager integration
      * @return ExtendedStateService
      */
     static public function getExtendedStateService()
     {
-        if (!isset(self::$extendedStateService)) {
-            self::$extendedStateService = new ExtendedStateService();
-        }
-        return self::$extendedStateService;
+        return self::getServiceManager()->get(ExtendedStateService::SERVICE_ID);
     }
     
     /**
@@ -134,7 +138,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
                 $values = $testTaker->getPropertyValues($rdfPropUri);
                 $outcome = $session->getVariable($outcomeId);
                 if(!is_null($outcome) && count($values)){
-                    $outcome->setValue(new String($values[0]));
+                    $outcome->setValue(new QtiString($values[0]));
                 }
             }
         }
@@ -261,8 +265,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
      * @return boolean
      */
     static public function doesAllowSkipping(AssessmentTestSession $session) {
-        $doesAllowSkipping = false;
-        $navigationMode = $session->getCurrentNavigationMode();
+        $doesAllowSkipping = true;
         $submissionMode = $session->getCurrentSubmissionMode();
          
         $routeItem = $session->getRoute()->current();
@@ -272,9 +275,29 @@ class taoQtiTest_helpers_TestRunnerUtils {
             $doesAllowSkipping = $routeControl->getItemSessionControl()->doesAllowSkipping();
         }
          
-        return $doesAllowSkipping && $navigationMode === NavigationMode::LINEAR && $submissionMode === SubmissionMode::INDIVIDUAL;
+        return $doesAllowSkipping && $submissionMode === SubmissionMode::INDIVIDUAL;
     }
-    
+
+    /**
+     * Whether or not the candidate's response is validated
+     *
+     * @param AssessmentTestSession $session A given AssessmentTestSession object.
+     * @return boolean
+     */
+    static public function doesValidateResponses(AssessmentTestSession $session) {
+        $doesValidateResponses = true;
+        $submissionMode = $session->getCurrentSubmissionMode();
+
+        $routeItem = $session->getRoute()->current();
+        $routeControl = $routeItem->getItemSessionControl();
+
+        if (empty($routeControl) === false) {
+            $doesValidateResponses = $routeControl->getItemSessionControl()->mustValidateResponses();
+        }
+
+        return $doesValidateResponses && $submissionMode === SubmissionMode::INDIVIDUAL;
+    }
+
     /**
      * Whether or not the candidate taking the given $session is allowed to make
      * a comment on the presented Assessment Item.
@@ -315,7 +338,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
                 $constraints[] = array(
                     'label' => $label,
                     'source' => $tc->getSource()->getIdentifier(),
-                    'seconds' => $tc->getMaximumRemainingTime()->getSeconds(true),
+                    'seconds' => self::getDurationWithMicroseconds($tc->getMaximumRemainingTime()),
                     'allowLateSubmission' => $tc->allowLateSubmission(),
                     'qtiClassName' => $tc->getSource()->getQtiClassName()
                 );
@@ -383,13 +406,14 @@ class taoQtiTest_helpers_TestRunnerUtils {
      * 
      * @param AssessmentTestSession $session A given AssessmentTestSession object.
      * @param array $testMeta An associative array containing meta-data about the test definition taken by the candidate.
+     * @param QtiTestCompilerIndex $itemIndex
      * @param string $qtiTestDefinitionUri The URI of a reference to an Assessment Test definition in the knowledge base.
      * @param string $qtiTestCompilationUri The Uri of a reference to an Assessment Test compilation in the knowledge base.
      * @param string $standalone
-     * @param string $compilationDirs An array containing respectively the private and public compilation directories.
+     * @param array $compilationDirs An array containing respectively the private and public compilation directories.
      * @return array The context of the candidate session.
      */
-    static public function buildAssessmentTestContext(AssessmentTestSession $session, array $testMeta, $qtiTestDefinitionUri, $qtiTestCompilationUri, $standalone, $compilationDirs) {
+    static public function buildAssessmentTestContext(AssessmentTestSession $session, array $testMeta, $itemIndex, $qtiTestDefinitionUri, $qtiTestCompilationUri, $standalone, $compilationDirs) {
         $context = array();
          
         // The state of the test session.
@@ -451,7 +475,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
             $context['sectionTitle'] = $session->getCurrentAssessmentSection()->getTitle();
              
             // Number of items composing the test session.
-            $context['numberItems'] = $session->getRoute()->count();
+            $context['numberItems'] = $session->getRouteCount(AssessmentTestSession::ROUTECOUNT_FLOW);
              
             // Number of items completed during the test session.
             $context['numberCompleted'] = self::testCompletion($session);
@@ -483,7 +507,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
             // The test review screen setup
             if (!empty($config['test-taker-review']) && $context['considerProgress']) {
                 // The navigation map in order to build the test navigator
-                $navigator = self::getNavigatorMap($session);
+                $navigator = self::getNavigatorMap($session, $itemIndex);
                 if ($navigator !== NavigationMode::LINEAR) {
                     $context['navigatorMap'] = $navigator['map'];
                     $context['itemFlagged'] = self::getItemFlag($session, $context['itemPosition']);
@@ -520,30 +544,11 @@ class taoQtiTest_helpers_TestRunnerUtils {
 
             // The code to be executed to build the ServiceApi object to be injected in the QTI Item frame.
             $context['itemServiceApiCall'] = self::buildServiceApi($session, $qtiTestDefinitionUri, $qtiTestCompilationUri);
-             
+
             // Rubric Blocks.
-            $rubrics = array();
-             
-            // -- variables used in the included rubric block templates.
-            // base path (base URI to be used for resource inclusion).
-            $basePathVarName = TAOQTITEST_BASE_PATH_NAME;
-            $$basePathVarName = $compilationDirs['public']->getPublicAccessUrl();
-             
-            // state name (the variable to access to get the state of the assessmentTestSession).
-            $stateName = TAOQTITEST_RENDERING_STATE_NAME;
-            $$stateName = $session;
-             
-            // views name (the variable to be accessed for the visibility of rubric blocks).
-            $viewsName = TAOQTITEST_VIEWS_NAME;
-            $$viewsName = array(View::CANDIDATE);
-             
-            foreach ($session->getRoute()->current()->getRubricBlockRefs() as $rubric) {
-                ob_start();
-                include($compilationDirs['private']->getPath() . $rubric->getHref());
-                $rubrics[] = ob_get_clean();
-            }
-             
-            $context['rubrics'] = $rubrics;
+            /** @var QtiRunnerRubric $rubricBlockHelper */
+            $rubricBlockHelper = self::getServiceManager()->get(QtiRunnerRubric::SERVICE_ID);
+            $context['rubrics'] = $rubricBlockHelper->getRubricBlock($session->getRoute()->current(), $session, $compilationDirs);
              
             // Comment allowed? Skipping allowed? Logout or Exit allowed ?
             $context['allowComment'] = self::doesAllowComment($session);
@@ -564,6 +569,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
                 'test-taker-review-prevents-unseen' => 'reviewPreventsUnseen',
                 'test-taker-review-can-collapse'    => 'reviewCanCollapse',
                 'next-section'                      => 'nextSection',
+                'keep-timer-up-to-timeout'          => 'keepTimerUpToTimeout',
             );
             foreach ($configMap as $configKey => $contextKey) {
                 if (isset($config[$configKey])) {
@@ -585,7 +591,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
                         $compilationDirs
                     );
                 } else {
-                    common_Logger::i('Try to use an extra context builder class that is not an instance of \\oat\\taoQtiTest\\models\\TestContextBuilder!');
+                    common_Logger::d('Try to use an extra context builder class that is not an instance of \\oat\\taoQtiTest\\models\\TestContextBuilder!');
                 }
             }
         }
@@ -664,12 +670,45 @@ class taoQtiTest_helpers_TestRunnerUtils {
     }
 
     /**
-     * Checks if an item has been completed
+     * Gets the usage of an item
+     * @param RouteItem $routeItem
+     * @return string Return the usage, can be: default, informational, seeding
+     */
+    static public function getItemUsage(RouteItem $routeItem)
+    {
+        $itemRef = $routeItem->getAssessmentItemRef();
+        $categories = $itemRef->getCategories()->getArrayCopy();
+        $prefixCategory = 'x-tao-itemusage-';
+        $prefixCategoryLen = strlen($prefixCategory);
+        foreach ($categories as $category) {
+            if (!strncmp($category, $prefixCategory, $prefixCategoryLen)) {
+                // extract the option name from the category, transform to camelCase if needed
+                return lcfirst(str_replace(' ', '', ucwords(strtr(substr($category, $prefixCategoryLen), ['-' => ' ', '_' => ' ']))));
+            }
+        }
+        
+        return 'default';
+    }
+
+    /**
+     * Checks if an item is informational
      * @param RouteItem $routeItem
      * @param AssessmentItemSession $itemSession
      * @return bool
      */
-    static public function isItemCompleted(RouteItem $routeItem, AssessmentItemSession $itemSession) {
+    static public function isItemInformational(RouteItem $routeItem, AssessmentItemSession $itemSession)
+    {
+        return !count($itemSession->getAssessmentItem()->getResponseDeclarations()) || 'informational' == self::getItemUsage($routeItem);
+    }
+
+    /**
+     * Checks if an item has been completed
+     * @param RouteItem $routeItem
+     * @param AssessmentItemSession $itemSession
+     * @param bool $partially (optional) Whether or not consider partially responded sessions as responded.
+     * @return bool
+     */
+    static public function isItemCompleted(RouteItem $routeItem, AssessmentItemSession $itemSession, $partially = true) {
         $completed = false;
         if ($routeItem->getTestPart()->getNavigationMode() === NavigationMode::LINEAR) {
             // In linear mode, we consider the item completed if it was presented.
@@ -686,7 +725,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
             if ($isAdaptive === true && $itemSession['completionStatus']->getValue() === AssessmentItemSession::COMPLETION_STATUS_COMPLETED) {
                 $completed = true;
             }
-            else if ($isAdaptive === false && $itemSession->isResponded() === true) {
+            else if ($isAdaptive === false && $itemSession->isResponded($partially) === true) {
                 $completed = true;
             }
         }
@@ -724,7 +763,9 @@ class taoQtiTest_helpers_TestRunnerUtils {
         foreach ($jumps as $jump) {
             $routeItem = $jump->getTarget();
             $partId = $routeItem->getTestPart()->getIdentifier();
-            $sectionId = key(current($routeItem->getAssessmentSections()));
+            $sections = $routeItem->getAssessmentSections();
+            $sections->rewind();
+            $sectionId = key(current($sections));
             $itemId = $routeItem->getAssessmentItemRef()->getIdentifier();
 
             $jumpsMap[$partId][$sectionId][$itemId] = self::getItemInfo($session, $jump);
@@ -743,9 +784,10 @@ class taoQtiTest_helpers_TestRunnerUtils {
      * Gets the section map for navigation between test parts, sections and items.
      *
      * @param AssessmentTestSession $session
+     * @param QtiTestCompilerIndex $itemIndex
      * @return array A navigator map (parts, sections, items so on)
      */
-    static private function getNavigatorMap(AssessmentTestSession $session) {
+    static private function getNavigatorMap(AssessmentTestSession $session, $itemIndex) {
 
         // get jumps
         $jumps = $session->getPossibleJumps();
@@ -782,6 +824,8 @@ class taoQtiTest_helpers_TestRunnerUtils {
         $config = common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiTest')->getConfig('testRunner');
         $forceTitles = !empty($config['test-taker-review-force-title']);
         $uniqueTitle = isset($config['test-taker-review-item-title']) ? $config['test-taker-review-item-title'] : '%d';
+        $useTitle = !empty($config['test-taker-review-use-title']);
+        $language = \common_session_SessionManager::getSession()->getInterfaceLanguage();
 
         $returnValue = array();
         $testParts   = array();
@@ -823,7 +867,8 @@ class taoQtiTest_helpers_TestRunnerUtils {
 
                         if (isset($jumpsMap[$id][$sectionId][$itemId])) {
                             $jumpInfo = $jumpsMap[$id][$sectionId][$itemId];
-                            $resItem  =  new \core_kernel_classes_Resource(strstr($item->getHref(), '|', true));
+                            $itemUri = strstr($item->getHref(), '|', true);
+                            $resItem  =  new \core_kernel_classes_Resource($itemUri);
                             if ($jumpInfo['answered']) {
                                 ++$completed;
                             }
@@ -836,7 +881,19 @@ class taoQtiTest_helpers_TestRunnerUtils {
                             if ($forceTitles) {
                                 $label = sprintf($uniqueTitle, ++$positionInSection);
                             } else {
-                                $label = $resItem->getLabel();
+                                if ($useTitle) {
+                                    $label = $itemIndex->getItemValue($itemUri, $language, 'title');
+                                } else {
+                                    $label = '';
+                                }
+
+                                if (!$label) {
+                                    $label = $itemIndex->getItemValue($itemUri, $language, 'label');
+                                }
+
+                                if (!$label) {
+                                    $label = $resItem->getLabel();
+                                }
                             }
                             $items[]  = array_merge(
                                 array(
@@ -1128,5 +1185,56 @@ class taoQtiTest_helpers_TestRunnerUtils {
      */
     static public function getCategories(AssessmentTestSession $session){
         return $session->getCurrentAssessmentItemRef()->getCategories()->getArrayCopy();
+    }
+
+
+    /**
+     * Get the array of available categories for the test
+     *
+     * @param \qtism\runtime\tests\AssessmentTestSession $session
+     * @return array
+     */
+    static public function getAllCategories(AssessmentTestSession $session)
+    {
+        $prevCategories = null;
+        $assessmentItemRefs = $session->getAssessmentTest()->getComponentsByClassName('assessmentItemRef');
+
+        /** @var \qtism\data\AssessmentItemRef $assessmentItemRef */
+        foreach ($assessmentItemRefs as $assessmentItemRef){
+            $categories = $assessmentItemRef->getCategories();
+            if(!is_null($prevCategories)){
+                $prevCategories->merge($categories);
+            } else {
+                $prevCategories = $categories;
+            }
+        }
+
+        return (!is_null($prevCategories))? array_unique($prevCategories->getArrayCopy()):[];
+    }
+    
+    /**
+     * Whether or not $value is considered as a null QTI value.
+     * 
+     * @param $value
+     * @return boolean
+     */
+    static public function isQtiValueNull($value){
+        return is_null($value) === true || ($value instanceof QtiString && $value->getValue() === '') || ($value instanceof Container && count($value) === 0);
+    }
+
+    /**
+     * Gets the amount of seconds with the microseconds as fractional part from a Duration instance.
+     * @param \qtism\common\datatypes\Duration $duration
+     * @return float|null
+     */
+    public static function getDurationWithMicroseconds($duration)
+    {
+        if ($duration) {
+            if (method_exists($duration, 'getMicroseconds')) {
+                return $duration->getMicroseconds(true) / 1e6;
+            }
+            return $duration->getSeconds(true);
+        }
+        return null;
     }
 }

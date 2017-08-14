@@ -77,10 +77,6 @@ class PackerTest extends TaoPhpUnitTestRunner
             ->will($this->returnValue(new core_kernel_classes_Resource('fooModel')));
 
         $serviceMock
-            ->method('getTestContent')
-            ->will($this->returnValue(''));
-
-        $serviceMock
             ->method('getTestModelImplementation')
             ->with($this->equalTo($model))
             ->will($this->returnValue($modelMock));
@@ -264,7 +260,8 @@ class PackerTest extends TaoPhpUnitTestRunner
 
 //use an old school mock as the Packer create it's own instance from the class
 class PackerMock implements Packable{
-    public function packTest(core_kernel_classes_Resource $test){
+    public function packTest(core_kernel_classes_Resource $test)
+    {
         return new TestPack('qti', array('uri' => $test->getUri()), array());
     }
 }

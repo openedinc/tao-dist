@@ -29,8 +29,10 @@ define([
     'taoQtiItem/qtiItem/core/Element',
     'taoQtiItem/qtiCommonRenderer/renderers/Renderer',
     'taoQtiItem/runner/provider/manager/picManager',
+    'taoQtiItem/runner/provider/manager/userModules',
+    'taoQtiItem/qtiItem/helper/modalFeedback',
     'taoItems/assets/manager'
-], function($, _, context, Promise, QtiLoader, Element, QtiRenderer, picManager, assetManagerFactory){
+], function($, _, context, Promise, QtiLoader, Element, QtiRenderer, picManager, userModules, modalFeedbackHelper){
     'use strict';
 
     var timeout = (context.timeout > 0 ? context.timeout + 1 : 30) * 1000;
@@ -65,55 +67,12 @@ define([
                     done();
                 }, this.getLoadedClasses());
             });
-
-            /**
-             * This "special" event has to be called on the IR to show a modal feedback
-             * @event itemRunner#feedback
-             * @param {Objtec} feedbackData - the feedback item data, loaded only on demand (hidden to the user)
-             * @param {Object} itemSession - the itemSession to decide which feedback to display
-             * @param {Function} done - what to do once the modal feedback is closed
-             */
-            this.on('feedback', function(feedbackData, itemSession, done){
-                //modal feedback data is
-                if(feedbackData && itemSession){
-                    self._loader.loadElements(feedbackData, function(item){
-                        self._renderer.load(function(){
-                            var queue = [];
-
-                            _.forEach(item.modalFeedbacks, function(feedback){
-
-                                var outcomeIdentifier = feedback.attr('outcomeIdentifier');
-                                if(itemSession[outcomeIdentifier].base.identifier === feedback.id()){
-                                    queue.push(new Promise(function(resolve){
-                                        var $feedbackContent = $(feedback.render());
-
-                                        //FIXME the IR should not be responsible of the modal rendering, i
-                                        //the container selection should be part of the renderer
-                                        $('#modalFeedbacks').append($feedbackContent);
-                                        feedback.postRender({
-                                            callback : function(){
-                                                $feedbackContent.remove();
-                                                resolve();
-                                            }
-                                        });
-                                    }));
-                                }
-                            });
-
-                            //execute the done callback once all modals are closed
-                            Promise.all(queue).then(done);
-
-                        }, this.getLoadedClasses());
-                    });
-                } else {
-                    done();
-                }
-            });
         },
 
-        render : function(elt, done){
+        render : function(elt, done, options){
             var self = this;
-            var current = 0;
+
+            options = _.defaults(options || {}, {state : {}});
 
             if(this._item){
 
@@ -127,7 +86,7 @@ define([
                     // Race between postRendering and timeout
                     // postRendering waits for everything to be resolved or one reject
                     Promise.race([
-                        Promise.all(this._item.postRender()),
+                        Promise.all(this._item.postRender(options)),
                         new Promise(function(resolve, reject){
                             _.delay(reject, timeout, new Error('Post rendering ran out of time.'));
                         })
@@ -158,10 +117,10 @@ define([
                          */
                         self.trigger('listpic', picManager.collection(self._item));
 
-                        done();
+                        return userModules.load().then(done);
 
                     }).catch(function(err){
-                        self.trigger('error', 'Error in post rendering : ' +  err.message);
+                        self.trigger('error', 'Error in post rendering : ' + err instanceof Error ? err.message : err);
                     });
                 } catch(err){
                     self.trigger('error', 'Error in post rendering : ' + err.message);
@@ -187,6 +146,8 @@ define([
                 if(this._renderer){
                     this._renderer.unload();
                 }
+
+                this._item = null;
             }
             done();
         },
@@ -250,6 +211,23 @@ define([
                 }, responses);
             }
             return responses;
+        },
+
+        renderFeedbacks : function(feedbacks, itemSession, done) {
+            var self = this;
+
+            var _renderer = self._item.getRenderer();
+            var _loader   = new QtiLoader(self._item);
+
+            // loading feedbacks from response into the current item
+            _loader.loadElements(feedbacks, function (item) {
+                _renderer.load(function () {
+
+                    var renderingQueue = modalFeedbackHelper.getFeedbacks(item, itemSession);
+
+                    done(renderingQueue);
+                }, this.getLoadedClasses());
+            });
         }
     };
 
