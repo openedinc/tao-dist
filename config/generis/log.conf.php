@@ -57,6 +57,14 @@ return array(
 */
 
 return new oat\oatbox\config\ConfigurationService(array(
-    'config' => array(
+  'config' => array(
+    array(
+        'class' => 'SingleFileAppender',
+        'mask' => 62,
+        'max_file_size' => 1048576, // 1Mb
+        'rotation-ratio' => .5,
+        'file' => ROOT_PATH.'log.txt',
+        'prefix' => '[dev]'
     )
+  )
 ));
