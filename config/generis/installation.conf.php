@@ -72,6 +72,18 @@ return new oat\oatbox\config\ConfigurationService(array(
         'taoCe' => array(
             'installed' => '3.4.1',
             'enabled' => true
+        ),
+        'taoLti' => array(
+            'installed' => '3.2.4',
+            'enabled' => true
+        ),
+        'taoLtiBasicOutcome' => array(
+            'installed' => '3.0.0',
+            'enabled' => true
+        ),
+        'ltiDeliveryProvider' => array(
+            'installed' => '3.3.2',
+            'enabled' => true
         )
     )
 ));

@@ -228,6 +228,30 @@ return new oat\oatbox\config\ConfigurationService(array(
         'taoCeCss' => array(
             'extId' => 'taoCe',
             'path' => 'css'
+        ),
+        'taoLti' => array(
+            'extId' => 'taoLti',
+            'path' => 'js'
+        ),
+        'taoLtiCss' => array(
+            'extId' => 'taoLti',
+            'path' => 'css'
+        ),
+        'taoLtiBasicOutcome' => array(
+            'extId' => 'taoLtiBasicOutcome',
+            'path' => 'js'
+        ),
+        'taoLtiBasicOutcomeCss' => array(
+            'extId' => 'taoLtiBasicOutcome',
+            'path' => 'css'
+        ),
+        'ltiDeliveryProvider' => array(
+            'extId' => 'ltiDeliveryProvider',
+            'path' => 'js'
+        ),
+        'ltiDeliveryProviderCss' => array(
+            'extId' => 'ltiDeliveryProvider',
+            'path' => 'css'
         )
     )
 ));

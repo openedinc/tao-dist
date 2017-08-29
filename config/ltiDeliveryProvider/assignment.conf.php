@@ -3,4 +3,4 @@
  * Default config header created during install
  */
 
-return new oat\ltiDeliveryProvider\model\ResultAliasService();
+return new oat\ltiDeliveryProvider\model\LtiAssignment();
