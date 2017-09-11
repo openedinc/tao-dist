@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b9ef586bd37e81e76cd317dbbe14f253",
+    "content-hash": "e0e6639053d5c9fb94e57971c8addb91",
     "packages": [
         {
             "name": "clearfw/clearfw",
@@ -235,7 +235,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-07-22 12:49:21"
+            "time": "2017-07-22T12:49:21+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -375,7 +375,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2017-07-22 08:35:55"
+            "time": "2017-07-22T08:35:55+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -446,7 +446,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2017-07-22 20:45:23"
+            "time": "2017-07-22T20:45:23+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -513,7 +513,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06 14:35:42"
+            "time": "2015-11-06T14:35:42+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -567,7 +567,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2017-07-24 09:37:08"
+            "time": "2017-07-24T09:37:08+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -792,7 +792,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2017-05-20 23:14:18"
+            "time": "2017-05-20T23:14:18+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -857,7 +857,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-07-17 09:11:21"
+            "time": "2017-07-17T09:11:21+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -932,12 +932,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "d3ce2f8f409ac7d01dea0fd03d30f1e466bdd957"
+                "reference": "3245df3acae2dded99694b499d3bbf937679c8f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/d3ce2f8f409ac7d01dea0fd03d30f1e466bdd957",
-                "reference": "d3ce2f8f409ac7d01dea0fd03d30f1e466bdd957",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/3245df3acae2dded99694b499d3bbf937679c8f3",
+                "reference": "3245df3acae2dded99694b499d3bbf937679c8f3",
                 "shasum": ""
             },
             "require": {
@@ -1007,7 +1007,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-08-08 08:44:14"
+            "time": "2017-09-04T09:35:39+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -1364,16 +1364,16 @@
         },
         {
             "name": "oat-sa/extension-tao-delivery-rdf",
-            "version": "v3.8.0",
+            "version": "v3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-delivery-rdf.git",
-                "reference": "96174ff828359b76d525f6a64aba45c89b86b2b6"
+                "reference": "1a2ec20594f93dc4ec1da6a5731615d8cef47f97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-delivery-rdf/zipball/96174ff828359b76d525f6a64aba45c89b86b2b6",
-                "reference": "96174ff828359b76d525f6a64aba45c89b86b2b6",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-delivery-rdf/zipball/1a2ec20594f93dc4ec1da6a5731615d8cef47f97",
+                "reference": "1a2ec20594f93dc4ec1da6a5731615d8cef47f97",
                 "shasum": ""
             },
             "require": {
@@ -1403,7 +1403,7 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-21T13:51:11+00:00"
+            "time": "2017-09-08T13:48:55+00:00"
         },
         {
             "name": "oat-sa/extension-tao-funcacl",
@@ -1779,16 +1779,16 @@
         },
         {
             "name": "oat-sa/extension-tao-itemqti-pci",
-            "version": "v3.1.0",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-itemqti-pci.git",
-                "reference": "5b04e4df14f050ab269671390149f8561f77fc3d"
+                "reference": "236b3b9733b546bc260e32bcc1985c12042db349"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti-pci/zipball/5b04e4df14f050ab269671390149f8561f77fc3d",
-                "reference": "5b04e4df14f050ab269671390149f8561f77fc3d",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti-pci/zipball/236b3b9733b546bc260e32bcc1985c12042db349",
+                "reference": "236b3b9733b546bc260e32bcc1985c12042db349",
                 "shasum": ""
             },
             "require": {
@@ -1817,7 +1817,7 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-08-04T15:01:37+00:00"
+            "time": "2017-09-08T13:55:53+00:00"
         },
         {
             "name": "oat-sa/extension-tao-itemqti-pic",
@@ -2552,16 +2552,16 @@
         },
         {
             "name": "oat-sa/extension-tao-testtaker",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-testtaker.git",
-                "reference": "a311d619596594fb27d4d06133538265a0af1b02"
+                "reference": "742b8908b36ce9b8f28ec3c835b7054daf722ecc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-testtaker/zipball/a311d619596594fb27d4d06133538265a0af1b02",
-                "reference": "a311d619596594fb27d4d06133538265a0af1b02",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-testtaker/zipball/742b8908b36ce9b8f28ec3c835b7054daf722ecc",
+                "reference": "742b8908b36ce9b8f28ec3c835b7054daf722ecc",
                 "shasum": ""
             },
             "require": {
@@ -2621,7 +2621,7 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-05-08T16:38:59+00:00"
+            "time": "2017-09-01T14:45:05+00:00"
         },
         {
             "name": "oat-sa/extension-tao-workspace",
@@ -3183,6 +3183,59 @@
             "time": "2017-08-04T15:05:39+00:00"
         },
         {
+            "name": "openedinc/extension-tao-caliper",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:openedinc/tao-caliper-opened.git",
+                "reference": "d65ec2af5b8eb1712e497c308acbc3c997672dd9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/d65ec2af5b8eb1712e497c308acbc3c997672dd9",
+                "reference": "d65ec2af5b8eb1712e497c308acbc3c997672dd9",
+                "shasum": ""
+            },
+            "require": {
+                "oat-sa/oatbox-extension-installer": "dev-master"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoCaliper"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoCaliper\\": ""
+                }
+            },
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Opened",
+                    "homepage": "https://www.opened.com"
+                },
+                {
+                    "name": "Luis Silvera",
+                    "role": "Developer"
+                }
+            ],
+            "description": "extension to manage caliper",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "computer-based-assessment",
+                "oat",
+                "opened",
+                "tao"
+            ],
+            "support": {
+                "source": "https://github.com/openedinc/tao-caliper-opened/tree/master",
+                "issues": "https://github.com/openedinc/tao-caliper-opened/issues"
+            },
+            "time": "2017-09-11T16:06:20+00:00"
+        },
+        {
             "name": "paragonie/random_compat",
             "version": "v2.0.10",
             "source": {
@@ -3294,7 +3347,7 @@
                 "archive",
                 "tar"
             ],
-            "time": "2017-07-31 07:04:16"
+            "time": "2017-07-31T07:04:16+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -3408,12 +3461,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_URL2.git",
-                "reference": "43a87606daf52efe6685c92131be083143108e37"
+                "reference": "07fd055820dbf466ee3990abe96d0e40a8791f9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_URL2/zipball/43a87606daf52efe6685c92131be083143108e37",
-                "reference": "43a87606daf52efe6685c92131be083143108e37",
+                "url": "https://api.github.com/repos/pear/Net_URL2/zipball/07fd055820dbf466ee3990abe96d0e40a8791f9d",
+                "reference": "07fd055820dbf466ee3990abe96d0e40a8791f9d",
                 "shasum": ""
             },
             "require": {
@@ -3434,6 +3487,9 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "./"
+            ],
             "license": [
                 "BSD-3-Clause"
             ],
@@ -3461,7 +3517,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2016-04-18 22:24:01"
+            "time": "2017-08-25T06:16:11+00:00"
         },
         {
             "name": "pear/pear-core-minimal",
@@ -3560,7 +3616,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10 20:07:52"
+            "time": "2015-02-10T20:07:52+00:00"
         },
         {
             "name": "pear/versioncontrol_git",
@@ -3568,12 +3624,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/VersionControl_Git.git",
-                "reference": "d2fd5c37a27541a4cea554d67cd39c73d7cb71fe"
+                "reference": "f074b9e7805197cb1019e05953960dde35ef3e31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/VersionControl_Git/zipball/d2fd5c37a27541a4cea554d67cd39c73d7cb71fe",
-                "reference": "d2fd5c37a27541a4cea554d67cd39c73d7cb71fe",
+                "url": "https://api.github.com/repos/pear/VersionControl_Git/zipball/f074b9e7805197cb1019e05953960dde35ef3e31",
+                "reference": "f074b9e7805197cb1019e05953960dde35ef3e31",
                 "shasum": ""
             },
             "require": {
@@ -3581,7 +3637,7 @@
                 "pear/pear_exception": "*"
             },
             "require-dev": {
-                "phpunit/phpunit": "*"
+                "phpunit/phpunit": "^5"
             },
             "type": "library",
             "autoload": {
@@ -3604,7 +3660,7 @@
                 }
             ],
             "description": "VersionControl_Git is a library that provides OO interface to handle Git repository.",
-            "time": "2015-11-04 13:03:54"
+            "time": "2017-08-23T19:37:51+00:00"
         },
         {
             "name": "phing/phing",
@@ -3754,52 +3810,39 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "5ce90b1962998f1536d9d46fb3707625312c1732"
+                "reference": "7201c4f7c089a26e9d19176c0fd833945e46d87b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/5ce90b1962998f1536d9d46fb3707625312c1732",
-                "reference": "5ce90b1962998f1536d9d46fb3707625312c1732",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/7201c4f7c089a26e9d19176c0fd833945e46d87b",
+                "reference": "7201c4f7c089a26e9d19176c0fd833945e46d87b",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
-                "php": ">=5.0.0"
+                "php": ">=5.5.0"
             },
             "require-dev": {
                 "doctrine/annotations": "1.2.*",
-                "jms/serializer": "0.16.*",
                 "phpdocumentor/phpdocumentor": "2.*",
-                "phpunit/phpunit": "4.8.*",
-                "symfony/debug": "2.8.*",
-                "symfony/filesystem": "2.8.*",
-                "symfony/translation": "2.8.*",
-                "symfony/yaml": "2.8.*",
-                "zendframework/zend-cache": "2.5.1",
-                "zendframework/zend-config": "2.5.1",
-                "zendframework/zend-eventmanager": "2.5.1",
-                "zendframework/zend-filter": "2.5.1",
-                "zendframework/zend-i18n": "2.5.1",
-                "zendframework/zend-json": "2.5.1",
-                "zendframework/zend-math": "2.5.1",
-                "zendframework/zend-serializer": "2.5.*",
-                "zendframework/zend-servicemanager": "2.5.*",
-                "zendframework/zend-stdlib": "2.5.1"
+                "phpunit/phpunit": "4.*",
+                "zendframework/zend-eventmanager": "3.0.*",
+                "zendframework/zend-i18n": "2.7.3",
+                "zendframework/zend-serializer": "2.7.*"
             },
             "suggest": {
-                "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
+                "ext-mbstring": "Needed to send email in multibyte encoding charset",
+                "hayageek/oauth2-yahoo": "Needed for Yahoo XOAUTH2 authentication",
+                "league/oauth2-google": "Needed for Google XOAUTH2 authentication",
+                "psr/log": "For optional PSR-3 debug logging",
+                "stevenmaguire/oauth2-microsoft": "Needed for Microsoft XOAUTH2 authentication",
+                "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "class.phpmailer.php",
-                    "class.phpmaileroauth.php",
-                    "class.phpmaileroauthgoogle.php",
-                    "class.smtp.php",
-                    "class.pop3.php",
-                    "extras/EasyPeasyICS.php",
-                    "extras/ntlm_sasl_client.php"
-                ]
+                "psr-4": {
+                    "PHPMailer\\PHPMailer\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -3823,7 +3866,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-08-12 15:59:58"
+            "time": "2017-09-08T17:31:28+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -3831,12 +3874,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "b734609e7928349247a1217c5461c8d41e898d2c"
+                "reference": "b5e5c1809fc323428715aa6a66ddca180e0adc0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/b734609e7928349247a1217c5461c8d41e898d2c",
-                "reference": "b734609e7928349247a1217c5461c8d41e898d2c",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/b5e5c1809fc323428715aa6a66ddca180e0adc0f",
+                "reference": "b5e5c1809fc323428715aa6a66ddca180e0adc0f",
                 "shasum": ""
             },
             "require": {
@@ -3873,7 +3916,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2017-07-23 07:32:49"
+            "time": "2017-08-23T11:42:00+00:00"
         },
         {
             "name": "psr/container",
@@ -3922,7 +3965,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-06-28 15:35:32"
+            "time": "2017-06-28T15:35:32+00:00"
         },
         {
             "name": "psr/http-message",
@@ -4019,7 +4062,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "qtism/qtism",
@@ -4084,12 +4127,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/slimphp/Slim.git",
-                "reference": "afef745e9f425309f571b107b857fdb3b7374e7a"
+                "reference": "a641082cdc08769c6fe195180ed73a63ca828b73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slimphp/Slim/zipball/afef745e9f425309f571b107b857fdb3b7374e7a",
-                "reference": "afef745e9f425309f571b107b857fdb3b7374e7a",
+                "url": "https://api.github.com/repos/slimphp/Slim/zipball/a641082cdc08769c6fe195180ed73a63ca828b73",
+                "reference": "a641082cdc08769c6fe195180ed73a63ca828b73",
                 "shasum": ""
             },
             "require": {
@@ -4147,7 +4190,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2017-08-13 09:20:58"
+            "time": "2017-08-16T17:16:12+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -4155,19 +4198,22 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "1395ddba6f65bf46cdf1d80d59223cbab8ff3ccc"
+                "reference": "c076a2d6f809130a84f99616b425b9665b3ce0a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/1395ddba6f65bf46cdf1d80d59223cbab8ff3ccc",
-                "reference": "1395ddba6f65bf46cdf1d80d59223cbab8ff3ccc",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/c076a2d6f809130a84f99616b425b9665b3ce0a5",
+                "reference": "c076a2d6f809130a84f99616b425b9665b3ce0a5",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.5.9|>=7.0.8"
             },
+            "conflict": {
+                "symfony/console": "<3.4"
+            },
             "require-dev": {
-                "symfony/console": "~2.8|~3.0|~4.0"
+                "symfony/console": "~3.4|~4.0"
             },
             "suggest": {
                 "symfony/console": "For validating YAML files using the lint command"
@@ -4202,7 +4248,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-08-04 13:29:48"
+            "time": "2017-09-04T13:18:59+00:00"
         },
         {
             "name": "zendframework/zend-servicemanager",
@@ -4258,7 +4304,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "openedinc/extension-tao-caliper": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
