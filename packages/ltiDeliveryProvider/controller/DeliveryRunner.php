@@ -34,10 +34,11 @@ use oat\taoLti\actions\traits\LtiModuleTrait;
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoLti\models\classes\LtiMessages\LtiMessage;
+use oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**
  * Called by the DeliveryTool to override DeliveryServer settings
- * 
+ *
  * @author CRP Henri Tudor - TAO Team - {@link http://www.tao.lu}
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
  * @package ltiDeliveryProvider
@@ -54,11 +55,11 @@ class DeliveryRunner extends DeliveryServer
     protected function showControls() {
         $themeService = $this->getServiceManager()->get(ThemeService::SERVICE_ID);
         if ($themeService instanceof LtiHeadless) {
-            return !$themeService->isHeadless(); 
+            return !$themeService->isHeadless();
         }
         return false;
     }
-    
+
     protected function getReturnUrl() {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         return _url('finishDeliveryExecution', 'DeliveryRunner', 'ltiDeliveryProvider',
@@ -74,7 +75,7 @@ class DeliveryRunner extends DeliveryServer
         $this->setData('allowRepeat', true);
         $this->setView('learner/overview.tpl');
     }
-    
+
     public function repeat() {
         $delivery = new \core_kernel_classes_Resource($this->getRequestParameter('delivery'));
 
@@ -92,24 +93,24 @@ class DeliveryRunner extends DeliveryServer
             $this->returnLtiError($ltiException);
         }
     }
-    
+
     public function thankYou() {
         $launchData = taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
-        
+
         if ($launchData->hasVariable(taoLti_models_classes_LtiLaunchData::TOOL_CONSUMER_INSTANCE_NAME)) {
             $this->setData('consumerLabel', $launchData->getVariable(taoLti_models_classes_LtiLaunchData::TOOL_CONSUMER_INSTANCE_NAME));
         } elseif($launchData->hasVariable(taoLti_models_classes_LtiLaunchData::TOOL_CONSUMER_INSTANCE_DESCRIPTION)) {
             $this->setData('consumerLabel', $launchData->getVariable(taoLti_models_classes_LtiLaunchData::TOOL_CONSUMER_INSTANCE_DESCRIPTION));
         }
-        
+
         if ($launchData->hasReturnUrl()) {
             $this->setData('returnUrl', $launchData->getReturnUrl());
         }
-        
+
         if ($launchData->hasVariable(DeliveryTool::PARAM_THANKYOU_MESSAGE)) {
             $this->setData('message', $launchData->getVariable(DeliveryTool::PARAM_THANKYOU_MESSAGE));
         }
-        
+
         $this->setData('allowRepeat', false);
         $this->setView('learner/thankYou.tpl');
     }
@@ -125,6 +126,10 @@ class DeliveryRunner extends DeliveryServer
                 $this->getRequestParameter('deliveryExecution')
             );
         }
+
+        $stateService = $this->getServiceManager()->get(StateServiceInterface::SERVICE_ID);
+        $stateService->finish($deliveryExecution);
+
         $redirectUrl = LTIDeliveryTool::singleton()->getFinishUrl($this->getLtiMessage($deliveryExecution), $deliveryExecution);
         $this->redirect($redirectUrl);
     }

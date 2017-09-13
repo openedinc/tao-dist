@@ -30,7 +30,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoTestTaker' => array(
-            'installed' => '3.0.1',
+            'installed' => '3.0.2',
             'enabled' => true
         ),
         'taoGroups' => array(
@@ -54,7 +54,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoDeliveryRdf' => array(
-            'installed' => '3.8.0',
+            'installed' => '3.8.1',
             'enabled' => true
         ),
         'taoOutcomeUi' => array(
@@ -62,7 +62,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'qtiItemPci' => array(
-            'installed' => '3.1.0',
+            'installed' => '3.1.1',
             'enabled' => true
         ),
         'funcAcl' => array(
