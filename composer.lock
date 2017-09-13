@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0e6639053d5c9fb94e57971c8addb91",
+    "content-hash": "ccd3be79e899db3b25737c5a1c03050c",
     "packages": [
         {
             "name": "clearfw/clearfw",
@@ -235,7 +235,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-07-22T12:49:21+00:00"
+            "time": "2017-07-22 12:49:21"
         },
         {
             "name": "doctrine/collections",
@@ -375,7 +375,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2017-07-22T08:35:55+00:00"
+            "time": "2017-07-22 08:35:55"
         },
         {
             "name": "doctrine/dbal",
@@ -446,7 +446,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2017-07-22T20:45:23+00:00"
+            "time": "2017-07-22 20:45:23"
         },
         {
             "name": "doctrine/inflector",
@@ -513,7 +513,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06T14:35:42+00:00"
+            "time": "2015-11-06 14:35:42"
         },
         {
             "name": "doctrine/lexer",
@@ -567,7 +567,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2017-07-24T09:37:08+00:00"
+            "time": "2017-07-24 09:37:08"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -629,7 +629,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27T09:45:49+00:00"
+            "time": "2015-02-27 09:45:49"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -792,7 +792,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2017-05-20T23:14:18+00:00"
+            "time": "2017-05-20 23:14:18"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -857,7 +857,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-07-17T09:11:21+00:00"
+            "time": "2017-07-17 09:11:21"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -1007,7 +1007,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-09-04T09:35:39+00:00"
+            "time": "2017-09-04 09:35:39"
         },
         {
             "name": "nikic/fast-route",
@@ -1937,17 +1937,12 @@
         },
         {
             "name": "oat-sa/extension-tao-ltideliveryprovider",
-            "version": "v3.3.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-ltideliveryprovider.git",
-                "reference": "86ee0f8457873587ce9cbc03ccfa0498e843efa6"
-            },
+            "version": "dev-master",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-ltideliveryprovider/zipball/86ee0f8457873587ce9cbc03ccfa0498e843efa6",
-                "reference": "86ee0f8457873587ce9cbc03ccfa0498e843efa6",
-                "shasum": ""
+                "type": "path",
+                "url": "packages/ltiDeliveryProvider",
+                "reference": "224d22244a5b09dd56bb00d71caea62212259997",
+                "shasum": null
             },
             "require": {
                 "oat-sa/oatbox-extension-installer": "dev-master"
@@ -1961,7 +1956,6 @@
                     "oat\\ltiDeliveryProvider\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0"
             ],
@@ -2002,12 +1996,15 @@
             "description": "extension to manage LTI delivery provider for TAO",
             "homepage": "http://www.taotesting.com",
             "keywords": [
-                "OAT",
                 "QTI",
-                "TAO",
-                "computer-based-assessment"
+                "computer-based-assessment",
+                "oat",
+                "tao"
             ],
-            "time": "2017-08-09T12:48:33+00:00"
+            "support": {
+                "forum": "http://forum.taotesting.com",
+                "issues": "http://forge.taotesting.com"
+            }
         },
         {
             "name": "oat-sa/extension-tao-mediamanager",
@@ -2355,16 +2352,16 @@
         },
         {
             "name": "oat-sa/extension-tao-test",
-            "version": "v6.4.0",
+            "version": "v6.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-test.git",
-                "reference": "685d537ff046d0ff0a75fac6bd4823ea433e591a"
+                "reference": "02c747fb496f0e783942a5a7a99eae896f2f2d79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-test/zipball/685d537ff046d0ff0a75fac6bd4823ea433e591a",
-                "reference": "685d537ff046d0ff0a75fac6bd4823ea433e591a",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-test/zipball/02c747fb496f0e783942a5a7a99eae896f2f2d79",
+                "reference": "02c747fb496f0e783942a5a7a99eae896f2f2d79",
                 "shasum": ""
             },
             "require": {
@@ -2427,7 +2424,7 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-21T13:55:14+00:00"
+            "time": "2017-09-12T18:02:52+00:00"
         },
         {
             "name": "oat-sa/extension-tao-testlinear",
@@ -3090,7 +3087,7 @@
                 "computer-based-assessment",
                 "oatbox"
             ],
-            "time": "2015-11-23T11:35:13+00:00"
+            "time": "2015-11-23 11:35:13"
         },
         {
             "name": "oat-sa/tao-core",
@@ -3188,12 +3185,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:openedinc/tao-caliper-opened.git",
-                "reference": "d65ec2af5b8eb1712e497c308acbc3c997672dd9"
+                "reference": "acbdb0d9d0e4c48dfd850727cc4893174509d262"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/d65ec2af5b8eb1712e497c308acbc3c997672dd9",
-                "reference": "d65ec2af5b8eb1712e497c308acbc3c997672dd9",
+                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/acbdb0d9d0e4c48dfd850727cc4893174509d262",
+                "reference": "acbdb0d9d0e4c48dfd850727cc4893174509d262",
                 "shasum": ""
             },
             "require": {
@@ -3233,7 +3230,7 @@
                 "source": "https://github.com/openedinc/tao-caliper-opened/tree/master",
                 "issues": "https://github.com/openedinc/tao-caliper-opened/issues"
             },
-            "time": "2017-09-11T16:06:20+00:00"
+            "time": "2017-09-11 21:02:35"
         },
         {
             "name": "paragonie/random_compat",
@@ -3347,7 +3344,7 @@
                 "archive",
                 "tar"
             ],
-            "time": "2017-07-31T07:04:16+00:00"
+            "time": "2017-07-31 07:04:16"
         },
         {
             "name": "pear/console_getopt",
@@ -3517,7 +3514,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-08-25T06:16:11+00:00"
+            "time": "2017-08-25 06:16:11"
         },
         {
             "name": "pear/pear-core-minimal",
@@ -3616,7 +3613,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10T20:07:52+00:00"
+            "time": "2015-02-10 20:07:52"
         },
         {
             "name": "pear/versioncontrol_git",
@@ -3660,7 +3657,7 @@
                 }
             ],
             "description": "VersionControl_Git is a library that provides OO interface to handle Git repository.",
-            "time": "2017-08-23T19:37:51+00:00"
+            "time": "2017-08-23 19:37:51"
         },
         {
             "name": "phing/phing",
@@ -3810,12 +3807,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "7201c4f7c089a26e9d19176c0fd833945e46d87b"
+                "reference": "28a306bfbd455f8ef7279f6461f220b84a3e2c8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/7201c4f7c089a26e9d19176c0fd833945e46d87b",
-                "reference": "7201c4f7c089a26e9d19176c0fd833945e46d87b",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/28a306bfbd455f8ef7279f6461f220b84a3e2c8a",
+                "reference": "28a306bfbd455f8ef7279f6461f220b84a3e2c8a",
                 "shasum": ""
             },
             "require": {
@@ -3866,7 +3863,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-09-08T17:31:28+00:00"
+            "time": "2017-09-12 07:49:15"
         },
         {
             "name": "pimple/pimple",
@@ -3916,7 +3913,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2017-08-23T11:42:00+00:00"
+            "time": "2017-08-23 11:42:00"
         },
         {
             "name": "psr/container",
@@ -3965,7 +3962,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-06-28T15:35:32+00:00"
+            "time": "2017-06-28 15:35:32"
         },
         {
             "name": "psr/http-message",
@@ -4015,7 +4012,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06T14:39:51+00:00"
+            "time": "2016-08-06 14:39:51"
         },
         {
             "name": "psr/log",
@@ -4062,7 +4059,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2016-10-10 12:19:37"
         },
         {
             "name": "qtism/qtism",
@@ -4190,7 +4187,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2017-08-16T17:16:12+00:00"
+            "time": "2017-08-16 17:16:12"
         },
         {
             "name": "symfony/yaml",
@@ -4248,7 +4245,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-09-04T13:18:59+00:00"
+            "time": "2017-09-04 13:18:59"
         },
         {
             "name": "zendframework/zend-servicemanager",
