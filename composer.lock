@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ccd3be79e899db3b25737c5a1c03050c",
+    "content-hash": "6e33938e57d76f546bf3d4211593610f",
     "packages": [
         {
             "name": "clearfw/clearfw",
@@ -3182,16 +3182,11 @@
         {
             "name": "openedinc/extension-tao-caliper",
             "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:openedinc/tao-caliper-opened.git",
-                "reference": "acbdb0d9d0e4c48dfd850727cc4893174509d262"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/acbdb0d9d0e4c48dfd850727cc4893174509d262",
+                "type": "path",
+                "url": "packages/taoCaliper",
                 "reference": "acbdb0d9d0e4c48dfd850727cc4893174509d262",
-                "shasum": ""
+                "shasum": null
             },
             "require": {
                 "oat-sa/oatbox-extension-installer": "dev-master"
@@ -3225,12 +3220,7 @@
                 "oat",
                 "opened",
                 "tao"
-            ],
-            "support": {
-                "source": "https://github.com/openedinc/tao-caliper-opened/tree/master",
-                "issues": "https://github.com/openedinc/tao-caliper-opened/issues"
-            },
-            "time": "2017-09-11 21:02:35"
+            ]
         },
         {
             "name": "paragonie/random_compat",
@@ -4301,9 +4291,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "openedinc/extension-tao-caliper": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
