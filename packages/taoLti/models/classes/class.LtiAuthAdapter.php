@@ -29,34 +29,34 @@ use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
  * @package taoLti
  */
 class taoLti_models_classes_LtiAuthAdapter
-	implements common_user_auth_Adapter
+    implements common_user_auth_Adapter
 {
     /**
      * 
      * @var common_http_Request
      */
-	private $request;
-	
-	/**
-	 * Creates an Authentication adapter from an OAuth Request
-	 * 
-	 * @param common_http_Request $request
-	 */
-	public function __construct(common_http_Request $request) {
-	    $this->request = $request;
-	}
-	
-	/**
+    private $request;
+
+    /**
+     * Creates an Authentication adapter from an OAuth Request
+     * 
+     * @param common_http_Request $request
+     */
+    public function __construct(common_http_Request $request) {
+        $this->request = $request;
+    }
+
+    /**
      * (non-PHPdoc)
      * @see common_user_auth_Adapter::authenticate()
      */
     public function authenticate() {
-    	
+
         $service = new tao_models_classes_oauth_Service();
         try {
             $service->validate($this->request);
-        	$ltiLaunchData = taoLti_models_classes_LtiLaunchData::fromRequest($this->request);
-        	return new taoLti_models_classes_LtiUser($ltiLaunchData);
+            $ltiLaunchData = taoLti_models_classes_LtiLaunchData::fromRequest($this->request);
+            return new taoLti_models_classes_LtiUser($ltiLaunchData);
         } catch (common_http_InvalidSignatureException $e) {
             throw new taoLti_models_classes_LtiException('Invalid LTI signature', LtiErrorMessage::ERROR_UNAUTHORIZED);
         }

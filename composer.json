@@ -58,6 +58,14 @@
         {
             "type" : "path",
             "url" : "packages/ltiDeliveryProvider"
+        },
+        {
+            "type" : "path",
+            "url" : "packages/taoLti"
+        },
+        {
+            "type" : "path",
+            "url" : "packages/taoQtiTest"
         }
     ],
     "minimum-stability": "dev",
@@ -78,14 +86,14 @@
         "oat-sa/extension-tao-delivery-rdf" : "~3.8.0",
         "oat-sa/extension-tao-group" : "~3.0.1",
         "oat-sa/extension-tao-item" : "~5.1.0",
-        "oat-sa/extension-tao-lti" : "~3.2.4",
+        "openedinc/extension-tao-lti" : "*",
         "oat-sa/extension-tao-outcomelti" : "~3.0.0",
         "oat-sa/extension-tao-mediamanager" : "~2.0.1",
         "oat-sa/extension-tao-itemhtml" : "~3.0.0",
         "oat-sa/extension-tao-outcomerds" : "~2.2.0",
         "oat-sa/extension-tao-outcomeui" : "~2.7.4",
         "oat-sa/extension-tao-itemqti" : "~9.7.0",
-        "oat-sa/extension-tao-testqti" : "~11.10.0",
+        "openedinc/extension-tao-testqti" : "*",
         "oat-sa/extension-tao-outcome" : "~3.4.0",
         "oat-sa/extension-tao-revision" : "~3.0.0",
         "oat-sa/extension-tao-testlinear" : "~3.0.0",

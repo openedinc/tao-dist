@@ -1,6 +1,6 @@
 {
 
-  "name": "oat-sa/extension-tao-testqti",
+  "name": "openedinc/extension-tao-testqti",
   "description": "extension to create QTI tests",
   "type": "tao-extension",
   "authors": [{

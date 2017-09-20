@@ -35,9 +35,11 @@ use qtism\data\SubmissionMode;
 use qtism\data\NavigationMode;
 use oat\taoQtiItem\helpers\QtiRunner;
 use oat\taoQtiTest\models\TestSessionMetaData;
+use oat\taoCaliper\models\events\AssessmentItemEvent;
 use oat\taoQtiTest\models\QtiTestCompilerIndex;
 use oat\taoQtiTest\models\files\QtiFlysystemFileManager;
 use oat\oatbox\service\ServiceManager;
+use oat\oatbox\event\EventManager;
 
 /**
  * Runs a QTI Test.
@@ -563,26 +565,25 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
 	 *
 	 */
 	public function moveForward() {
-        if ($this->beforeAction()) {
-            $session = $this->getTestSession();
-            $nextPosition = $session->getRoute()->getPosition() + 1;
+            if ($this->beforeAction()) {
+                $session = $this->getTestSession();
+                $nextPosition = $session->getRoute()->getPosition() + 1;
 
-            try {
-                $this->endTimedSection($nextPosition);
+                try {
+                    $this->endTimedSection($nextPosition);
+                    $session->moveNext();
 
-                $session->moveNext();
-
-                if ($session->isRunning() === true && taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
-                    taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
+                    if ($session->isRunning() === true && taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
+                        taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
+                    }
+                } catch (AssessmentTestSessionException $e) {
+                    $this->handleAssessmentTestSessionException($e);
                 }
-            } catch (AssessmentTestSessionException $e) {
-                $this->handleAssessmentTestSessionException($e);
-            }
 
-            $this->afterAction();
+                $this->afterAction();
+            }
         }
-	}
-	    
+
 	/**
 	 * Move backward in the Assessment Test Session flow.
 	 *
@@ -786,6 +787,15 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                 foreach ($itemSession->getAllVariables() as $var) {
                     $stateOutput->addVariable($var);
                 }
+
+                if (\taoLti_models_classes_LtiService::singleton()->hasLtiSession()) {
+                    // trigger AssessmentItemEvent for Caliper
+                    $launchData = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
+                    $testTaker = \common_session_SessionManager::getSession();
+                    $event = new AssessmentItemEvent($this->getTestSession(), $stateOutput->getOutput(), $testTaker, $launchData);
+                    ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                }
+
 
                 $itemCompilationDirectory = $this->getDirectory($this->getRequestParameter('itemDataPath'));
                 $jsonReturn = array('success' => true,
