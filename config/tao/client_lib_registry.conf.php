@@ -252,6 +252,14 @@ return new oat\oatbox\config\ConfigurationService(array(
         'ltiDeliveryProviderCss' => array(
             'extId' => 'ltiDeliveryProvider',
             'path' => 'css'
+        ),
+        'taoCaliper' => array(
+            'extId' => 'taoCaliper',
+            'path' => 'js'
+        ),
+        'taoCaliperCss' => array(
+            'extId' => 'taoCaliper',
+            'path' => 'css'
         )
     )
 ));

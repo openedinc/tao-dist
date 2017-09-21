@@ -46,6 +46,18 @@ return new oat\oatbox\event\EventManager(array(
                 'oat\\taoDeliveryRdf\\model\\TestRunnerFeatures',
                 'enableDefaultFeatures'
             )
+        ),
+        'oat\\taoCaliper\\models\\events\\AssessmentItemEvent' => array(
+            array(
+                'oat\\taoCaliper\\models\\testSession\\TestSessionProcessor',
+                'catchMove'
+            )
+        ),
+        'oat\\taoCaliper\\models\\events\\AssessmentEvent' => array(
+            array(
+                'oat\\taoCaliper\\models\\testSession\\TestSessionProcessor',
+                'catchFinished'
+            )
         )
     )
 ));

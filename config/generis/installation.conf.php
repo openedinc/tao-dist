@@ -18,7 +18,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoOutcomeRds' => array(
-            'installed' => '2.2.0',
+            'installed' => '2.2.1',
             'enabled' => true
         ),
         'taoDelivery' => array(
@@ -30,7 +30,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoTestTaker' => array(
-            'installed' => '3.0.2',
+            'installed' => '3.0.1',
             'enabled' => true
         ),
         'taoGroups' => array(
@@ -42,7 +42,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoTests' => array(
-            'installed' => '6.4.0',
+            'installed' => '6.4.1',
             'enabled' => true
         ),
         'taoQtiItem' => array(
@@ -54,7 +54,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoDeliveryRdf' => array(
-            'installed' => '3.8.1',
+            'installed' => '3.8.0',
             'enabled' => true
         ),
         'taoOutcomeUi' => array(
@@ -62,7 +62,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'qtiItemPci' => array(
-            'installed' => '3.1.1',
+            'installed' => '3.1.0',
             'enabled' => true
         ),
         'funcAcl' => array(
@@ -83,6 +83,10 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'ltiDeliveryProvider' => array(
             'installed' => '3.3.2',
+            'enabled' => true
+        ),
+        'taoCaliper' => array(
+            'installed' => '1.0.0',
             'enabled' => true
         )
     )
