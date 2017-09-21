@@ -932,12 +932,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "8650a4de9686a38148a17073dea5e2eeca0cdd86"
+                "reference": "a47cf22a26f9d5ebad1506fd7b69e714cc228170"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/8650a4de9686a38148a17073dea5e2eeca0cdd86",
-                "reference": "8650a4de9686a38148a17073dea5e2eeca0cdd86",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/a47cf22a26f9d5ebad1506fd7b69e714cc228170",
+                "reference": "a47cf22a26f9d5ebad1506fd7b69e714cc228170",
                 "shasum": ""
             },
             "require": {
@@ -1007,7 +1007,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-09-19T14:49:21+00:00"
+            "time": "2017-09-20T20:10:32+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -1863,7 +1863,7 @@
         },
         {
             "name": "oat-sa/extension-tao-ltideliveryprovider",
-            "version": "dev-installed_caliper_ext",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/ltiDeliveryProvider",
@@ -3033,7 +3033,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/taoCaliper",
-                "reference": "35ad5df8d6523290e686ee0c3bc307dd15375825",
+                "reference": "233de8f8c4ab9c28996bc3327f1068a10d5a318f",
                 "shasum": null
             },
             "require": {
@@ -3073,7 +3073,7 @@
         },
         {
             "name": "openedinc/extension-tao-lti",
-            "version": "dev-taoCaliper_trigger_assessment_item_event",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/taoLti",
@@ -3144,7 +3144,7 @@
         },
         {
             "name": "openedinc/extension-tao-testqti",
-            "version": "dev-taoCaliper_trigger_assessment_item_event",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/taoQtiTest",
@@ -4192,12 +4192,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/slimphp/Slim.git",
-                "reference": "a641082cdc08769c6fe195180ed73a63ca828b73"
+                "reference": "403b7980e0bc19ca43015f6232259d81479b24b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slimphp/Slim/zipball/a641082cdc08769c6fe195180ed73a63ca828b73",
-                "reference": "a641082cdc08769c6fe195180ed73a63ca828b73",
+                "url": "https://api.github.com/repos/slimphp/Slim/zipball/403b7980e0bc19ca43015f6232259d81479b24b2",
+                "reference": "403b7980e0bc19ca43015f6232259d81479b24b2",
                 "shasum": ""
             },
             "require": {
@@ -4255,7 +4255,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2017-08-16T17:16:12+00:00"
+            "time": "2017-09-21T08:03:31+00:00"
         },
         {
             "name": "symfony/yaml",
