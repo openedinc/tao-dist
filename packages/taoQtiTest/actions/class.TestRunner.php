@@ -36,6 +36,7 @@ use qtism\data\NavigationMode;
 use oat\taoQtiItem\helpers\QtiRunner;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoCaliper\models\events\AssessmentItemEvent;
+use oat\taoCaliper\models\events\AssessmentEvent;
 use oat\taoQtiTest\models\QtiTestCompilerIndex;
 use oat\taoQtiTest\models\files\QtiFlysystemFileManager;
 use oat\oatbox\service\ServiceManager;
@@ -572,6 +573,14 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                 try {
                     $this->endTimedSection($nextPosition);
                     $session->moveNext();
+                    if ((false === $session->getCurrentRemainingAttempts() || null === $session->getCurrentRemainingAttempts())
+                        && \taoLti_models_classes_LtiService::singleton()->hasLtiSession()) {
+                        // trigger AssessmentItemEvent for Caliper
+                        $launchData = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
+                        $testTaker = \common_session_SessionManager::getSession();
+                        $event = new AssessmentEvent($session, $testTaker, $launchData);
+                        ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                    }
 
                     if ($session->isRunning() === true && taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
                         taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
@@ -795,7 +804,6 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                     $event = new AssessmentItemEvent($this->getTestSession(), $stateOutput->getOutput(), $testTaker, $launchData);
                     ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
                 }
-
 
                 $itemCompilationDirectory = $this->getDirectory($this->getRequestParameter('itemDataPath'));
                 $jsonReturn = array('success' => true,
