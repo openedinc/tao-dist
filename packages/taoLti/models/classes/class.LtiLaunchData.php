@@ -35,6 +35,7 @@ class taoLti_models_classes_LtiLaunchData
     const LIS_PERSON_NAME_FAMILY           = 'lis_person_name_family';
     const LIS_PERSON_NAME_FULL             = 'lis_person_name_full';
     const LIS_PERSON_CONTACT_EMAIL_PRIMARY = 'lis_person_contact_email_primary';
+    const LIS_COURSE_SECTION_SOURCE_ID      = 'lis_course_section_sourcedid';
     
     const LAUNCH_PRESENTATION_LOCALE       = 'launch_presentation_locale';
     const LAUNCH_PRESENTATION_RETURN_URL   = 'launch_presentation_return_url';
