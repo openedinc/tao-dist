@@ -131,7 +131,11 @@ class DeliveryRunner extends DeliveryServer
         $stateService->finish($deliveryExecution);
 
         $redirectUrl = LTIDeliveryTool::singleton()->getFinishUrl($this->getLtiMessage($deliveryExecution), $deliveryExecution);
-        $this->redirect($redirectUrl);
+
+        echo json_encode(array(
+            'success'      => true,
+            'destination'  => $redirectUrl
+        ));
     }
 
     /**
