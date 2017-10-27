@@ -67,7 +67,6 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
      * @return boolean
      */
     public function hasLtiSession() {
-        /* $session = common_session_SessionManager::getSession(); */
         try {
             $this->getLtiSession();
         } catch (taoLti_models_classes_LtiException $e){
@@ -83,9 +82,12 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
     public function hasLastQuestion()
     {
         $result = array('success' => false);
+        if (!$this->hasLtiSession()){
+            return $result;
+        }
         $lastQuestionConstName = \taoLti_models_classes_LtiLaunchData::CUSTOM_LAST_QUESTION;
         $lastQuestion = $this->getLtiSession()->getLaunchData()->getVariable($lastQuestionConstName);
-        if ($this->hasLtiSession() && isset($lastQuestion)) {
+        if (isset($lastQuestion)) {
             $result['success'] = true;
             $result['lastQuestion'] = json_decode($lastQuestion, true);
         }

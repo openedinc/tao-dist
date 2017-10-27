@@ -429,7 +429,11 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                             );
                             $responses = new State();
                             $response = $responsesFromLtiForm[(string)$currentItem];
-                            $responseForFilter = ['base' => ['identifier' => $response]];
+                            if( preg_match($response, "/^i(\d{1,4})/")){
+                                $responseForFilter = ['base' => ['identifier' => $response]];
+                            }else{
+                                $responseForFilter = ['base' => ['string' => $response]];
+                            }
                             if( is_array($response)){
                                 $responseForFilter = ['list' => ['identifier' => $response]];
                             }

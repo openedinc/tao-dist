@@ -78,7 +78,7 @@
         "php": "^5.6.0",
         "oat-sa/extension-tao-funcacl" : "~4.0.0",
         "oat-sa/generis" : "~4.0.1",
-        "oat-sa/extension-tao-ltideliveryprovider" : "*",
+        "openedinc/extension-tao-ltideliveryprovider" : "*",
         "oat-sa/extension-tao-itemqti-pci" : "~3.1.0",
         "oat-sa/extension-tao-itemqti-pic" : "~4.0.0",
         "oat-sa/extension-pcisample" :"~2.0.1",
