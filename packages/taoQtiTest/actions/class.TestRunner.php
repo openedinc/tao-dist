@@ -419,17 +419,15 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                 if( is_array($responsesFromLtiForm) ){
                     $itemSession = $session->getCurrentAssessmentItemSession();
                     $currentItem = $session->getCurrentAssessmentItemRef();
-                    common_Logger::d('************* Current Item "'.$currentItem.'" has '. $itemSession->getRemainingAttempts().' remaining attempts. State: '. $itemSession->getState());
                     while( array_key_exists((string)$currentItem, $responsesFromLtiForm) /* && ($itemSession->getRemainingAttempts() === -1 || $itemSession->getRemainingAttempts() > 0) */){
                         if( $itemSession->getState() !== AssessmentTestSessionState::CLOSED ){
-                            common_Logger::d('****** responding to: ' . (string)$currentItem);
                             $filler = new taoQtiCommon_helpers_PciVariableFiller(
                                 $currentItem,
                                 ServiceManager::getServiceManager()->get(QtiFlysystemFileManager::SERVICE_ID)
                             );
                             $responses = new State();
                             $response = $responsesFromLtiForm[(string)$currentItem];
-                            if( preg_match($response, "/^i(\d{1,4})/")){
+                            if( preg_match($response, "/^i(\d{1,7})/")){
                                 $responseForFilter = ['base' => ['identifier' => $response]];
                             }else{
                                 $responseForFilter = ['base' => ['string' => $response]];
