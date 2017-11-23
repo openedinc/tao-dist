@@ -22,6 +22,7 @@
 use oat\taoQtiItem\model\qti\Resource;
 use oat\taoQtiItem\model\qti\ImportService;
 use oat\taoQtiTest\models\metadata\MetadataTestContextAware;
+use oat\taoQtiTest\models\event\RestImportTestBeforeSaveItems;
 use oat\taoTests\models\event\TestUpdatedEvent;
 use qtism\data\storage\StorageException;
 use qtism\data\storage\xml\XmlDocument;
@@ -32,6 +33,8 @@ use qtism\data\AssessmentItemRef;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\oatbox\filesystem\File;
 use oat\oatbox\filesystem\Directory;
+use oat\oatbox\service\ServiceManager;
+use oat\oatbox\event\EventManager;
 use oat\taoQtiItem\model\qti\Service;
 use oat\taoQtiItem\model\qti\metadata\MetadataService;
 use oat\taoQtiItem\model\qti\metadata\importer\MetadataImporter;
@@ -369,23 +372,15 @@ class taoQtiTest_models_classes_QtiTestService extends TestService {
         $testClass = $targetClass;
         $qtiTestResourceIdentifier = $qtiTestResource->getIdentifier();
 
-        /* Delete all old test imported before related with this 'Reference' identifier */
-        $externalIdProperty = new core_kernel_classes_Property(TestService::PROPERTY_TEST_EXTERNAL_ID);
-        foreach($testClass->getInstances() as $testInstance){
-            $externalIdPropertyValue = $testInstance->getPropertyValues($externalIdProperty);
-            common_Logger::w('deleted: '.(string)$testInstance);
-            if (count($externalIdPropertyValue) > 0 && $qtiTestResourceIdentifier === $externalIdPropertyValue[0]){
-                $testInstance->delete(true);
-            }
-        }
-
         // Create an RDFS resource in the knowledge base that will hold
         // the information about the imported QTI Test.
         $testResource = $this->createInstance($testClass);
         $qtiTestModelResource = new core_kernel_classes_Resource(self::INSTANCE_TEST_MODEL_QTI);
         $modelProperty = new core_kernel_classes_Property(TestService::PROPERTY_TEST_TESTMODEL);
-        $testResource->editPropertyValues($externalIdProperty, $qtiTestResourceIdentifier);
         $testResource->editPropertyValues($modelProperty, $qtiTestModelResource);
+
+        $event = new RestImportTestBeforeSaveItems($testClass, $qtiTestResourceIdentifier, $testResource);
+        ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
 
         // Create the report that will hold information about the import
         // of $qtiTestResource in TAO.

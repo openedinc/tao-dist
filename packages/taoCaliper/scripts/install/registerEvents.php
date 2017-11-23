@@ -35,4 +35,9 @@ $eventManager->attach(
     array(TestSessionProcessor::class, 'catchFinished')
 );
 
+$eventManager->attach(
+    'oat\\taoQtiTest\\models\\event\\RestImportTestBeforeSaveItems',
+    array(TestSessionProcessor::class, 'catchImport')
+);
+
 ServiceManager::getServiceManager()->register(EventManager::SERVICE_ID , $eventManager);
