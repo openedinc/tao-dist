@@ -1,32 +1,32 @@
 <?php
-/**  
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *               
- * 
+ *
+ *
  */
 
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 
 /**
  * Basic service to handle everything LTI
- * 
+ *
  * @author Joel Bout, <joel@taotesting.com>
  */
-class taoLti_models_classes_LtiService extends tao_models_classes_Service 
+class taoLti_models_classes_LtiService extends tao_models_classes_Service
 {
     const LIS_CONTEXT_ROLE_NAMESPACE = 'urn:lti:role:ims/lis/';
 
@@ -37,7 +37,7 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
 
     /**
      * start a session from the provided OAuth Request
-     * 
+     *
      * @param common_http_Request $request
      * @throws common_user_auth_AuthFailedException
      */
@@ -51,7 +51,7 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
     /**
      * Returns the current LTI session
      * @throws \taoLti_models_classes_LtiException
-     * @return taoLti_models_classes_TaoLtiSession 
+     * @return taoLti_models_classes_TaoLtiSession
      */
     public function getLtiSession() {
         $session = common_session_SessionManager::getSession();
@@ -62,18 +62,36 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
     }
 
     /**
-     * Returns the true|false depends on ltiSession exists
+     * Returns true|false depends on ltiSession exists
      * @throws \taoLti_models_classes_LtiException
      * @return boolean
      */
     public function hasLtiSession() {
-        /* $session = common_session_SessionManager::getSession(); */
         try {
             $this->getLtiSession();
         } catch (taoLti_models_classes_LtiException $e){
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns true|false if LAST_QUESTION var has something
+     * @return array
+     */
+    public function hasLastQuestion()
+    {
+        $result = array('success' => false);
+        if (!$this->hasLtiSession()){
+            return $result;
+        }
+        $lastQuestionConstName = \taoLti_models_classes_LtiLaunchData::CUSTOM_LAST_QUESTION;
+        $lastQuestion = $this->getLtiSession()->getLaunchData()->getVariable($lastQuestionConstName);
+        if (isset($lastQuestion)) {
+            $result['success'] = true;
+            $result['lastQuestion'] = json_decode($lastQuestion, true);
+        }
+        return $result;
     }
 
     /**
@@ -110,7 +128,7 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
     /**
      * Returns the existing tao User that corresponds to
      * the LTI request or spawns it
-     * 
+     *
      * @param taoLti_models_classes_LtiLaunchData $launchData
      * @throws taoLti_models_classes_LtiException
      * @return core_kernel_classes_Resource
@@ -125,7 +143,7 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
 
     /**
      * Searches if this user was already created in TAO
-     * 
+     *
      * @param taoLti_models_classes_LtiLaunchData $ltiContext
      * @throws taoLti_models_classes_LtiException
      * @return core_kernel_classes_Resource
@@ -149,7 +167,7 @@ class taoLti_models_classes_LtiService extends tao_models_classes_Service
 
     /**
      * Creates a new LTI User with the absolute minimum of required informations
-     * 
+     *
      * @param taoLti_models_classes_LtiLaunchData $ltiContext
      * @return core_kernel_classes_Resource
      */

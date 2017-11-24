@@ -45,6 +45,7 @@ class taoLti_models_classes_LtiLaunchData
 
     const CUSTOM_CALIPER_ENDPOINT               = 'custom_caliper_endpoint';
     const CUSTOM_CALIPER_APIKEY                 = 'custom_caliper_apikey';
+    const CUSTOM_LAST_QUESTION                  = 'custom_last_questions';
 
     /**
      * LTI variables

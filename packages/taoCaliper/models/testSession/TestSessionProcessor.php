@@ -46,4 +46,19 @@ class TestSessionProcessor
     {
         EventManager::sessionSubmitted($event);
     }
+
+    /**
+     * @param RestImportTestBeforeSaveItems $event
+     */
+    public static function catchImport($event)
+    {
+        $externalIdProperty = new \core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAOTest.rdf#ExternalId');
+        foreach($event->getTestClass()->getInstances() as $testInstance){
+            $externalIdPropertyValue = $testInstance->getPropertyValues($externalIdProperty);
+            if (count($externalIdPropertyValue) > 0 && $event->getTestIdentifier() === $externalIdPropertyValue[0]){
+                $testInstance->delete(true);
+            }
+        }
+        $event->getNewTest()->editPropertyValues($externalIdProperty, $event->getTestIdentifier());
+    }
 }
