@@ -65,10 +65,6 @@
         },
         {
             "type" : "path",
-            "url" : "packages/taoTests"
-        },
-        {
-            "type" : "path",
             "url" : "packages/taoQtiTest"
         }
     ],
@@ -101,7 +97,7 @@
         "oat-sa/extension-tao-outcome" : "~3.4.0",
         "oat-sa/extension-tao-revision" : "~3.0.0",
         "oat-sa/extension-tao-testlinear" : "~3.0.0",
-        "openedinc/extension-tao-test" : "*",
+        "oat-sa/extension-tao-test" : "~6.4.0",
         "oat-sa/extension-tao-testtaker" : "~3.0.1",
         "oat-sa/extension-tao-workspace" : "~1.0.0",
         "openedinc/extension-tao-caliper": "*"

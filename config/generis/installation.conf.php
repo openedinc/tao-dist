@@ -14,7 +14,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoResultServer' => array(
-            'installed' => '3.4.0',
+            'installed' => '3.4.1',
             'enabled' => true
         ),
         'taoOutcomeRds' => array(

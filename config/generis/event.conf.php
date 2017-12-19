@@ -58,6 +58,12 @@ return new oat\oatbox\event\EventManager(array(
                 'oat\\taoCaliper\\models\\testSession\\TestSessionProcessor',
                 'catchFinished'
             )
+        ),
+        'oat\\taoQtiTest\\models\\event\\RestImportTestBeforeSaveItems' => array(
+            array(
+                'oat\\taoCaliper\\models\\testSession\\TestSessionProcessor',
+                'catchImport'
+            )
         )
     )
 ));
