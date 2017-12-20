@@ -150,10 +150,6 @@ class Authoring
         $doc = self::loadQtiXml($qti);
         
         $xpath = new \DOMXpath($doc);
-        
-        foreach ($xpath->query("//*[local-name() = 'itemBody']//*[@style]") as $elementWithStyle) {
-            $elementWithStyle->removeAttribute('style');
-        }
 
         $ids = array();
         /** @var \DOMElement $elementWithId */
