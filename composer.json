@@ -66,6 +66,10 @@
         {
             "type" : "path",
             "url" : "packages/taoQtiTest"
+        },
+        {
+            "type" : "path",
+            "url" : "packages/taoQtiItem"
         }
     ],
     "minimum-stability": "dev",
@@ -92,7 +96,7 @@
         "oat-sa/extension-tao-itemhtml" : "~3.0.0",
         "oat-sa/extension-tao-outcomerds" : "~2.2.0",
         "oat-sa/extension-tao-outcomeui" : "~2.7.4",
-        "oat-sa/extension-tao-itemqti" : "~9.7.0",
+        "openedinc/extension-tao-itemqti" : "*",
         "openedinc/extension-tao-testqti" : "*",
         "oat-sa/extension-tao-outcome" : "~3.4.0",
         "oat-sa/extension-tao-revision" : "~3.0.0",
@@ -101,6 +105,6 @@
         "oat-sa/extension-tao-testtaker" : "~3.0.1",
         "oat-sa/extension-tao-workspace" : "~1.0.0",
         "openedinc/extension-tao-caliper": "*"
-     },
+    },
     "description": "TAO is an Open Source e-Testing platform that empowers you to build, deliver, and share innovative and engaging assessments online \u2013 in any language or subject matter."
 }

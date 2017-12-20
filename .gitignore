@@ -1,3 +1,9 @@
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/tao-dist.iml
+/.idea/vcs.xml
+/.idea/workspace.xml
 /data/
 /vendor/
 *.log
