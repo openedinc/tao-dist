@@ -4,3 +4,5 @@ if [ -n "$SAMPLE_DATA_SOURCE" ]; then
   wget -O data.zip $SAMPLE_DATA_SOURCE
   unzip -o data.zip
 fi
+echo "Patching..."
+cp bin/patches/InlineCollection.php vendor/qtism/qtism/qtism/data/content/InlineCollection.php
