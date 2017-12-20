@@ -5,4 +5,6 @@ if [ -n "$SAMPLE_DATA_SOURCE" ]; then
   unzip -o data.zip
 fi
 echo "Patching..."
+#Patching InlineCollection to allow structures like <span><div>sdf</div></span> - such structures are not allowed in tao,
+#bc span is inline element and can contain only inline elements
 cp bin/patches/InlineCollection.php vendor/qtism/qtism/qtism/data/content/InlineCollection.php
