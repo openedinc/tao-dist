@@ -77,8 +77,8 @@ return new oat\oatbox\config\ConfigurationService(array(
                 )
             )
         ),
-        'enable-allow-skipping' => false,
-        'enable-validate-responses' => false,
+        'enable-allow-skipping' => true,
+        'enable-validate-responses' => true,
         'force-branchrules' => false,
         'force-preconditions' => false,
         'path-tracking' => false,
