@@ -203,6 +203,21 @@ function (
                 var self = this,
                     action = 'moveForward';
 
+                if(!self.isCurrentItemAnswered()){
+                    var $confirmBox = $('.exit-modal-feedback');
+                    $confirmBox.find('.message').html("Please answer the question");
+                    $confirmBox.find('.js-exit-confirm').html("ok");
+                    $confirmBox.find('.js-exit-cancel').hide();
+                    $confirmBox.modal({ width: 500 });
+                    $confirmBox.find('.js-exit-cancel, .modal-close').off('click').on('click', function () {
+                        $confirmBox.modal('close');
+                    });
+                    $confirmBox.find('.js-exit-confirm').off('click').on('click', function () {
+                        $confirmBox.modal('close');
+                    });
+                    return;
+                }
+
                 function doExitSection() {
                     if( self.isTimedSection() && !self.testContext.isTimeout){
                         self.exitTimedSection(action);
@@ -437,6 +452,7 @@ function (
                 }
 
                 $confirmBox.find('.message').html(message);
+                $confirmBox.find('.js-exit-cancel').show();
                 $confirmBox.find('.js-exit-confirm').html(confirmLabel);
                 $confirmBox.find('.js-exit-cancel').html(cancelLabel);
                 $confirmBox.modal({ width: 500 });
