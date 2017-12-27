@@ -279,9 +279,14 @@ function (
                 if( (this.testContext.itemPositionSection == 0) && this.isCurrentItemActive() && this.isTimedSection() ){
                     this.exitTimedSection(action);
                 } else {
-                this.killItemSession(function () {
+
+                    if (self.isCurrentItemAnswered()) {
+                        this.killItemSession(function () {
+                            self.actionCall(action);
+                        });
+                    } else {
                         self.actionCall(action);
-                    });
+                    }
                 }
             },
 
