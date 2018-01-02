@@ -47,7 +47,7 @@ define('DEFAULT_LANG','en-US');
 define('DEFAULT_ANONYMOUS_INTERFACE_LANG','en-US');
 
 #mode
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true);
 
 #application state
 /**
