@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+tail -f tao/install/log/install.log &
+
+php tao/scripts/taoInstall.php \
+--db_driver pdo_pgsql \
+--db_host $DB_HOST \
+--db_name $DB_NAME \
+--db_user $DB_USERNAME \
+--db_pass $DB_PASSWORD \
+--module_namespace http://opened/tao.rdf \
+--module_url $ROOT_URL \
+--user_login admin \
+--user_pass admin \
+-e taoCe,taoLti,taoLtiBasicOutcome,ltiDeliveryProvider,taoCaliper,taoQtiTest
