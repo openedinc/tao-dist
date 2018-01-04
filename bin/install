@@ -10,6 +10,6 @@ php tao/scripts/taoInstall.php \
 --db_pass $DB_PASSWORD \
 --module_namespace http://opened/tao.rdf \
 --module_url $ROOT_URL \
---user_login admin \
---user_pass admin \
+--user_login $ADMIN_USERNAME \
+--user_pass $ADMIN_PASSWORD \
 -e taoCe,taoLti,taoLtiBasicOutcome,ltiDeliveryProvider,taoCaliper,taoQtiTest
