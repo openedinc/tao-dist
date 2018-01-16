@@ -1385,8 +1385,8 @@ function (
                 TestRunner.updateProgress();
                 TestRunner.updateTestReview();
 
-                iframeNotifier.parent('serviceready');
-
+                //sometimes "$frame.on('load', function(e){"   iframe is not loaded when serviceready is fired, attemp to fix, setting 1.5 sec timeout
+                setTimeout(function(){ iframeNotifier.parent('serviceready'); }, 1500);
 
                 TestRunner.adjustFrame();
 
