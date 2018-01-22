@@ -17,3 +17,4 @@ RewriteCond %{REQUEST_URI} (.*)/tao/getFile.php/  [NC]
 RewriteRule ^(.*)$ tao/getFile.php [L]
 
 </IfModule>
+
