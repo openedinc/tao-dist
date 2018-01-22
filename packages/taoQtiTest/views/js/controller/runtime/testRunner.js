@@ -1008,7 +1008,8 @@ function (
                 // Visibility of section?
                 var sectionText = (this.testContext.isDeepestSectionVisible === true) ? (' - ' + this.testContext.sectionTitle) : '';
 
-                $controls.$position.text(sectionText);
+                //Disabling, bc of duplicating titles
+                //$controls.$position.text(sectionText);
                 $controls.$titleGroup.show();
             },
 
