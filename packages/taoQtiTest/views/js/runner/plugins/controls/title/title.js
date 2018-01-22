@@ -43,12 +43,15 @@ define([
                     control : 'qti-test-title',
                     text    : testData.title
                 }];
+
+               /*
+               //Commenting it, bc it leads to duplicating title
                if(context.isDeepestSectionVisible){
                     titles.push({
                         control : 'qti-test-position',  //WTF !? isn't it the section title... ?
                         text    : context.sectionTitle
                     });
-                }
+               }*/
 
                 return $(titleTpl({ titles : titles }));
             };
