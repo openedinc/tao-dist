@@ -242,7 +242,7 @@ define([
         }
 
         if(!minInstructionSet && min > 0 && min < choiceCount){
-            msg = min === 1 ? __('You must select at least 1 choice') : __('You must select at least %s choices', min);
+            msg = min === 1 ? __('Select your answer.') : __('You must select at least %s choices', min);
             instructionMgr.appendInstruction(interaction, msg, function(){
                 if(_getRawResponse(interaction).length >= min){
                     this.setLevel('success');
