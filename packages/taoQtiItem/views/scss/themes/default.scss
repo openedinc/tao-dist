@@ -4,11 +4,14 @@ $fontPath : '../../../../tao/views/css/font/';
 
 // rest regular font to whatever has been declared in /tao
 @import "inc/bootstrap";
-@import "inc/fonts/source-sans-pro";
 
 .qti-item {
-    font-family: "Source Sans Pro";
+    font-family: "Helvetica";
+    sub,sup {
+        font-size: 75%;
+    }
 }
+
 
 // override items that make actually use of the font
 .qti-inlineChoiceInteraction .select2-chosen,
