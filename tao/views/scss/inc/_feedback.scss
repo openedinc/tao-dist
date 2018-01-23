@@ -47,10 +47,10 @@
 }
 
 .feedback-success {
-    border-color: $successBorderColor;
-    background-color: $successBgColor;
+    border-color: $infoBorderColor;
+    background-color: $infoBgColor;
     .icon-success {
-        color: $success !important;
+        color: $info !important;
     }
 }
 

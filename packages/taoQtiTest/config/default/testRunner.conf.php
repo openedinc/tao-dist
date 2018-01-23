@@ -46,7 +46,7 @@ return array(
      * - position : Progress bar displaying the position of the current item within the test session
      * @type string
      */
-    'progress-indicator' => 'percentage',
+    'progress-indicator' => 'position',
 
     /**
      * When the `progress-indicator` option is set to `position`, define the scope of progress

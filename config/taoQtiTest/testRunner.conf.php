@@ -11,7 +11,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'testPart' => null,
             'assessmentTest' => null
         ),
-        'progress-indicator' => 'percentage',
+        'progress-indicator' => 'position',
         'progress-indicator-scope' => 'testSection',
         'progress-indicator-forced' => false,
         'progress-indicator-show-total' => true,
