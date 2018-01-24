@@ -27,7 +27,7 @@ return new oat\oatbox\config\ConfigurationService(array(
         'test-taker-review-can-collapse' => false,
         'test-taker-review-display-subsection-title' => true,
         'test-taker-unanswered-items-message' => true,
-        'exitButton' => false,
+        'exitButton' => true,
         'next-section' => false,
         'reset-timer-after-resume' => false,
         'extraContextBuilder' => null,

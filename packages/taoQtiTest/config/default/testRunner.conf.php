@@ -157,7 +157,7 @@ return array(
      * Replace logout to exit button...
      * @type boolean
      */
-    'exitButton' => false,
+    'exitButton' => true,
 
     /**
      * Allows the next section button...

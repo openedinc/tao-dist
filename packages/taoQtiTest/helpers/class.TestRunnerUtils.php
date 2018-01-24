@@ -1163,7 +1163,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
         $config = common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiTest')->getConfig('testRunner');
         $exitButton = (isset($config['exitButton']) && $config['exitButton']);
         $categories = self::getCategories($session);
-        return ($exitButton && in_array('x-tao-option-exit', $categories));
+        return $exitButton;
     }
 
     /**
