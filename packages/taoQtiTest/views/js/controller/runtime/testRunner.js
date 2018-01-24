@@ -1202,10 +1202,12 @@ function (
                 this.displayExitMessage(
                     __('Are you sure you want to end the test?'),
                     function() {
-                    self.killItemSession(function () {
-                        self.actionCall('endTestSession');
-                        testMetaData.clearData();
-                    });
+                        document.domain = 'opened.com';
+                        window.parent.parent.Ember.$(window.parent.parent.document).trigger('closeAssessmentRunnerPopup');
+                    //self.killItemSession(function () {
+                    //    self.actionCall('endTestSession');
+                    //    testMetaData.clearData();
+                    //});
                     },
                     { scope: this.testReview ? this.testContext.reviewScope : null }
                 );
@@ -1255,7 +1257,7 @@ function (
                     $nextSection: $('[data-control="next-section"]'),
                     $skip: $('[data-control="skip"]'),
                     $skipEnd: $('[data-control="skip-end"]'),
-                    $exit: $(window.parent.document).find('[data-control="exit"]'),
+                    $exit: $('[data-control="exit"]'),
                     $logout: $(window.parent.document).find('[data-control="logout"]'),
                     $naviButtons: $('.bottom-action-bar .action'),
                     $skipButtons: $('.navi-box .skip'),

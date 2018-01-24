@@ -50,6 +50,11 @@ use oat\tao\model\theme\Theme;
                 <div data-control="progress-bar" class="qti-controls"></div>
                 <div data-control="progress-label" class="qti-controls"></div>
             </div>
+            <div class="infoControl sep-before" data-control="exit">
+                                <a href="#"> <span class="icon-logout"></span>
+                                    <span class="text">Exit</span>
+                                </a>
+            </div>
         </div>
     </div>
 
