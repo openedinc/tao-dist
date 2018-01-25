@@ -10,6 +10,11 @@ $fontPath : '../../../../tao/views/css/font/';
     sub,sup {
         font-size: 90%;
     }
+    .composite-question {
+        border: 1px solid black;
+        display: block;
+        padding: 10px;
+    }
 }
 
 
