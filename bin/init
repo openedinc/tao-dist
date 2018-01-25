@@ -8,6 +8,7 @@ echo "Patching..."
 #Patching InlineCollection to allow structures like <span><div>sdf</div></span> - such structures are not allowed in tao,
 #bc span is inline element and can contain only inline elements
 cp bin/patches/InlineCollection.php vendor/qtism/qtism/qtism/data/content/InlineCollection.php
+cp bin/patches/BlockCollection.php vendor/qtism/qtism/qtism/data/content/BlockCollection.php
 
 #Sometimes, not always, I had weird errors like 'The value 'qtism\common\datatypes\QtiIdentifier' is not compliant with the 'identifier' baseType.
 #monkey-patching by commenting throw error line
