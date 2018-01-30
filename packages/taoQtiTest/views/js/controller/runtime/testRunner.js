@@ -1203,7 +1203,7 @@ function (
                     __('Are you sure you want to end the test?'),
                     function() {
                         document.domain = 'opened.com';
-                        window.parent.parent.Ember.$(window.parent.parent.document).trigger('closeAssessmentRunnerPopup');
+                        window.top.location.reload();
                     //self.killItemSession(function () {
                     //    self.actionCall('endTestSession');
                     //    testMetaData.clearData();
