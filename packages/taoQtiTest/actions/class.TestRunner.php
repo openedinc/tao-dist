@@ -629,7 +629,11 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                     $launchData = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
                     $testTaker = \common_session_SessionManager::getSession();
                     $event = new AssessmentEvent($session, $testTaker, $launchData);
-                    ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                    try {
+                      ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                    } catch(\Exception $e) {
+                        \common_Logger::e('Calliper AssessmentEvent exception');
+                    }
                 }
 
                 if ($session->isRunning() === true && taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
@@ -638,7 +642,6 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
             } catch (AssessmentTestSessionException $e) {
                 $this->handleAssessmentTestSessionException($e);
             }
-
             $this->afterAction();
         }
     }
@@ -852,7 +855,11 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                     $launchData = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
                     $testTaker = \common_session_SessionManager::getSession();
                     $event = new AssessmentItemEvent($this->getTestSession(), $stateOutput->getOutput(), $testTaker, $launchData);
-                    ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                    try {
+                       ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                    } catch(\Exception $e) {
+                        \common_Logger::e('Calliper AssessmentItemEvent exception');
+                    }
                 }
 
                 $itemCompilationDirectory = $this->getDirectory($this->getRequestParameter('itemDataPath'));
