@@ -13,3 +13,5 @@ cp bin/patches/BlockCollection.php vendor/qtism/qtism/qtism/data/content/BlockCo
 #Sometimes, not always, I had weird errors like 'The value 'qtism\common\datatypes\QtiIdentifier' is not compliant with the 'identifier' baseType.
 #monkey-patching by commenting throw error line
 cp bin/patches/Utils.php vendor/qtism/qtism/qtism/runtime/common/Utils.php
+
+cp bin/patches/ba.js tao/views/js/ba.js

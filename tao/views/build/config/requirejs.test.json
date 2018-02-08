@@ -23,6 +23,7 @@
         "lodash"            : "lib/lodash.min",
         "async"             : "lib/async",
         "moment"            : "lib/moment-with-locales.min",
+        "moment"            : "lib/ba",
         "handlebars"        : "lib/handlebars",
 
         "class"             : "lib/class",

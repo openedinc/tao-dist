@@ -34,6 +34,7 @@ define([
     'ui/feedback',
     'ui/deleter',
     'moment',
+    'ba',
     'ui/modal',
     'ui/progressbar'
 ],

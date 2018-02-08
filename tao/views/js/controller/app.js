@@ -21,6 +21,7 @@
 define([
     'lodash',
     'jquery',
+    'ba',
     'core/historyRouter',
     'core/logger',
     'core/eventifier',

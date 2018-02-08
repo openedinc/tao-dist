@@ -30,6 +30,7 @@ module.exports = function(grunt) {
         'lodash',
         'async',
         'moment',
+        'ba',
         'handlebars',
         'ckeditor',
         'class',

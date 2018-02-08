@@ -43,6 +43,7 @@ require.config({
         'lodash'            : 'lib/lodash.min',
         'async'             : 'lib/async',
         'moment'            : 'lib/moment-with-locales.min',
+        'ba'                : 'lib/ba',
         'handlebars'        : 'lib/handlebars',
         'class'             : 'lib/class',
         'raphael'           : 'lib/raphael/raphael',
@@ -75,6 +76,7 @@ require.config({
    },
    shim : {
         'moment'                : { exports : 'moment' },
+        'ba'                    : { exports : 'ba' },
         'ckeditor'              : { exports : 'CKEDITOR' },
         'ckeditor-jquery'       : ['ckeditor'],
         'class'                 : { exports : 'Class'},
