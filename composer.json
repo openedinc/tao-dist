@@ -70,6 +70,10 @@
         {
             "type" : "path",
             "url" : "packages/taoQtiItem"
+        },
+        {
+            "type" : "path",
+            "url" : "packages/tao"
         }
     ],
     "minimum-stability": "dev",
@@ -82,7 +86,7 @@
         "oat-sa/extension-tao-itemqti-pci" : "~3.1.0",
         "oat-sa/extension-tao-itemqti-pic" : "~4.0.0",
         "oat-sa/extension-pcisample" :"~2.0.1",
-        "oat-sa/tao-core" : "~12.8.0",
+        "openedinc/tao-core" : "*",
         "oat-sa/extension-tao-backoffice" : "~1.1.0",
         "oat-sa/extension-tao-community" : "~3.4.1",
         "oat-sa/extension-tao-dac-simple" : "~2.0.3",

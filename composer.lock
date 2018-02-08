@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "59b975dcab75f44e0aae0d984b46aeae",
+    "content-hash": "5b590e78fbdaea58158db2bf03ff93bf",
     "packages": [
         {
             "name": "clearfw/clearfw",
@@ -3282,6 +3282,93 @@
             "homepage": "http://www.taotesting.com",
             "keywords": [
                 "QTI",
+                "computer-based-assessment",
+                "oat",
+                "tao"
+            ],
+            "support": {
+                "forum": "http://forum.taotesting.com",
+                "issues": "http://forge.taotesting.com"
+            }
+        },
+        {
+            "name": "openedinc/tao-core",
+            "version": "dev-browsealod",
+            "dist": {
+                "type": "path",
+                "url": "packages/tao",
+                "reference": "0b6092983457cad7e8cbbffe661407433b9dd184",
+                "shasum": null
+            },
+            "require": {
+                "ezyang/htmlpurifier": "^4.9",
+                "guzzlehttp/guzzle": "~6.0",
+                "justinrainbow/json-schema": "5.2.1",
+                "oat-sa/extension-builder": "^0.1",
+                "oat-sa/jig": "~0.1",
+                "oat-sa/oatbox-extension-installer": "dev-master",
+                "php": ">=5.5",
+                "phpdocumentor/reflection-docblock": "2.*",
+                "phpmailer/phpmailer": "dev-master",
+                "pimple/pimple": "^3.0",
+                "psr/http-message": "~1.0",
+                "slim/slim": "^3.0"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "tao"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\tao\\model\\": "models/classes/",
+                    "oat\\tao\\helpers\\": "helpers",
+                    "oat\\tao\\test\\": "test",
+                    "oat\\tao\\scripts\\": "scripts"
+                },
+                "files": [
+                    "includes/globalHelpers.php"
+                ]
+            },
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies S.A.",
+                    "homepage": "http://www.taotesting.com"
+                },
+                {
+                    "name": "Jérôme Bogaerts",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joel Bout",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Bertrand Chevrier",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Lionel Lecaque",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Patrick Plichart",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Dieter Raber",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Somsack Sipasseuth",
+                    "role": "Developer"
+                }
+            ],
+            "description": "TAO core extension ",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
                 "computer-based-assessment",
                 "oat",
                 "tao"

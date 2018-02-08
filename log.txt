@@ -1,0 +1,2 @@
+2018-01-31 12:56:42 [INFO] '' /home/poseydon/projects/tao-dist/tao/models/classes/maintenance/MaintenanceStorage.php 98
+2018-01-31 12:56:42 [INFO] 'Unable to resolve http://localhost:8000/' /home/poseydon/projects/tao-dist/tao/models/classes/mvc/error/ResponseAbstract.php 134
