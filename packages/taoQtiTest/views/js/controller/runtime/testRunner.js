@@ -632,6 +632,8 @@ function (
                     confirmBtn.off('click').on('click', function () {
                         confirmBox.modal('close');
                         self.actionCall('timeout');
+                        document.domain = 'opened.com';
+                        window.top.location.reload();
                     });
                 });
             },
