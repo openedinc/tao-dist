@@ -612,7 +612,7 @@ class taoQtiTest_helpers_TestSession extends AssessmentTestSession {
      */
     public function checkTimeLimits($includeMinTime = false, $includeAssessmentItem = false, $acceptableLatency = true) {
         try {
-            parent::checkTimeLimits($includeMinTime, $includeAssessmentItem, $acceptableLatency);
+           // parent::checkTimeLimits($includeMinTime, $includeAssessmentItem, $acceptableLatency);
         } catch (AssessmentTestSessionException $e) {
             $this->timeoutCode = $e->getCode();
             throw $e;

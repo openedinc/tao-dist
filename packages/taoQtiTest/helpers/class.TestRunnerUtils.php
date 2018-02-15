@@ -175,7 +175,7 @@ class taoQtiTest_helpers_TestRunnerUtils {
     static public function isTimeout(AssessmentTestSession $session) {
         
         try {
-            $session->checkTimeLimits(false, true, false);
+            //$session->checkTimeLimits(false, true, false);
         }
         catch (AssessmentTestSessionException $e) {
             return true;

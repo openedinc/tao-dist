@@ -725,7 +725,7 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
             $session = $this->getTestSession();
 
             try {
-                $session->checkTimeLimits(false, true, false);
+               // $session->checkTimeLimits(false, true, false);
             } catch (AssessmentTestSessionException $e) {
                 $this->onTimeout($e);
             }

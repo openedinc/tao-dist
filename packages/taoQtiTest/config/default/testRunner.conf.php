@@ -295,7 +295,7 @@ return array(
          * provided by the implementation. If the client TimeLine is missing, the durations will be zeroed.
          * @type string
          */
-        'target' => 'server'
+        'target' => 'client'
     ],
 
     /**

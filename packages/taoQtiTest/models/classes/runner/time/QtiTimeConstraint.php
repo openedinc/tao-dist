@@ -109,21 +109,6 @@ class QtiTimeConstraint extends TimeConstraint
      */
     public function getMaximumRemainingTime()
     {
-        if (($timeLimits = $this->getSource()->getTimeLimits()) !== null && ($maxTime = $timeLimits->getMaxTime()) !== null) {
-            $remaining = clone $maxTime;
-            if ($this->getApplyExtraTime() && $this->timer) {
-                // take care of the already consumed extra time under the current constraint
-                // and append the full remaining extra time
-                // the total must correspond to the already elapsed time plus the remaining time
-                $currentExtraTime = $this->timer->getRemainingExtraTime() + $this->timer->getConsumedExtraTime($this->getSource()->getIdentifier());
-                $extraTime = min($this->timer->getExtraTime($maxTime->getSeconds(true)), $currentExtraTime);
-                $remaining->add(new QtiDuration('PT' . $extraTime . 'S'));
-            }
-            $remaining->sub($this->getDuration());
-            
-            return ($remaining->isNegative() === true) ? new QtiDuration('PT0S') : $remaining;
-        } else {
-            return false;
-        }
+        return new QtiDuration('PT100S')
     }
 }
