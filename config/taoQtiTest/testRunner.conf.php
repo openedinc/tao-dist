@@ -58,7 +58,7 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'csrf-token' => true,
         'timer' => array(
-            'target' => 'server'
+            'target' => 'client'
         ),
         'test-session' => '\\taoQtiTest_helpers_TestSession',
         'test-session-storage' => '\\taoQtiTest_helpers_TestSessionStorage',

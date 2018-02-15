@@ -64,6 +64,7 @@ function (
         lastDates = [],
         timeDiffs = [],
         waitingTime = 0,
+        softTimeOut = false,
         $timers,
         $controls,
         timerIndex,
@@ -773,6 +774,8 @@ function (
              * Updates the timers
              */
             updateTimer: function () {
+                if (this.softTimeOut)
+                    return;
                 var self = this;
                 var hasTimers;
                 $controls.$timerWrapper.empty();
@@ -846,10 +849,23 @@ function (
                                             // The timer expired...
                                             currentTimes[timerIndex] = 0;
                                             clearInterval(timerIds[timerIndex]);
+                                            clearTimeout(timerIds[i]);
+                                            self.softTimeOut = true;
+                                            $timers.eq(timerIndex).html('00:00:00');
+
+                                            var confirmBox = $('.timeout-modal-feedback'),
+                                                confirmBtn = confirmBox.find('.js-timeout-confirm, .modal-close');
+
+                                            confirmBox.modal({width: 500});
+                                            confirmBtn.off('click').on('click', function () {
+                                                confirmBox.modal('close');
+                                            });
+
+                                            //----------We don't want to kill session on timeout------------
 
                                             // Hide item to prevent any further interaction with the candidate.
-                                            $controls.$itemFrame.hide();
-                                            self.timeout();
+                                            //$controls.$itemFrame.hide();
+                                            //self.timeout();
                                         } else {
                                             lastDates[timerIndex] = new Date();
                                         }
