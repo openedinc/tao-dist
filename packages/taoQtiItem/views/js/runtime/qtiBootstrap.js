@@ -68,6 +68,8 @@ define([
                         if (config && config.userModules && _.isArray(config.userModules) && config.userModules.length > 0) {
                             userModulesOverride = config.userModules;
                         }
+
+                        runnerContext.TexthelpSpeechStream.addToolbar('OpenedQuestions', runnerContext.itemData.identifier);
                         userModules.load(userModulesOverride)
                             .then(function() {
 
