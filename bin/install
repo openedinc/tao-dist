@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+touch tao/install/log/install.log
 tail -f tao/install/log/install.log &
 
 php tao/scripts/taoInstall.php \
