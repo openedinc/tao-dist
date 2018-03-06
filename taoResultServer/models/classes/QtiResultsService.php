@@ -21,7 +21,6 @@
 namespace oat\taoResultServer\models\classes;
 
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
-use oat\taoDelivery\model\execution\ServiceProxy;
 use qtism\common\enums\Cardinality;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;

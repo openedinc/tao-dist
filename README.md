@@ -26,7 +26,7 @@ sudo -u www-data php tao/scripts/taoInstall.php \
 --module_url http://myurl \
 --user_login admin \
 --user_pass admin \
--e taoCe,taoCaliper,ltiDeliveryProvider
+-e taoCe
 ```
 
 | Optional/Reuired | Parameter           | Description |
@@ -49,8 +49,3 @@ sudo -u www-data php tao/scripts/taoInstall.php \
 |                  | --instance_name\|-n | The name of the instance to install. |
 |                  | --extensions\|-e    | Comma-separated list of extensions to install. |
 |                  | --verbose\|-v       | Verbose mode. |
-
-Custom params on LTI Sessions
-
-- `custom_caliper_endpoint`: receive a URL where will send events triggered using Caliper-like format while test-taker is responding a test.    
-- `custom_last_questions`: receive a JSON-like string then a test-taker would resume a test (each test attemp is a new LTI Session). e. g. `{"i1111111": "drinked", "i1111111": "i2222", "i1111111": ["i2222", "i3333"]}`

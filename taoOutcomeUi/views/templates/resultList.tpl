@@ -2,11 +2,14 @@
 use oat\tao\helpers\Template;
 ?>
 <link rel="stylesheet" href="<?= Template::css('icon.css') ?>" />
-<div id="inspect-result" class="flex-container-full"
-    data-model="<?= tao_helpers_Display::encodeAttrValue(json_encode(get_data("model"))) ?>"
-    data-uri="<?= tao_helpers_Display::encodeAttrValue(get_data("uri")) ?>"
->
 
+<div class="results-headings flex-container-full">
+    <header>
+        <h2><?=get_data("title")?></h2>
+    </header>
+</div>
+
+<div id="inspect-result" class="flex-container-full" data-uri="<?= tao_helpers_Display::encodeAttrValue(get_data("uri")) ?>">
 	<div class="grid-row">
     	<div class="col-12">
     		<div class="inspect-results-grid"></div>
@@ -14,16 +17,14 @@ use oat\tao\helpers\Template;
 	</div>
 </div>
 
-<div class="preview-modal-feedback modal">
-    <div class="modal-body clearfix">
-        <p><?= __('Please confirm deletion') ?></p>
-
-        <div class="rgt">
-            <button class="btn-regular small cancel" type="button"><?= __('Cancel') ?></button>
-            <button class="btn-info small save" type="button"><?= __('Ok') ?></button>
-        </div>
-    </div>
-</div>
 <?php
 Template::inc('footer.tpl', 'tao');
 ?>
+
+<script>
+    requirejs.config({
+        config: {
+            'taoOutcomeUi/controller/inspectResults' : <?= json_encode(get_data('config')) ?>
+        }
+    });
+</script>

@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
     'use strict';
+
     var requirejs   = grunt.config('requirejs') || {};
     var clean       = grunt.config('clean') || {};
     var copy        = grunt.config('copy') || {};
@@ -30,7 +31,7 @@ module.exports = function(grunt) {
             modules : [{
                 name: 'taoOutcomeUi/controller/routes',
                 include : ext.getExtensionsControllers(['taoOutcomeUi']),
-                exclude : ['mathJax', 'mediaElement'].concat(libs)
+                exclude : ['mathJax'].concat(libs)
             }]
         }
     };

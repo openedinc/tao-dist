@@ -22,23 +22,24 @@
 namespace oat\taoOutcomeUi\scripts\update;
 
 use oat\generis\model\data\ModelManager;
+use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
+use oat\taoOutcomeUi\scripts\install\RegisterTestPluginService;
 
 /**
- * 
+ *
  * @author Joel Bout <joel@taotesting.com>
  */
 class Updater extends \common_ext_ExtensionUpdater
 {
-    
+
     /**
-     * 
-     * @param string $currentVersion
+     *
+     * @param string $initialVersion
      * @return string $versionUpdatedTo
      */
     public function update($initialVersion)
     {
-
-
         // move ResultsManagerRole to model 1
         if ($this->isVersion('2.6')) {
             $rdf = ModelManager::getModel()->getRdfInterface();
@@ -53,11 +54,32 @@ class Updater extends \common_ext_ExtensionUpdater
                 $triple->modelid = 1;
                 $rdf->add($triple);
             }
-            $$this->setVersion('2.6.1');
+            $this->setVersion('2.6.1');
         }
-        
-        $this->skip('2.6.1', '2.7.5');
 
-        return null;
+        $this->skip('2.6.1', '4.3.1');
+
+        if ($this->isVersion('4.3.1')) {
+            $this->runExtensionScript(RegisterTestPluginService::class);
+
+            $this->setVersion('4.4.0');
+        }
+
+        if ($this->isVersion('4.4.0')) {
+            $this->runExtensionScript(RegisterTestPluginService::class);
+
+            $this->setVersion('4.4.1');
+        }
+
+        $this->skip('4.4.1', '4.5.2');
+
+        if ($this->isVersion('4.5.2') || $this->isVersion('4.6.0')) {
+
+            $service = new ResultServiceWrapper(['class' => ResultsService::class]);
+            $this->getServiceManager()->register(ResultServiceWrapper::SERVICE_ID , $service);
+            $this->setVersion('4.6.1');
+        }
+
+        $this->skip('4.6.1', '4.7.2');
     }
 }

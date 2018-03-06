@@ -72,7 +72,20 @@ class RdsResultStorage extends ConfigurableService
     const RESULTSKV_FK_NAME = "fk_resultsKv_variables";
 
     /** result storage persistence identifier */
-    const OPTION_PERSISTENCE = 'persistence';
+    const OPTION_PERSISTENCE = 'persistence_id';
+
+    /**
+     * SQL persistence to use
+     *
+     * @var \common_persistence_SqlPersistence
+     */
+    private $persistence;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->persistence = $this->getPersistence();
+    }
 
     private function getPersistence()
     {
@@ -109,7 +122,7 @@ class RdsResultStorage extends ConfigurableService
             $testVariable->setEpoch(microtime());
         }
 
-        $this->getPersistence()->insert(
+        $this->persistence->insert(
             self::VARIABLES_TABLENAME,
             array(
                 self::VARIABLES_FK_COLUMN => $deliveryResultIdentifier,
@@ -142,7 +155,7 @@ class RdsResultStorage extends ConfigurableService
         }
 
         //store value in all case
-        $this->getPersistence()->insert(
+        $this->persistence->insert(
             self::VARIABLES_TABLENAME,
             array(
                 self::VARIABLES_FK_COLUMN => $deliveryResultIdentifier,
@@ -173,8 +186,8 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT COUNT(*) FROM ' . self::RESULTS_TABLENAME .
             ' WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
         $params = array($deliveryResultIdentifier);
-        if ($this->getPersistence()->query($sql, $params)->fetchColumn() == 0) {
-            $this->getPersistence()->insert(
+        if ($this->persistence->query($sql, $params)->fetchColumn() == 0) {
+            $this->persistence->insert(
                 self::RESULTS_TABLENAME,
                 array(
                     self::TEST_TAKER_COLUMN => $testTakerIdentifier,
@@ -184,7 +197,7 @@ class RdsResultStorage extends ConfigurableService
         } else {
             $sqlUpdate = 'UPDATE ' . self::RESULTS_TABLENAME . ' SET ' . self::TEST_TAKER_COLUMN . ' = ? WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
             $paramsUpdate = array($testTakerIdentifier, $deliveryResultIdentifier);
-            $this->getPersistence()->exec($sqlUpdate, $paramsUpdate);
+            $this->persistence->exec($sqlUpdate, $paramsUpdate);
         }
     }
 
@@ -198,15 +211,15 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT COUNT(*) FROM ' . self::RESULTS_TABLENAME .
             ' WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
         $params = array($deliveryResultIdentifier);
-        if ($this->getPersistence()->query($sql, $params)->fetchColumn() == 0) {
-            $this->getPersistence()->insert(
+        if ($this->persistence->query($sql, $params)->fetchColumn() == 0) {
+            $this->persistence->insert(
                 self::RESULTS_TABLENAME,
                 array(self::DELIVERY_COLUMN => $deliveryIdentifier, self::RESULTS_TABLE_ID => $deliveryResultIdentifier)
             );
         } else {
             $sqlUpdate = 'UPDATE ' . self::RESULTS_TABLENAME . ' SET ' . self::DELIVERY_COLUMN . ' = ? WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
             $paramsUpdate = array($deliveryIdentifier, $deliveryResultIdentifier);
-            $this->getPersistence()->exec($sqlUpdate, $paramsUpdate);
+            $this->persistence->exec($sqlUpdate, $paramsUpdate);
         }
     }
 
@@ -220,7 +233,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT * FROM ' . self::VARIABLES_TABLENAME . '
         WHERE (' . self::CALL_ID_ITEM_COLUMN . ' = ? OR ' . self::CALL_ID_TEST_COLUMN . ' = ?) ORDER BY ' . self::VARIABLES_TABLE_ID;
         $params = array($callId, $callId);
-        $variables = $this->getPersistence()->query($sql, $params);
+        $variables = $this->persistence->query($sql, $params);
 
         $returnValue = array();
 
@@ -251,7 +264,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT * FROM ' . self::VARIABLES_TABLENAME . '
         WHERE ' . self::VARIABLES_FK_COLUMN . ' = ? ORDER BY ' . self::VARIABLES_TABLE_ID;
         $params = array($deliveryResultIdentifier);
-        $variables = $this->getPersistence()->query($sql, $params);
+        $variables = $this->persistence->query($sql, $params);
 
         $returnValue = array();
 
@@ -285,7 +298,7 @@ class RdsResultStorage extends ConfigurableService
         AND ' . self::VARIABLE_IDENTIFIER . ' = ?';
 
         $params = array($callId, $callId, $variableIdentifier);
-        $variables = $this->getPersistence()->query($sql, $params);
+        $variables = $this->persistence->query($sql, $params);
 
         $returnValue = array();
 
@@ -313,7 +326,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT ' . self::VARIABLE_VALUE . ' FROM ' . self::VARIABLES_TABLENAME . '
         WHERE ' . self::VARIABLES_TABLE_ID . ' = ?';
         $params = array($variableId);
-        $variableValue = $this->getPersistence()->query($sql, $params)->fetchColumn();
+        $variableValue = $this->persistence->query($sql, $params)->fetchColumn();
         $getter = 'get' . ucfirst($property);
         $variableValue = unserialize($variableValue);
         if(is_callable([$variableValue, $getter])){
@@ -333,7 +346,7 @@ class RdsResultStorage extends ConfigurableService
     {
         $sql = 'SELECT ' . self::TEST_TAKER_COLUMN . ' FROM ' . self::RESULTS_TABLENAME . ' WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
         $params = array($deliveryResultIdentifier);
-        return $this->getPersistence()->query($sql, $params)->fetchColumn();
+        return $this->persistence->query($sql, $params)->fetchColumn();
     }
 
     /**
@@ -345,7 +358,7 @@ class RdsResultStorage extends ConfigurableService
     {
         $sql = 'SELECT ' . self::DELIVERY_COLUMN . ' FROM ' . self::RESULTS_TABLENAME . ' WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
         $params = array($deliveryResultIdentifier);
-        return $this->getPersistence()->query($sql, $params)->fetchColumn();
+        return $this->persistence->query($sql, $params)->fetchColumn();
     }
 
     /**
@@ -356,7 +369,7 @@ class RdsResultStorage extends ConfigurableService
     {
         $returnValue = array();
         $sql = 'SELECT DISTINCT(' . self::CALL_ID_ITEM_COLUMN . '), ' . self::CALL_ID_TEST_COLUMN . ', ' . self::VARIABLES_FK_COLUMN . ' FROM ' . self::VARIABLES_TABLENAME;
-        $results = $this->getPersistence()->query($sql);
+        $results = $this->persistence->query($sql);
         foreach ($results as $value) {
             $returnValue[] = ($value[self::CALL_ID_ITEM_COLUMN] != "") ? $value[self::CALL_ID_ITEM_COLUMN] : $value[self::CALL_ID_TEST_COLUMN];
         }
@@ -375,7 +388,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT DISTINCT(' . self::CALL_ID_ITEM_COLUMN . ') FROM ' . self::VARIABLES_TABLENAME . '
         WHERE ' . self::VARIABLES_FK_COLUMN . ' = ? AND ' . self::CALL_ID_ITEM_COLUMN . ' <> \'\'';
         $params = array($deliveryResultIdentifier);
-        $results = $this->getPersistence()->query($sql, $params);
+        $results = $this->persistence->query($sql, $params);
         foreach ($results as $value) {
             if(isset($value[self::CALL_ID_ITEM_COLUMN])){
                 $returnValue[] = $value[self::CALL_ID_ITEM_COLUMN];
@@ -392,7 +405,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'SELECT DISTINCT(' . self::CALL_ID_TEST_COLUMN . ') FROM ' . self::VARIABLES_TABLENAME . '
         WHERE ' . self::VARIABLES_FK_COLUMN . ' = ? AND ' . self::CALL_ID_TEST_COLUMN . ' <> \'\'';
         $params = array($deliveryResultIdentifier);
-        $results = $this->getPersistence()->query($sql, $params);
+        $results = $this->persistence->query($sql, $params);
         foreach ($results as $value) {
             if(isset($value[self::CALL_ID_TEST_COLUMN])){
                 $returnValue[] = $value[self::CALL_ID_TEST_COLUMN];
@@ -410,7 +423,7 @@ class RdsResultStorage extends ConfigurableService
     {
         $returnValue = array();
         $sql = 'SELECT ' . self::RESULTS_TABLE_ID . ', ' . self::TEST_TAKER_COLUMN . ' FROM ' . self::RESULTS_TABLENAME;
-        $results = $this->getPersistence()->query($sql);
+        $results = $this->persistence->query($sql);
         foreach ($results as $value) {
             $returnValue[] = array(
                 "deliveryResultIdentifier" => $value[self::RESULTS_TABLE_ID],
@@ -428,7 +441,7 @@ class RdsResultStorage extends ConfigurableService
     {
         $returnValue = array();
         $sql = 'SELECT ' . self::RESULTS_TABLE_ID . ', ' . self::DELIVERY_COLUMN . ' FROM ' . self::RESULTS_TABLENAME;
-        $results = $this->getPersistence()->query($sql);
+        $results = $this->persistence->query($sql);
         foreach ($results as $value) {
             $returnValue[] = array(
                 "deliveryResultIdentifier" => $value[self::RESULTS_TABLE_ID],
@@ -467,9 +480,9 @@ class RdsResultStorage extends ConfigurableService
         if(isset($options['offset']) || isset($options['limit'])){
             $offset = (isset($options['offset']))?$options['offset']:0;
             $limit = (isset($options['limit']))?$options['limit']:1000;
-            $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $limit, $offset);
+            $sql = $this->persistence->getPlatForm()->limitStatement($sql, $limit, $offset);
         }
-        $results = $this->getPersistence()->query($sql, $params);
+        $results = $this->persistence->query($sql, $params);
         foreach ($results as $value) {
             $returnValue[] = array(
                 "deliveryResultIdentifier" => $value[self::RESULTS_TABLE_ID],
@@ -493,7 +506,7 @@ class RdsResultStorage extends ConfigurableService
             $params = array_merge($params, $delivery);
         }
 
-        return $this->getPersistence()->query($sql, $params)->fetchColumn();
+        return $this->persistence->query($sql, $params)->fetchColumn();
     }
 
 
@@ -508,7 +521,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'DELETE FROM ' . self::VARIABLES_TABLENAME . '
             WHERE ' . self::VARIABLES_FK_COLUMN . ' = ?';
 
-        if ($this->getPersistence()->exec($sql, array($deliveryResultIdentifier)) === false) {
+        if ($this->persistence->exec($sql, array($deliveryResultIdentifier)) === false) {
             return false;
         }
 
@@ -516,7 +529,7 @@ class RdsResultStorage extends ConfigurableService
         $sql = 'DELETE FROM ' . self::RESULTS_TABLENAME . '
             WHERE ' . self::RESULTS_TABLE_ID . ' = ?';
 
-        if ($this->getPersistence()->exec($sql, array($deliveryResultIdentifier)) === false) {
+        if ($this->persistence->exec($sql, array($deliveryResultIdentifier)) === false) {
             return false;
         }
 
