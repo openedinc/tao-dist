@@ -31,6 +31,8 @@ use qtism\common\enums\Cardinality;
 use qtism\common\datatypes\QtiString as QtismString;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\storage\common\AbstractStorage;
+use oat\taoCaliper\models\events\AssessmentItemEvent;
+use oat\oatbox\event\EventManager;
 use qtism\data\SubmissionMode;
 use qtism\data\NavigationMode;
 use oat\taoQtiItem\helpers\QtiRunner;
@@ -785,6 +787,20 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
 
                 foreach ($itemSession->getAllVariables() as $var) {
                     $stateOutput->addVariable($var);
+                }
+
+                if (\taoLti_models_classes_LtiService::singleton()->hasLtiSession()) {
+                   // trigger AssessmentItemEvent for Caliper
+                   $launchData = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
+                   $testTaker = \common_session_SessionManager::getSession();
+                   $event = new AssessmentItemEvent($this->getTestSession(), $stateOutput->getOutput(), $testTaker, $launchData);
+
+                   try {
+                      ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                   } catch(\Exception $e) {
+                      \common_Logger::e('Calliper AssessmentEvent exception');
+                   }
+
                 }
 
                 $itemCompilationDirectory = $this->getDirectory($this->getRequestParameter('itemDataPath'));

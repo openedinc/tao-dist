@@ -41,9 +41,5 @@ class BlockCollection extends QtiComponentCollection {
      * @throws InvalidArgumentException If $value is not an Block object.
      */
     protected function checkType($value) {
-        if (!$value instanceof Block) {
-            $msg = "BlockCollection objects only accept to store Block objects.";
-            throw new InvalidArgumentException($msg);
-        }
     }
 }

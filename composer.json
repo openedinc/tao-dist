@@ -55,6 +55,7 @@
   "minimum-stability": "dev",
   "homepage": "http://www.taotesting.com",
   "require": {
+    "php": "^5.6.0",
     "oat-sa/generis": "~4.1.1",
     "oat-sa/tao-core": "~12.16.0",
     "oat-sa/extension-tao-community": "~3.4.1",

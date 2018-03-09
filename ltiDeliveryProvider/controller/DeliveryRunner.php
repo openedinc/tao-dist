@@ -34,6 +34,7 @@ use oat\taoLti\actions\traits\LtiModuleTrait;
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoLti\models\classes\LtiMessages\LtiMessage;
+use oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**
  * Called by the DeliveryTool to override DeliveryServer settings
@@ -142,8 +143,16 @@ class DeliveryRunner extends DeliveryServer
                 $this->getRequestParameter('deliveryExecution')
             );
         }
+
+        $stateService = $this->getServiceManager()->get(StateServiceInterface::SERVICE_ID);
+        $stateService->finish($deliveryExecution);
+
         $redirectUrl = LTIDeliveryTool::singleton()->getFinishUrl($this->getLtiMessage($deliveryExecution), $deliveryExecution);
-        $this->redirect($redirectUrl);
+
+        echo json_encode(array(
+          'success'      => true,
+          'destination'  => $redirectUrl
+        ));
     }
 
     /**

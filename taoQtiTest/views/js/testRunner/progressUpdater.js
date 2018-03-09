@@ -111,7 +111,7 @@ define([
             var position = testContext[counter.position] + 1;
             return {
                 ratio : Math.floor(position / total * 100),
-                label : __('Item %d of %d', position, total)
+                label : __('Question %d of %d', position, total)
             };
         }
     };

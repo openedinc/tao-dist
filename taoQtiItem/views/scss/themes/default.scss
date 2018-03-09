@@ -4,10 +4,17 @@ $fontPath : '../../../../tao/views/css/font/';
 
 // rest regular font to whatever has been declared in /tao
 @import "inc/bootstrap";
-@import "inc/fonts/source-sans-pro";
 
 .qti-item {
-    font-family: "Source Sans Pro";
+    font-family: "Helvetica";
+    sub,sup {
+      font-size: 90%;
+    }
+    .composite-question {
+        border: 1px solid black;
+        display: block;
+        padding: 10px;
+    }
 }
 
 // override items that make actually use of the font
@@ -16,4 +23,8 @@ select.qti-inlineChoiceInteraction,
 .qti-inlineChoiceInteraction-dropdown .select2-result-label {
     font-family: $regularFont !important;
     font-weight: normal !important;
+}
+
+.qti-interaction {
+   margin-top: 35px !important;
 }

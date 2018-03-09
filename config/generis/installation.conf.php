@@ -53,6 +53,10 @@ return new oat\oatbox\config\ConfigurationService(array(
             'installed' => '3.1.1',
             'enabled' => true
         ),
+        'taoCaliper' => array(
+           'installed' => '1.0.0',
+           'enabled' => true
+        ),
         'funcAcl' => array(
             'installed' => '4.0.0',
             'enabled' => true

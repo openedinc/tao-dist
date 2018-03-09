@@ -1372,7 +1372,7 @@ msgstr ""
 msgid "You must select at least %s choices"
 msgstr ""
 
-msgid "You must select at least 1 choice"
+msgid "Select your answer."
 msgstr ""
 
 msgid "You must select exactly %d choice"

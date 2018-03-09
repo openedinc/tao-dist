@@ -31,10 +31,12 @@
                 min-height: 100% !important;
             }
         </style>
+        <script type="text/javascript" src="//openedtoolbar.speechstream.net/opened/standardconfigdemo.js"></script>
         <script id="initQtiRunner" type="text/javascript">
             (function(){
                 window.tao = window.tao || {};
                 window.tao.qtiRunnerContext = {
+                    TexthelpSpeechStream : TexthelpSpeechStream,
                     itemData : <?=json_encode(get_data('itemData'))?>,
                     variableElements : <?=json_encode(get_data('contentVariableElements'))?>,
                     userVars : <?=json_encode(get_data('js_variables'))?>,

@@ -11,7 +11,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'testPart' => null,
             'assessmentTest' => null
         ),
-        'progress-indicator' => 'percentage',
+        'progress-indicator' => 'position',
         'progress-indicator-scope' => 'testSection',
         'progress-indicator-forced' => false,
         'progress-indicator-show-total' => true,
@@ -27,7 +27,7 @@ return new oat\oatbox\config\ConfigurationService(array(
         'test-taker-review-can-collapse' => false,
         'test-taker-review-display-subsection-title' => true,
         'test-taker-unanswered-items-message' => true,
-        'exitButton' => false,
+        'exitButton' => true,
         'next-section' => false,
         'reset-timer-after-resume' => false,
         'extraContextBuilder' => null,

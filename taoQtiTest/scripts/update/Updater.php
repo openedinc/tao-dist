@@ -87,7 +87,7 @@ class Updater extends \common_ext_ExtensionUpdater {
         if ($currentVersion == '2.6') {
 
             \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiTest')->setConfig('testRunner', array(
-                'progress-indicator' => 'percentage',
+                'progress-indicator' => 'position',
                 'timerWarning' => array(
                     'assessmentItemRef' => null,
                     'assessmentSection' => 300,
@@ -128,7 +128,7 @@ class Updater extends \common_ext_ExtensionUpdater {
                     'assessmentSection' => null,
                     'testPart'          => null
                 ),
-                'progress-indicator' => 'percentage',
+                'progress-indicator' => 'position',
                 'progress-indicator-scope' => 'testSection',
                 'test-taker-review' => false,
                 'test-taker-review-region' => 'left',

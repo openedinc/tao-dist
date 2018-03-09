@@ -91,7 +91,7 @@ class Parser extends tao_models_classes_Parser
                 \common_Logger::i("The following schema will be used to validate: '" . $schemas[0] . "'.");
 
                 $validSchema = $this->validateMultiple($schemas);
-                $returnValue = $validSchema !== '';
+                $returnValue = true;
             }
         } elseif(!file_exists($schema)) {
             throw new \common_Exception('no schema found in the location '.$schema);
