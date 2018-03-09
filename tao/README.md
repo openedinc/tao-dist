@@ -1,2 +1,3 @@
 tao-core
+test
 ========
