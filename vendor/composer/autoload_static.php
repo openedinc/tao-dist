@@ -9,9 +9,9 @@ class ComposerStaticInit9865c25b72299c6a01878e3542ffa476
     public static $files = array (
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
-        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '050275d2af1eda067ec150361de824a2' => __DIR__ . '/..' . '/clearfw/clearfw/clearbricks/init.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '0337bfd82002c71c680d955944950fb5' => __DIR__ . '/../..' . '/generis/common/legacy/class.LegacyAutoLoader.php',
@@ -59,6 +59,7 @@ class ComposerStaticInit9865c25b72299c6a01878e3542ffa476
             'oat\\taoDacSimple\\' => 17,
             'oat\\taoClientDiagnostic\\' => 24,
             'oat\\taoCe\\' => 10,
+            'oat\\taoCaliper\\' => 15,
             'oat\\taoBackOffice\\' => 18,
             'oat\\taoAltResultStorage\\' => 24,
             'oat\\search\\test\\' => 16,
@@ -85,6 +86,10 @@ class ComposerStaticInit9865c25b72299c6a01878e3542ffa476
             'Symfony\\Component\\Yaml\\' => 23,
             'Slim\\' => 5,
             'Sinergi\\BrowserDetector\\' => 24,
+        ),
+        'R' => 
+        array (
+            'Ramsey\\Uuid\\' => 12,
         ),
         'P' => 
         array (
@@ -262,6 +267,10 @@ class ComposerStaticInit9865c25b72299c6a01878e3542ffa476
         array (
             0 => __DIR__ . '/../..' . '/taoCe',
         ),
+        'oat\\taoCaliper\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/taoCaliper',
+        ),
         'oat\\taoBackOffice\\' => 
         array (
             0 => __DIR__ . '/../..' . '/taoBackOffice',
@@ -341,6 +350,10 @@ class ComposerStaticInit9865c25b72299c6a01878e3542ffa476
         'Sinergi\\BrowserDetector\\' => 
         array (
             0 => __DIR__ . '/..' . '/sinergi/browser-detector/src',
+        ),
+        'Ramsey\\Uuid\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/uuid/src',
         ),
         'Psr\\Log\\' => 
         array (

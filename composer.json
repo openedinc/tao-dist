@@ -50,7 +50,38 @@
     "computer-based-assessment"
   ],
   "repositories": [
-
+    {
+      "type" : "vcs",
+      "url" : "https://github.com/oat-sa/ZendSearch"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/taoCaliper"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/ltiDeliveryProvider"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/taoLti"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/taoQtiTest"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/vendor/lib-tao-qti"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/vendor/qtism"
+    },
+    {
+      "type" : "path",
+      "url" : "packages/taoQtiItem"
+    }
   ],
   "minimum-stability": "dev",
   "homepage": "http://www.taotesting.com",
@@ -65,20 +96,20 @@
     "oat-sa/extension-tao-group": "~3.0.1",
     "oat-sa/extension-tao-item": "~5.1.0",
     "oat-sa/extension-tao-itemhtml": "~3.0.0",
-    "oat-sa/extension-tao-itemqti": "~9.10.0",
+    "openedinc/extension-tao-itemqti": "*",
     "oat-sa/extension-tao-itemqti-pci": "~3.1.1",
     "oat-sa/extension-tao-itemqti-pic": "~4.0.0",
     "oat-sa/extension-tao-test": "~6.4.0",
     "oat-sa/extension-tao-testlinear": "~3.0.0",
-    "oat-sa/extension-tao-testqti": "dev-breaking/enable-new-tr-15.7.3",
+    "openedinc/extension-tao-testqti": "*",
     "oat-sa/extension-tao-outcome": "~3.4.0",
     "oat-sa/extension-tao-outcomeui": "~4.7.2",
     "oat-sa/extension-tao-outcomerds": "~2.2.0",
     "oat-sa/extension-tao-outcomekeyvalue": "~2.2.0",
     "oat-sa/extension-tao-outcomelti": "~3.0.0",
     "oat-sa/extension-tao-delivery": "~7.2.0",
-    "oat-sa/extension-tao-lti": "~3.2.4",
-    "oat-sa/extension-tao-ltideliveryprovider": "~3.4.0",
+    "openedinc/extension-tao-lti": "*",
+    "openedinc/extension-tao-ltideliveryprovider" : "*",
     "oat-sa/extension-tao-revision": "~3.0.0",
     "oat-sa/extension-tao-mediamanager": "~2.0.1",
     "oat-sa/extension-pcisample": "~2.0.1",
@@ -86,7 +117,8 @@
     "oat-sa/extension-tao-proctoring": "~7.3.3",
     "oat-sa/extension-tao-clientdiag": "~2.5.6",
     "oat-sa/extension-tao-eventlog": "~1.1.2",
-    "doctrine/inflector": "~1.0.0"
+    "doctrine/inflector": "~1.0.0",
+    "openedinc/extension-tao-caliper": "*"
   },
   "description": "TAO is an Open Source e-Testing platform that empowers you to build, deliver, and share innovative and engaging assessments online – in any language or subject matter."
 }

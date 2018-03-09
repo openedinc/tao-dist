@@ -1,7 +1,7 @@
 {
 
-    "name": "oat-sa/extension-tao-itemqti",
-    "description" : "extension to create QTI items",
+    "name": "openedinc/extension-tao-ltideliveryprovider",
+    "description" : "extension to manage LTI delivery provider for TAO",
     "type" : "tao-extension",
     "authors" : [
 		{
@@ -52,16 +52,15 @@
 	"GPL-2.0"
 	],
     "extra" : {
-    	"tao-extension-name" : "taoQtiItem"
+    	"tao-extension-name" : "ltiDeliveryProvider"
+    },
+        "autoload" : {
+	        "psr-4": {
+	            "oat\\ltiDeliveryProvider\\" :""
+	        }
     },
     "minimum-stability" : "dev",
     "require": {
-        "oat-sa/lib-tao-qti" : "~3.5.0",
         "oat-sa/oatbox-extension-installer": "dev-master"
-    },
-    "autoload" : {
-        "psr-4" : {
-            "oat\\taoQtiItem\\" : ""
-        }
     }
 }
