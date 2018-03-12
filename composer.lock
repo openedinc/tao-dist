@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0bdd2f9b2fc3cc129a099ab5be5881e3",
+    "content-hash": "4485cf8bbda5b264cf41f0dce6ca02fa",
     "packages": [
         {
             "name": "ccampbell/chromephp",
