@@ -213,6 +213,14 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoLtiBasicOutcome',
             'path' => 'css'
         ),
+        'taoEventLog' => array(
+            'extId' => 'taoEventLog',
+            'path' => 'js'
+        ),
+        'taoEventLogCss' => array(
+            'extId' => 'taoEventLog',
+            'path' => 'css'
+        ),
         'taoQtiTest' => array(
             'extId' => 'taoQtiTest',
             'path' => 'js'
@@ -245,12 +253,28 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoCe',
             'path' => 'css'
         ),
+        'taoProctoring' => array(
+            'extId' => 'taoProctoring',
+            'path' => 'js'
+        ),
+        'taoProctoringCss' => array(
+            'extId' => 'taoProctoring',
+            'path' => 'css'
+        ),
         'ltiDeliveryProvider' => array(
             'extId' => 'ltiDeliveryProvider',
             'path' => 'js'
         ),
         'ltiDeliveryProviderCss' => array(
             'extId' => 'ltiDeliveryProvider',
+            'path' => 'css'
+        ),
+        'taoCaliper' => array(
+            'extId' => 'taoCaliper',
+            'path' => 'js'
+        ),
+        'taoCaliperCss' => array(
+            'extId' => 'taoCaliper',
             'path' => 'css'
         )
     )

@@ -27,7 +27,8 @@ return new oat\oatbox\config\ConfigurationService(array(
                 16,
                 17,
                 18,
-                20
+                20,
+                21
             ),
             'writeable' => array(
                 '1'

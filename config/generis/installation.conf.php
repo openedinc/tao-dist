@@ -53,10 +53,6 @@ return new oat\oatbox\config\ConfigurationService(array(
             'installed' => '3.1.1',
             'enabled' => true
         ),
-        'taoCaliper' => array(
-           'installed' => '1.0.0',
-           'enabled' => true
-        ),
         'funcAcl' => array(
             'installed' => '4.0.0',
             'enabled' => true
@@ -67,6 +63,10 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'taoLtiBasicOutcome' => array(
             'installed' => '3.0.0',
+            'enabled' => true
+        ),
+        'taoEventLog' => array(
+            'installed' => '1.1.2',
             'enabled' => true
         ),
         'taoQtiTest' => array(
@@ -85,8 +85,16 @@ return new oat\oatbox\config\ConfigurationService(array(
             'installed' => '3.4.1',
             'enabled' => true
         ),
+        'taoProctoring' => array(
+            'installed' => '7.3.3',
+            'enabled' => true
+        ),
         'ltiDeliveryProvider' => array(
             'installed' => '3.4.0',
+            'enabled' => true
+        ),
+        'taoCaliper' => array(
+            'installed' => '1.0.0',
             'enabled' => true
         )
     )

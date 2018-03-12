@@ -3,4 +3,4 @@
  * Default config header created during install
  */
 
-return new oat\taoQtiTest\models\SectionPauseService();
+return new oat\taoProctoring\model\execution\ProctoredSectionPauseService();

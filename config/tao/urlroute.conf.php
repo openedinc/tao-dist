@@ -39,5 +39,20 @@ return new oat\tao\model\mvc\DefaultUrlService(array(
                 'ext' => 'tao'
             )
         )
+    ),
+    'ProctoringHome' => array(
+        'ext' => 'taoProctoring',
+        'controller' => 'TestCenter',
+        'action' => 'index'
+    ),
+    'ProctoringLogout' => array(
+        'ext' => 'tao',
+        'controller' => 'Main',
+        'action' => 'logout'
+    ),
+    'ProctoringDeliveryServer' => array(
+        'ext' => 'taoProctoring',
+        'controller' => 'DeliveryServer',
+        'action' => 'index'
     )
 ));

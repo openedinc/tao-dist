@@ -3,4 +3,4 @@
  * Default config header created during install
  */
 
-return new oat\taoQtiTest\models\runner\QtiRunnerMessageService();
+return new oat\taoProctoring\model\implementation\TestRunnerMessageService();
