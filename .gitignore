@@ -1,0 +1,12 @@
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/tao-dist.iml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/vendor/
+*.log
+ltiDeliveryProvider
+taoCaliper
+taoQtiTest
+taoLti

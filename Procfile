@@ -1,1 +1,1 @@
-web: heroku-php-apache2 -l log.txt
+web: ./bin/init && heroku-php-apache2 -l log.txt
