@@ -22,6 +22,7 @@
 namespace oat\pciSamples\scripts\update;
 
 use oat\pciSamples\scripts\install\RegisterPciTextReader;
+use oat\qtiItemPci\model\IMSPciModel;
 use oat\taoQtiItem\model\HookRegistry;
 
 class Updater extends \common_ext_ExtensionUpdater
@@ -32,7 +33,7 @@ class Updater extends \common_ext_ExtensionUpdater
      * @param string $currentVersion
      * @return string $versionUpdatedTo
      */
-    public function update($initialVersion) 
+    public function update($initialVersion)
     {
 
         if ($this->isBetween('0', '0.2.1')) {
@@ -54,5 +55,36 @@ class Updater extends \common_ext_ExtensionUpdater
         }
 
         $this->skip('1.3.0', '2.0.1');
+
+        if ($this->isVersion('2.0.1')) {
+            call_user_func(new RegisterPciTextReader(), ['0.5.0']);
+            $this->setVersion('2.1.0');
+        }
+
+        if ($this->isVersion('2.1.0')) {
+            $registry = (new IMSPciModel())->getRegistry();
+            if($registry->has('textReaderInteraction')){
+                $registry->removeAllVersions('textReaderInteraction');
+            }
+            call_user_func(new RegisterPciTextReader(), ['0.5.0']);
+            $this->setVersion('2.1.1');
+        }
+
+        if ($this->isVersion('2.1.1')) {
+            call_user_func(new RegisterPciTextReader(), ['0.7.0']);
+            $this->setVersion('2.2.0');
+        }
+
+        if ($this->isVersion('2.2.0')) {
+            call_user_func(new RegisterPciTextReader(), ['0.8.0']);
+            $this->setVersion('2.3.0');
+        }
+
+        $this->skip('2.3.0', '2.3.1');
+
+        if ($this->isVersion('2.3.1')) {
+            call_user_func(new RegisterPciTextReader(), ['0.8.1']);
+            $this->setVersion('2.3.2');
+        }
     }
 }

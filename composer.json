@@ -53,58 +53,65 @@
         },
         {
             "type" : "path",
-            "url" : "packages/taoCaliper"
+            "url" : "packages2/taoCaliper"
         },
         {
             "type" : "path",
-            "url" : "packages/ltiDeliveryProvider"
+            "url" : "packages2/ltiDeliveryProvider"
         },
         {
             "type" : "path",
-            "url" : "packages/taoLti"
+            "url" : "packages2/taoLti"
         },
         {
             "type" : "path",
-            "url" : "packages/taoQtiTest"
+            "url" : "packages2/taoQtiTest"
         },
         {
             "type" : "path",
-            "url" : "packages/taoQtiItem"
+            "url" : "packages2/taoQtiItem"
         }
     ],
     "minimum-stability": "dev",
     "homepage": "http://www.taotesting.com",
     "require": {
         "php": "^5.6.0",
-        "oat-sa/extension-tao-funcacl" : "~4.0.0",
-        "oat-sa/generis" : "~4.0.1",
+        "oat-sa/extension-tao-funcacl" : "master",
+        "oat-sa/generis" : "master",
         "openedinc/extension-tao-ltideliveryprovider" : "*",
-        "oat-sa/extension-tao-itemqti-pci" : "~3.1.0",
-        "oat-sa/extension-tao-itemqti-pic" : "~4.0.0",
-        "oat-sa/extension-pcisample" :"~2.0.1",
-        "oat-sa/tao-core" : "~12.8.0",
-        "oat-sa/extension-tao-backoffice" : "~1.1.0",
-        "oat-sa/extension-tao-community" : "~3.4.1",
-        "oat-sa/extension-tao-dac-simple" : "~2.0.3",
-        "oat-sa/extension-tao-delivery" : "~7.0.2",
-        "oat-sa/extension-tao-delivery-rdf" : "~3.8.0",
-        "oat-sa/extension-tao-group" : "~3.0.1",
-        "oat-sa/extension-tao-item" : "~5.1.0",
+        "oat-sa/extension-tao-itemqti-pci" : "master",
+        "oat-sa/extension-tao-itemqti-pic" : "master",
+        "oat-sa/extension-pcisample" :"master",
+        "oat-sa/extension-tao-task-queue" :"master",
+        "oat-sa/tao-core" : "master",
+        "oat-sa/extension-tao-backoffice" : "master",
+        "oat-sa/extension-tao-community" : "master",
+        "oat-sa/extension-tao-dac-simple" : "master",
+        "oat-sa/extension-tao-delivery" : "master",
+        "oat-sa/extension-tao-delivery-rdf" : "dev-develop",
+        "oat-sa/extension-tao-group" : "master",
+        "oat-sa/extension-tao-item" : "master",
         "openedinc/extension-tao-lti" : "*",
-        "oat-sa/extension-tao-outcomelti" : "~3.0.0",
-        "oat-sa/extension-tao-mediamanager" : "~2.0.1",
-        "oat-sa/extension-tao-itemhtml" : "~3.0.0",
-        "oat-sa/extension-tao-outcomerds" : "~2.2.0",
-        "oat-sa/extension-tao-outcomeui" : "~2.7.4",
+        "oat-sa/extension-tao-outcomelti" : "master",
+        "oat-sa/extension-tao-mediamanager" : "master",
+        "oat-sa/extension-tao-itemhtml" : "master",
+        "oat-sa/extension-tao-outcomerds" : "master",
+        "oat-sa/extension-tao-outcomeui" : "master",
         "openedinc/extension-tao-itemqti" : "*",
         "openedinc/extension-tao-testqti" : "*",
-        "oat-sa/extension-tao-outcome" : "~3.4.0",
-        "oat-sa/extension-tao-revision" : "~3.0.0",
-        "oat-sa/extension-tao-testlinear" : "~3.0.0",
-        "oat-sa/extension-tao-test" : "~6.4.0",
-        "oat-sa/extension-tao-testtaker" : "~3.0.1",
-        "oat-sa/extension-tao-workspace" : "~1.0.0",
+        "oat-sa/extension-tao-outcome" : "master",
+        "oat-sa/extension-tao-outcomekeyvalue": "master",
+        "oat-sa/extension-tao-revision" : "master",
+        "oat-sa/extension-tao-testlinear" : "master",
+        "oat-sa/extension-tao-test" : "master",
+        "oat-sa/extension-tao-testtaker" : "master",
+        "oat-sa/extension-tao-workspace" : "master",
+        "oat-sa/extension-tao-proctoring": "master",
+        "oat-sa/extension-tao-clientdiag": "master",
+        "oat-sa/extension-tao-eventlog": "master",
+        "doctrine/inflector": "~1.0.0",
         "openedinc/extension-tao-caliper": "*"
+
     },
     "description": "TAO is an Open Source e-Testing platform that empowers you to build, deliver, and share innovative and engaging assessments online \u2013 in any language or subject matter."
 }

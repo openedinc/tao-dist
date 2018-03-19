@@ -19,26 +19,33 @@
  *
  */
 use oat\taoDeliveryRdf\install\RegisterDeliveryFactoryService;
+use oat\taoDeliveryRdf\install\RegisterDeliveryPublishingService;
 use oat\taoDeliveryRdf\scripts\install\OverrideRuntime;
+use oat\taoDeliveryRdf\scripts\install\RegisterDeliveryAssemblyWrapperService;
+use oat\taoDeliveryRdf\scripts\install\SetUpQueueTasks;
 
 return array(
-    'name'        => 'taoDeliveryRdf',
-    'label'       => 'Delivery Management',
-    'description' => 'Manages deliveries using the ontology',
-    'license'     => 'GPL-2.0',
-    'version'     => '3.8.0',
-	'author'      => 'Open Assessment Technologies SA',
-	'requires'    => array(
-        'generis'     => '>=3.36.0',
-        'tao'         => '>=10.26.0',
+  'name'        => 'taoDeliveryRdf',
+  'label'       => 'Delivery Management',
+  'description' => 'Manages deliveries using the ontology',
+  'license'     => 'GPL-2.0',
+  'version'     => '4.8.0',
+    'author'      => 'Open Assessment Technologies SA',
+    'requires'    => array(
+        'generis'     => '>=5.11.0',
+        'tao'         => '>=17.9.0',
         'taoGroups'   => '>=2.7.1',
         'taoTests'    => '>=3.5.0',
-        'taoQtiTest'  => '>=9.11.0',
-        'taoDelivery' => '>=7.0.0'
+        'taoQtiTest'  => '>=18.6.0',
+        'taoDelivery' => '>=9.2.0',
+        'taoTaskQueue' => '>=0.14.0',
+        'taoResultServer' => '>=6.1.0'
     ),
-	'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoDeliveryRdfManager',
+    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoDeliveryRdfManager',
     'acl' => array(
-		array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoDeliveryRdfManager', array('ext'=>'taoDeliveryRdf')),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoDeliveryRdfManager', array('ext'=>'taoDeliveryRdf')),
+        array('grant', \oat\tao\model\user\TaoRoles::REST_PUBLISHER, array('ext'=>'taoDeliveryRdf', 'mod' => 'RestDelivery')),
+        array('grant', \oat\tao\model\user\TaoRoles::REST_PUBLISHER, array('ext'=>'taoDeliveryRdf', 'mod' => 'RestTest')),
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole','oat\taoDeliveryRdf\controller\Guest@guest'),
     ),
     'install' => array(
@@ -51,7 +58,9 @@ return array(
             'oat\\taoDeliveryRdf\\install\\RegisterDeliveryContainerService',
             'oat\\taoDeliveryRdf\\scripts\\RegisterEvents',
             RegisterDeliveryFactoryService::class,
-            OverrideRuntime::class
+            OverrideRuntime::class,
+            SetUpQueueTasks::class,
+            RegisterDeliveryAssemblyWrapperService::class
         )
     ),
     //'uninstall' => array(),

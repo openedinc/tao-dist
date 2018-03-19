@@ -17,9 +17,6 @@ return new oat\oatbox\config\ConfigurationService(array(
         'tao_actions_ClientConfig' => '*',
         'oat\\taoDelivery\\controller\\DeliveryServer' => array(
             'logout' => '*'
-        ),
-        'oat\\taoDeliveryRdf\\controller\\Guest' => array(
-            'guest' => '*'
         )
     )
 ));

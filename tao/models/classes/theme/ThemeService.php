@@ -17,113 +17,96 @@
  * Copyright (c) 2015 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\tao\model\theme;
 
+
 use oat\oatbox\Configurable;
-use oat\oatbox\service\ConfigurableService;
+
 /**
  *
  * @author Joel Bout
  */
-class ThemeService extends ConfigurableService {
-
-    const SERVICE_ID = 'tao/theming';
-
-    const OPTION_AVAILABLE = 'available';
-
-    const OPTION_CURRENT = 'current';
-
+class ThemeService extends ThemeServiceAbstract
+{
     /**
-     * Get the current Theme
+     * @inheritdoc
      */
-    public function getTheme()
+    public function getCurrentThemeId()
     {
-        return $this->getThemeById($this->getOption(self::OPTION_CURRENT));
+        return $this->getOption(static::OPTION_CURRENT);
     }
 
     /**
-     * Add and set a theme as default
-     *
-     * @param Theme $theme
+     * @inheritdoc
      */
-    public function setTheme(Theme $theme)
+    public function addTheme(Theme $theme, $protectAlreadyExistingThemes = true)
     {
-        $id = $this->addTheme($theme);
-        $this->setCurrentTheme($id);
-    }
-
-    /**
-     * Add a Theme but don't activate it
-     *
-     * @param Theme $theme
-     * @return string
-     */
-    public function addTheme(Theme $theme)
-    {
-        $themes = $this->getOption(self::OPTION_AVAILABLE);
-        $baseId = method_exists($theme, 'getId') ? $theme->getId() : '';
-        $nr = 0;
-        while (isset($themes[$baseId.$nr])) {
-            $nr++;
+        $themes  = $this->getAllThemes();
+        $themeId = $theme->getId();
+        
+        if ($protectAlreadyExistingThemes) {
+            $themeId = $this->getUniqueId($theme);
         }
-        $themes[$baseId.$nr] = [
-            'class' => get_class($theme),
-            'options' => ($theme instanceof Configurable) ? $theme->getOptions() : []
+        
+        $themes[$themeId] = [
+            static::THEME_CLASS_OFFSET   => get_class($theme),
+            static::THEME_OPTIONS_OFFSET => ($theme instanceof Configurable) ? $theme->getOptions() : []
         ];
-        $this->setOption(self::OPTION_AVAILABLE, $themes);
-        return $baseId.$nr;
+
+        $this->setOption(static::OPTION_AVAILABLE, $themes);
+
+        return $themeId;
     }
 
     /**
-     * Switch between themes
-     *
-     * @param string $themeId
-     * @throws \common_exception_Error
+     * @inheritdoc
      */
     public function setCurrentTheme($themeId)
     {
-        $themes = $this->getOption(self::OPTION_AVAILABLE);
-        if (!isset($themes[$themeId])) {
-            throw new \common_exception_Error('Theme '.$themeId.' not found');
+        if (!$this->hasTheme($themeId)) {
+            throw new \common_exception_Error('Theme '. $themeId .' not found');
         }
-        $this->setOption(self::OPTION_CURRENT, $themeId);
+
+        $this->setOption(static::OPTION_CURRENT, $themeId);
     }
 
     /**
-     * Return all available Themes
-     *
-     * @return Theme[]
+     * @inheritdoc
      */
     public function getAllThemes()
     {
-        return $this->getOption(self::OPTION_AVAILABLE);
-    }
+        $themes = (array)$this->getOption(static::OPTION_AVAILABLE);
+        foreach ($themes as $key => $theme) {
+            if (is_array($theme) && isset($theme[static::THEME_CLASS_OFFSET])) {
+                $options = isset($theme[static::THEME_OPTIONS_OFFSET])
+                    ? $theme[static::THEME_OPTIONS_OFFSET]
+                    : []
+                ;
 
-    protected function hasTheme($id)
-    {
-        $themes = $this->getOption(self::OPTION_AVAILABLE);
-        return isset($themes[$id]);
+                $theme   = $this->getServiceManager()->build($theme[static::THEME_CLASS_OFFSET], $options);
+            }
+
+            $themes[$key] = $theme;
+        }
+
+        return $themes;
     }
 
     /**
-     * Get Theme identified by id
-     *
-     * @param unknown $id
-     * @throws \common_exception_InconsistentData
-     * @return Theme
+     * @inheritdoc
      */
-    protected function getThemeById($id)
+    public function removeThemeById($themeId)
     {
-        $themes = $this->getOption(self::OPTION_AVAILABLE);
-        if (isset($themes[$id])) {
-            $theme = $themes[$id];
-            if (is_array($theme) && isset($theme['class'])) {
-                $options = isset($theme['options']) ? $theme['options'] : [];
-                $theme = $this->getServiceManager()->build($theme['class'], $options);
-            }
-            return $theme;
-        } else {
-            throw new \common_exception_InconsistentData('Theme '.$id.' not found');
+        if(!$this->hasTheme($themeId)) {
+            return false;
         }
+
+        $themes = $this->getOption(static::OPTION_AVAILABLE);
+        unset($themes[$themeId]);
+
+        $this->setOption(static::OPTION_AVAILABLE, $themes);
+
+        return true;
     }
 }

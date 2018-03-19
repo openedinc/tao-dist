@@ -22,6 +22,7 @@ namespace oat\tao\helpers;
 
 use core_kernel_classes_Class;
 use core_kernel_classes_Resource;
+use oat\generis\model\OntologyRdfs;
 use tao_helpers_Uri;
 
 /**
@@ -50,7 +51,8 @@ class TreeHelper
         $toOpen = array($rootNode->getUri());
         while (!empty($toTest)) {
             reset($toTest);
-            list($classUri, $depends) = each($toTest);
+            $classUri = key($toTest);
+            $depends = current($toTest);
             unset($toTest[$classUri]);
             if (in_array($classUri, $toOpen)) {
                 $toOpen = array_merge($toOpen, $depends);
@@ -58,7 +60,7 @@ class TreeHelper
                 $class = new core_kernel_classes_Class($classUri);
                 /** @var core_kernel_classes_Class $parent */
                 foreach ($class->getParentClasses(false) as $parent) {
-                    if ($parent->getUri() === RDFS_CLASS) {
+                    if ($parent->getUri() === OntologyRdfs::RDFS_CLASS) {
                         continue;
                     }
                     if (!isset($toTest[$parent->getUri()])) {
@@ -75,27 +77,36 @@ class TreeHelper
         return $toOpen;
     }
 
-    /**
-     * generis tree representation of a resource node
-     *
-     * @param core_kernel_classes_Resource $resource
-     * @param core_kernel_classes_Class $class
-     *
-     * @return array
-     */
-    public static function buildResourceNode(core_kernel_classes_Resource $resource, core_kernel_classes_Class $class) {
+	/**
+	 * generis tree representation of a resource node
+	 *
+	 * @param core_kernel_classes_Resource $resource
+	 * @param core_kernel_classes_Class $class
+	 * @param array $extraProperties
+	 * @return array
+	 */
+    public static function buildResourceNode(core_kernel_classes_Resource $resource, core_kernel_classes_Class $class, array $extraProperties = []) {
         $label = $resource->getLabel();
         $label = empty($label) ? __('no label') : $label;
+
+		$extraValues = [];
+        if (!empty($extraProperties))
+		{
+			foreach ($extraProperties as $key => $value)
+			{
+				$extraValues[$key] =  $resource->getOnePropertyValue($class->getProperty($value));
+			}
+		}
 
         return array(
             'data' 	=> _dh($label),
             'type'	=> 'instance',
-            'attributes' => array(
+            'attributes' => array_merge(array(
                 'id' => tao_helpers_Uri::encode($resource->getUri()),
                 'class' => 'node-instance',
                 'data-uri' => $resource->getUri(),
-                'data-classUri' => $class->getUri()
-            )
+                'data-classUri' => $class->getUri(),
+            ), $extraValues)
         );
     }
 

@@ -21,25 +21,25 @@
 
 namespace oat\taoTests\scripts\install;
 
+use oat\oatbox\extension\InstallAction;
 use oat\taoTests\models\runner\plugins\TestPluginService;
-use oat\oatbox\service\ServiceManager;
 
 /**
  * Installation action that registers the TestPluginService
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-class RegisterTestPluginService extends \common_ext_action_InstallAction
+class RegisterTestPluginService extends InstallAction
 {
     /**
      * @param $params
+     * @throws \common_Exception
+     * @throws \common_exception_Error
      */
     public function __invoke($params)
     {
-        $serviceManager = ServiceManager::getServiceManager();
-
+        $serviceManager = $this->getServiceManager();
         $testPluginService = new TestPluginService();
-        $testPluginService->setServiceManager($serviceManager);
         $serviceManager->register(TestPluginService::SERVICE_ID, $testPluginService);
     }
 }

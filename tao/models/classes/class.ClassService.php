@@ -18,6 +18,9 @@
  *
  */
 use oat\oatbox\service\ServiceManager;
+use oat\tao\model\TaoOntology;
+use oat\tao\model\search\index\OntologyIndex;
+
 /**
  * This service represents the actions applicable from a root class
  *
@@ -93,7 +96,7 @@ abstract class tao_models_classes_ClassService
      * @return bool
      */
     public function deleteClassProperty(core_kernel_classes_Property $property){
-        $indexes = $property->getPropertyValues(new core_kernel_classes_Property(INDEX_PROPERTY));
+        $indexes = $property->getPropertyValues(new core_kernel_classes_Property(OntologyIndex::PROPERTY_INDEX));
 
         //delete property and the existing values of this property
         if($returnValue = $property->delete(true)){

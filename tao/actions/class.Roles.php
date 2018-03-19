@@ -21,6 +21,10 @@
  */
 ?>
 <?php
+
+use oat\generis\model\GenerisRdf;
+use oat\tao\model\TaoOntology;
+
 /**
  * Role Controller provide actions performed from url resolution
  * 
@@ -117,12 +121,12 @@ class tao_actions_Roles extends tao_actions_TaoModule {
 				
 				$formValues = $myForm->getValues();
 				$roleService = tao_models_classes_RoleService::singleton();
-				$includedRolesProperty = new core_kernel_classes_Property(PROPERTY_ROLE_INCLUDESROLE);
+				$includedRolesProperty = new core_kernel_classes_Property(GenerisRdf::PROPERTY_ROLE_INCLUDESROLE);
 				
 				// We have to make the difference between the old list
 				// of included roles and the new ones.
 				$oldIncludedRolesUris = $role->getPropertyValues($includedRolesProperty);
-				$newIncludedRolesUris = $formValues[PROPERTY_ROLE_INCLUDESROLE];
+				$newIncludedRolesUris = $formValues[GenerisRdf::PROPERTY_ROLE_INCLUDESROLE];
 				$removeIncludedRolesUris = array_diff($oldIncludedRolesUris, $newIncludedRolesUris);
 				$addIncludedRolesUris = array_diff($newIncludedRolesUris, $oldIncludedRolesUris);
 				
@@ -161,7 +165,7 @@ class tao_actions_Roles extends tao_actions_TaoModule {
 	public function assignUsers()
 	{
 	    $role = $this->getCurrentInstance();
-	    $prop = new core_kernel_classes_Property(PROPERTY_USER_ROLES);
+	    $prop = new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_ROLES);
 	    $tree = tao_helpers_form_GenerisTreeForm::buildReverseTree($role, $prop);
 	    $tree->setData('title', __('Assign User to role'));
 	    $tree->setData('dataUrl', _url('getUsers'));
@@ -186,9 +190,9 @@ class tao_actions_Roles extends tao_actions_TaoModule {
 			
 				if(!in_array($role->getUri(), $this->forbidden)){
 						//check if no user is using this role:
-						$userClass = new core_kernel_classes_Class(CLASS_GENERIS_USER);
+						$userClass = new core_kernel_classes_Class(GenerisRdf::CLASS_GENERIS_USER);
 						$options = array('recursive' => true, 'like' => false);
-						$filters = array(PROPERTY_USER_ROLES => $role->getUri());
+						$filters = array(GenerisRdf::PROPERTY_USER_ROLES => $role->getUri());
 						$users = $userClass->searchInstances($filters, array());
 						if(empty($users)){
 							//delete role here:
@@ -213,7 +217,7 @@ class tao_actions_Roles extends tao_actions_TaoModule {
 		}
 		else{
 			$userService = tao_models_classes_UserService::singleton();
-			echo json_encode($userService->toTree(new core_kernel_classes_Class(CLASS_TAO_USER), array()));	
+			echo json_encode($userService->toTree(new core_kernel_classes_Class(TaoOntology::CLASS_URI_TAO_USER), array()));
 		}
 	}
 	

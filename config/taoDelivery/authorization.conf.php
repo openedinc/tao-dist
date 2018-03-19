@@ -9,6 +9,6 @@
 
 return new oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator(array(
     'providers' => array(
-        new oat\taoDelivery\model\authorization\strategy\StateValidation()
+        1 => new oat\taoProctoring\model\authorization\ProctorAuthorizationProvider()
     )
 ));

@@ -33,11 +33,11 @@ return array(
     'label' => 'QTI Portable Custom Interaction',
     'description' => '',
     'license' => 'GPL-2.0',
-    'version' => '3.1.0',
+    'version' => '4.5.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=9.2.2',
-        'taoQtiItem' => '>=9.6.0'
+        'tao' => '>=15.4.0',
+        'taoQtiItem' => '>=11.2.0'
     ),
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#qtiItemPciManager', array('ext'=>'qtiItemPci')),

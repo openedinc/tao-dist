@@ -13,7 +13,14 @@ return new oat\oatbox\config\ConfigurationService(array(
         'core/logger' => array(
             'level' => 'warn',
             'loggers' => array(
-                'core/logger/console'
+                'core/logger/console' => array(
+                    'level' => 'warn'
+                )
+            )
+        ),
+        'controller/main' => array(
+            'extraRoutes' => array(
+                'taoTaskQueue/Main/index'
             )
         ),
         'taoQtiItem/qtiRunner/core/QtiRunner' => array(
@@ -41,6 +48,14 @@ return new oat\oatbox\config\ConfigurationService(array(
                 )
             )
         ),
+        'taoQtiItem/portableElementRegistry/ciRegistry' => array(
+            'providers' => array(
+                array(
+                    'name' => 'pciRegistry',
+                    'module' => 'qtiItemPci/pciProvider'
+                )
+            )
+        ),
         'taoQtiTest/controller/runtime/testRunner' => array(
             'qtiTools' => array(
                 'markForReview' => array(
@@ -53,14 +68,6 @@ return new oat\oatbox\config\ConfigurationService(array(
                 ),
                 'comment' => array(
                     'hook' => 'taoQtiTest/testRunner/actionBar/comment'
-                )
-            )
-        ),
-        'taoQtiItem/portableElementRegistry/ciRegistry' => array(
-            'providers' => array(
-                array(
-                    'name' => 'pciRegistry',
-                    'module' => 'qtiItemPci/pciProvider'
                 )
             )
         )

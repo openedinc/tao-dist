@@ -23,10 +23,10 @@ return array(
     'label' => 'Community Edition',
     'description' => 'the Community Edition extension',
     'license' => 'GPL-2.0',
-    'version' => '3.4.1',
+    'version' => '3.15.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=9.0.0',
+        'tao' => '>=12.21.0',
         'funcAcl' => '*',
         'taoItems' => '*',
         'taoQtiItem' => '*',
@@ -37,7 +37,7 @@ return array(
         'taoGroups' => '*',
         'taoOutcomeUi' => '*',
         'taoOutcomeRds' => '*',
-        'taoDeliveryRdf' => '*'
+        'taoDeliveryRdf' => '*',
     ),
     'update' => 'oat\\taoCe\\scripts\\update\\Updater',
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoCeManager',

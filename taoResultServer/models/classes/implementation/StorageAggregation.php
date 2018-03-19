@@ -19,10 +19,8 @@
  */
 namespace oat\taoResultServer\models\classes\implementation;
 
-use oat\oatbox\service\ConfigurableService;
-use taoResultServer_models_classes_ResultServerStateFull;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use taoResultServer_models_classes_Variable;
-use oat\generis\model\OntologyAwareTrait;
 use oat\taoResultServer\models\classes\ResultManagement  as StorageManage;
 use taoResultServer_models_classes_ReadableResultStorage as StorageRead;
 use taoResultServer_models_classes_WritableResultStorage as StorageWrite;
@@ -131,6 +129,13 @@ class StorageAggregation implements
         }
     }
     
+    public function storeItemVariables($deliveryResultIdentifier, $test, $item, array $itemVariables, $callIdItem)
+    {
+        foreach ($this->getAllImplementations(StorageWrite::class) as $impl) {
+            $impl->storeItemVariables($deliveryResultIdentifier, $test, $item, $itemVariables, $callIdItem);
+        }
+    }
+    
     public function storeTestVariable($deliveryResultIdentifier, $test, taoResultServer_models_classes_Variable $testVariable, $callIdTest)
     {
         foreach ($this->getAllImplementations(StorageWrite::class) as $impl) {
@@ -138,10 +143,17 @@ class StorageAggregation implements
         }
     }
     
-    public function configure(\core_kernel_classes_Resource $resultServer, $callOptions = array())
+    public function storeTestVariables($deliveryResultIdentifier, $test, array $testVariables, $callIdTest)
     {
         foreach ($this->getAllImplementations(StorageWrite::class) as $impl) {
-            $success = $impl->configure($resultServer, $callOptions);
+            $impl->storeTestVariables($deliveryResultIdentifier, $test, $testVariables, $callIdTest);
+        }
+    }
+    
+    public function configure($callOptions = array())
+    {
+        foreach ($this->getAllImplementations(StorageWrite::class) as $impl) {
+            $success = $impl->configure($callOptions);
         }
     }
     
@@ -185,5 +197,17 @@ class StorageAggregation implements
         }
         return $success === true;
     }
-   
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteDeliveryExecutionData(DeliveryExecutionDeleteRequest $request)
+    {
+        $success = null;
+        /** @var \oat\taoDelivery\model\execution\Delete\DeliveryExecutionDelete $impl */
+        foreach ($this->getAllImplementations(StorageManage::class) as $impl) {
+            $success = $impl->deleteDeliveryExecutionData($request) && ($success === true || is_null($success));
+        }
+        return $success === true;
+    }
 }

@@ -11,10 +11,10 @@ return new common_persistence_Manager(array(
         'default' => array(
             'driver' => 'pdo_pgsql',
             'host' => getenv('DB_HOST'),
-            'dbname' => getenv('DB_NAME'),
-            'user' => getenv('DB_USERNAME'),
-            'password' => getenv('DB_PASSWORD'),
-            'port' => getenv('DB_PORT')
+             'dbname' => getenv('DB_NAME'),
+             'user' => getenv('DB_USERNAME'),
+             'password' => getenv('DB_PASSWORD'),
+             'port' => getenv('DB_PORT')
         ),
         'serviceState' => array(
             'driver' => 'phpfile'

@@ -6,13 +6,15 @@
 return new oat\tao\model\entryPoint\EntryPointService(array(
     'existing' => array(
         'passwordreset' => new oat\tao\model\entryPoint\PasswordReset(),
-        'deliveryServer' => new oat\taoDelivery\model\entrypoint\FrontOfficeEntryPoint(),
+        'deliveryServer' => new oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer(),
         'backoffice' => new oat\taoCe\model\entryPoint\TaoCeEntrypoint(),
-        'guestaccess' => new oat\taoDeliveryRdf\model\guest\GuestAccess()
+        'guestaccess' => new oat\taoDeliveryRdf\model\guest\GuestAccess(),
+        'proctoring' => new oat\taoProctoring\model\entrypoint\ProctoringEntryPoint()
     ),
     'postlogin' => array(
         'deliveryServer',
-        'backoffice'
+        'backoffice',
+        'proctoring'
     ),
     'prelogin' => array(
         'guestaccess'

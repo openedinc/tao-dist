@@ -20,26 +20,31 @@
  */
 namespace oat\taoDeliveryRdf\scripts\update;
 
+use oat\oatbox\service\ConfigurableService;
+use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\taoDeliveryRdf\install\RegisterDeliveryFactoryService;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyWrapperService;
+use oat\taoDeliveryRdf\model\DeliveryFactory;
+use oat\taoDeliveryRdf\model\DeliveryPublishing;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDeliveryRdf\install\RegisterDeliveryContainerService;
+use oat\taoDeliveryRdf\model\tasks\CompileDelivery;
 use oat\taoDeliveryRdf\scripts\RegisterEvents;
 use oat\taoDeliveryRdf\model\ContainerRuntime;
 use oat\taoDelivery\model\RuntimeService;
+use oat\taoTaskQueue\model\TaskLogInterface;
 
 /**
- *
- * @author Joel Bout <joel@taotesting.com>
+ ** @author Joel Bout <joel@taotesting.com>
  */
 class Updater extends \common_ext_ExtensionUpdater {
 
     /**
-     *
-     * @param string $currentVersion
+     * @param string $initialVersion
      * @return string $versionUpdatedTo
      */
     public function update($initialVersion) {
@@ -144,14 +149,91 @@ class Updater extends \common_ext_ExtensionUpdater {
             OntologyUpdater::syncModels();
             $this->setVersion('3.4.0');
         }
-       
+
         $this->skip('3.4.0', '3.6.1');
-      
+
         if ($this->isVersion('3.6.1')) {
             OntologyUpdater::syncModels();
             $this->getServiceManager()->register(RuntimeService::SERVICE_ID, new ContainerRuntime());
             $this->setVersion('3.7.0');
         }
-	$this->skip('3.7.0', '3.8.0');
+
+        $this->skip('3.7.0', '3.9.1');
+
+        if ($this->isVersion('3.9.1')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('3.9.2');
+        }
+
+        $this->skip('3.9.2', '3.16.0');
+
+        if ($this->isVersion('3.16.0')) {
+            $deliveryFactory = $this->getServiceManager()->get(DeliveryFactory::SERVICE_ID);
+            $options = $deliveryFactory->getOptions();
+            $options[DeliveryFactory::OPTION_INITIAL_PROPERTIES] = [];
+            $options[DeliveryFactory::OPTION_INITIAL_PROPERTIES_MAP] = [];
+            $deliveryFactory->setOptions($options);
+            $this->getServiceManager()->register(DeliveryFactory::SERVICE_ID, $deliveryFactory);
+            $this->setVersion('3.17.0');
+        }
+
+        $this->skip('3.17.0', '3.17.3');
+
+        if ($this->isVersion('3.17.3')) {
+            $this->getServiceManager()->register(
+                'taoDeliveryRdf/DeliveryMgmt',
+                new \oat\oatbox\config\ConfigurationService([
+                    'config' => [
+                        'OntologyTreeOrder' => [\oat\generis\model\OntologyRdfs::RDFS_LABEL => 'asc']
+                    ]
+                ])
+            );
+            $this->setVersion('3.18.0');
+        }
+
+        if ($this->isVersion('3.18.0')) {
+            /** @var TaskLogInterface|ConfigurableService $taskLogService */
+            $taskLogService = $this->getServiceManager()->get(TaskLogInterface::SERVICE_ID);
+
+            $taskLogService->linkTaskToCategory(CompileDelivery::class, TaskLogInterface::CATEGORY_DELIVERY_COMPILATION);
+
+            $this->getServiceManager()->register(TaskLogInterface::SERVICE_ID, $taskLogService);
+
+            $this->setVersion('3.19.0');
+        }
+
+        $this->skip('3.19.0', '3.20.0');
+
+        if ($this->isVersion('3.20.0')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('3.21.0');
+        }
+
+        $this->skip('3.21.0', '3.23.0');
+
+        if ($this->isVersion('3.23.0')){
+            OntologyUpdater::syncModels();
+            $this->setVersion('3.23.1');
+
+        }
+
+        $this->skip('3.23.1', '3.29.0');
+
+        if ($this->isVersion('3.29.0')) {
+            $deliveryAssemblerWrapper = new DeliveryAssemblyWrapperService();
+            $this->getServiceManager()->register(DeliveryAssemblyWrapperService::SERVICE_ID, $deliveryAssemblerWrapper);
+
+            $this->setVersion('4.0.0');
+        }
+
+        $this->skip('4.0.0', '4.6.0');
+
+        if ($this->isVersion('4.6.0')) {
+            AclProxy::applyRule(new AccessRule('grant', TaoRoles::REST_PUBLISHER, array('ext'=>'taoDeliveryRdf', 'mod' => 'RestDelivery')));
+            AclProxy::applyRule(new AccessRule('grant', TaoRoles::REST_PUBLISHER, array('ext'=>'taoDeliveryRdf', 'mod' => 'RestTest')));
+            $this->setVersion('4.7.0');
+        }
+
+        $this->skip('4.7.0', '4.8.0');
     }
 }

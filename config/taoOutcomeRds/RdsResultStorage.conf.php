@@ -3,4 +3,6 @@
  * Default config header created during install
  */
 
-return new oat\taoOutcomeRds\model\RdsResultStorage();
+return new oat\taoOutcomeRds\model\RdsResultStorage(array(
+    'persistence' => 'default'
+));

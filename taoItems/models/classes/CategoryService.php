@@ -25,6 +25,7 @@ use core_kernel_classes_Property as RdfProperty;
 use core_kernel_classes_Resource as RdfResource;
 use oat\oatbox\service\ConfigurableService;
 use taoItems_models_classes_ItemsService;
+use oat\generis\model\GenerisRdf;
 
 /**
  * Category management service.
@@ -160,7 +161,7 @@ class CategoryService extends ConfigurableService
         $exposeProperty = new RdfProperty(self::EXPOSE_PROP_URI);
         $expose = $property->getOnePropertyValue($exposeProperty);
 
-        return !is_null($expose) && $expose->getUri() === GENERIS_TRUE;
+        return !is_null($expose) && $expose->getUri() === GenerisRdf::GENERIS_TRUE;
     }
 
     /**
@@ -176,9 +177,9 @@ class CategoryService extends ConfigurableService
         $exposeProperty = new RdfProperty(self::EXPOSE_PROP_URI);
 
         if ($value == true) {
-            $property->setPropertyValue($exposeProperty, GENERIS_TRUE);
+            $property->setPropertyValue($exposeProperty, GenerisRdf::GENERIS_TRUE);
         } else {
-            $property->removePropertyValue($exposeProperty, GENERIS_TRUE);
+            $property->removePropertyValue($exposeProperty, GenerisRdf::GENERIS_TRUE);
         }
     }
 

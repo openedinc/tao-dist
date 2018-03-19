@@ -18,6 +18,9 @@
  *
  */
 
+use oat\taoLti\models\classes\LtiService;
+use oat\taoResultServer\models\classes\ResultAliasServiceInterface;
+
 /**
  * Implements tao results storage with respect to LTI 1.1.1 specs acting as a Tool provider calling back the consumer outcome service
  *
@@ -25,7 +28,10 @@
 
 class taoLtiBasicOutcome_models_classes_LtiBasicOutcome
     extends tao_models_classes_GenerisService
-    implements taoResultServer_models_classes_WritableResultStorage {
+    implements taoResultServer_models_classes_WritableResultStorage
+    {
+
+    const VARIABLE_IDENTIFIER = 'LtiOutcome';
 
     //private $ltiConsumer;//the kb resource modelling the LTI consumer
     /**
@@ -35,29 +41,38 @@ class taoLtiBasicOutcome_models_classes_LtiBasicOutcome
 		parent::__construct();
         common_ext_ExtensionsManager::singleton()->getExtensionById("taoLtiBasicOutcome");
     }
+
     /**
-     * @param type $deliveryResultIdentifier lis_result_sourcedid
-     * @param type $test ignored
+     * @param $deliveryResultIdentifier lis_result_sourcedid
+     * @param $test ignored
      * @param taoResultServer_models_classes_Variable $testVariable
-     * @param type $callIdTest ignored
+     * @param $callIdTest ignored
+     * @throws \oat\taoLti\models\classes\LtiException
+     * @throws common_exception_Error
      */
-    public function storeTestVariable($deliveryResultIdentifier, $test, taoResultServer_models_classes_Variable $testVariable, $callIdTest){
-       
+    public function storeTestVariable($deliveryResultIdentifier, $test, taoResultServer_models_classes_Variable $testVariable, $callIdTest)
+    {
         if (get_class($testVariable)=="taoResultServer_models_classes_OutcomeVariable") {
-            common_Logger::i(
+            common_Logger::d(
                 "Outcome submission VariableId. (".$testVariable->getIdentifier().") Result Identifier ("
                 .$deliveryResultIdentifier.")Service URL (".$this->serviceUrl.")"
                 );
             $variableIdentifier = $testVariable->getIdentifier();
-            if (($variableIdentifier == LTI_OUTCOME_VARIABLE_IDENTIFIER)
+            if (($variableIdentifier == self::VARIABLE_IDENTIFIER)
                // or true
                 ) {
                 $grade = (string)$testVariable->getValue();
+
+                /** @var ResultAliasServiceInterface $resultAliasService */
+                $resultAliasService = $this->getServiceLocator()->get(ResultAliasServiceInterface::SERVICE_ID);
+                $deliveryResultAlias = $resultAliasService->getResultAlias($deliveryResultIdentifier);
+                $deliveryResultIdentifier = empty($deliveryResultAlias) ? $deliveryResultIdentifier: current($deliveryResultAlias);
+
                 $message = taoLtiBasicOutcome_helpers_LtiBasicOutcome::buildXMLMessage($deliveryResultIdentifier, $grade, 'replaceResultRequest');
 
                 //common_Logger::i("Preparing POX message for the outcome service :".$message."\n");
 
-                $credentialResource = taoLti_models_classes_LtiService::singleton()->getCredential($this->consumerKey);
+                $credentialResource = LtiService::singleton()->getCredential($this->consumerKey);
                 //common_Logger::i("Credential for the consumerKey :". $credentialResource->getUri()."\n");
                 $credentials = new tao_models_classes_oauth_Credentials($credentialResource);
                 //$this->serviceUrl = "http://tao-dev/log.php";
@@ -66,16 +81,16 @@ class taoLtiBasicOutcome_models_classes_LtiBasicOutcome
                 $unSignedOutComeRequest->setBody($message);
                 $signingService = new tao_models_classes_oauth_Service();
                 $signedRequest = $signingService->sign($unSignedOutComeRequest, $credentials, true );
-                common_Logger::i("Request sent (Body)\n".($signedRequest->getBody())."\n");
-                common_Logger::i("Request sent (Headers)\n".(serialize($signedRequest->getHeaders()))."\n");
-                common_Logger::i("Request sent (Headers)\n".(serialize($signedRequest->getParams()))."\n");
+                common_Logger::d("Request sent (Body)\n".($signedRequest->getBody())."\n");
+                common_Logger::d("Request sent (Headers)\n".(serialize($signedRequest->getHeaders()))."\n");
+                common_Logger::d("Request sent (Headers)\n".(serialize($signedRequest->getParams()))."\n");
                  //Hack for moodle comaptibility, the header is ignored for the signature computation
                 $signedRequest->setHeader("Content-Type", "application/xml");
 
                 $response = $signedRequest->send();
-                common_Logger::i("\nHTTP Code received: ".($response->httpCode)."\n" );
-                common_Logger::i("\nHTTP From: ".($response->effectiveUrl)."\n" );
-                common_Logger::i("\nHTTP Content received: ".($response->responseData)."\n" );
+                common_Logger::d("\nHTTP Code received: ".($response->httpCode)."\n" );
+                common_Logger::d("\nHTTP From: ".($response->effectiveUrl)."\n" );
+                common_Logger::d("\nHTTP Content received: ".($response->responseData)."\n" );
                 if ($response->httpCode != "200") {
                     throw new common_exception_Error("An HTTP level proble occured when sending the outcome to the service url");
                 }
@@ -83,11 +98,20 @@ class taoLtiBasicOutcome_models_classes_LtiBasicOutcome
         }
        
     }
+    
+    public function storeTestVariables($deliveryResultIdentifier, $test, array $testVariables, $callIdTest)
+    {
+        foreach ($testVariables as $testVariable) {
+            $this->storeTestVariable($deliveryResultIdentifier, $test, $testVariable, $callIdTest);
+        }
+    }
+    
     /*
     * retrieve specific parameters from the resultserver to configure the storage
     */
     /*sic*/
-    public function configure(core_kernel_classes_Resource $resultserver, $callOptions = array()) {
+    public function configure($callOptions = array())
+    {
         /**
          * Retrieve the lti consumer associated with the result server in the KB , those rpoperties are available within taoLtiBasicComponent only
          */
@@ -104,26 +128,37 @@ class taoLtiBasicOutcome_models_classes_LtiBasicOutcome
             throw new common_Exception("LtiBasicOutcome Storage requires a call parameter consumerKey");
         }
 
-        common_Logger::i("ResultServer configured with ".$callOptions["service_url"]. " and ".$callOptions["consumer_key"]);
+        common_Logger::d("ResultServer configured with ".$callOptions["service_url"]. " and ".$callOptions["consumer_key"]);
         
     }
      /**
      * In the case of An LtiBasic OutcomeSubmission, spawnResult has no effect
      */
-    public function spawnResult(){
-       //
+    public function spawnResult()
+    {
+       
     }
-    public function storeRelatedTestTaker($deliveryResultIdentifier, $testTakerIdentifier) {
-    }
-
-    public function storeRelatedDelivery($deliveryResultIdentifier, $deliveryIdentifier) {
-    }
-
-    public function storeItemVariable($deliveryResultIdentifier, $test, $item, taoResultServer_models_classes_Variable $itemVariable, $callIdItem){
-            //for testing purpose
-            common_Logger::i("Item Variable Submission: ".$itemVariable->getIdentifier() );
-            $this->storeTestVariable($deliveryResultIdentifier, $test, $itemVariable, $callIdItem);
+    public function storeRelatedTestTaker($deliveryResultIdentifier, $testTakerIdentifier)
+    {
+        
     }
 
+    public function storeRelatedDelivery($deliveryResultIdentifier, $deliveryIdentifier)
+    {
+        
+    }
+
+    public function storeItemVariable($deliveryResultIdentifier, $test, $item, taoResultServer_models_classes_Variable $itemVariable, $callIdItem)
+    {
+        // For testing purpose.            
+        common_Logger::d("Item Variable Submission: ".$itemVariable->getIdentifier() );
+        $this->storeTestVariable($deliveryResultIdentifier, $test, $itemVariable, $callIdItem);
+    }
+
+    public function storeItemVariables($deliveryResultIdentifier, $test, $item, array $itemVariables, $callIdItem)
+    {
+        foreach ($itemVariables as $itemVariable) {
+            $this->storeItemVariable($deliveryResultIdentifier, $test, $item, $itemVariable, $callIdItem);
+        }
+    }
 }
-?>

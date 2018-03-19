@@ -39,15 +39,15 @@ define('GENERIS_INSTANCE_NAME','mytao');
 define('GENERIS_SESSION_NAME',getenv('GENERIS_SESSION_NAME'));
 
 # paths
-define('ROOT_PATH', getenv('ROOT_PATH'));
-define('ROOT_URL', getenv('ROOT_URL'));
+define('ROOT_PATH',getenv('ROOT_PATH'));
+define('ROOT_URL',getenv('ROOT_URL'));
 
 # language
 define('DEFAULT_LANG','en-US');
 define('DEFAULT_ANONYMOUS_INTERFACE_LANG','en-US');
 
 #mode
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true);
 
 #application state
 /**
@@ -75,7 +75,7 @@ define('FILES_PATH',ROOT_PATH.'data'.DIRECTORY_SEPARATOR);
 define('GENERIS_CACHE_PATH', FILES_PATH.'generis'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR);
 
 #path to read configs from
-define('CONFIG_PATH', ROOT_PATH.'config'.DIRECTORY_SEPARATOR);
+define('CONFIG_PATH', ROOT_PATH.'config/');
 
 # users cache
 define('GENERIS_CACHE_USERS_ROLES', true);

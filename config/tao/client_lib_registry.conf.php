@@ -37,6 +37,14 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoDelivery',
             'path' => 'css'
         ),
+        'taoTaskQueue' => array(
+            'extId' => 'taoTaskQueue',
+            'path' => 'js'
+        ),
+        'taoTaskQueueCss' => array(
+            'extId' => 'taoTaskQueue',
+            'path' => 'css'
+        ),
         'taoBackOffice' => array(
             'extId' => 'taoBackOffice',
             'path' => 'js'
@@ -87,91 +95,91 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'IMSGlobal/jquery_2_1_1' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/IMSGlobal/jquery_2_1_1'
+            'path' => 'js/legacyPortableSharedLib/jquery_2_1_1'
         ),
         'OAT/lodash' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/lodash'
+            'path' => 'js/legacyPortableSharedLib/lodash'
         ),
         'OAT/async' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/async'
+            'path' => 'js/legacyPortableSharedLib/async'
         ),
         'OAT/raphael' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/raphael'
+            'path' => 'js/legacyPortableSharedLib/raphael'
         ),
         'OAT/scale.raphael' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/scale.raphael'
+            'path' => 'js/legacyPortableSharedLib/OAT/scale.raphael'
         ),
         'OAT/jquery.qtip' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/jquery.qtip'
+            'path' => 'js/legacyPortableSharedLib/jquery.qtip'
         ),
         'OAT/util/xml' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/xml'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/xml'
         ),
         'OAT/util/math' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/math'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/math'
         ),
         'OAT/util/html' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/html'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/html'
         ),
         'OAT/util/EventMgr' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/EventMgr'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/EventMgr'
         ),
         'OAT/util/event' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/event'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/event'
         ),
         'OAT/util/asset' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/asset'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/asset'
         ),
         'OAT/util/tpl' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/util/tpl'
+            'path' => 'js/legacyPortableSharedLib/OAT/util/tpl'
         ),
         'OAT/sts/common' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/sts/common'
+            'path' => 'js/legacyPortableSharedLib/OAT/sts/common'
         ),
         'OAT/interact' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/interact'
+            'path' => 'js/legacyPortableSharedLib/interact'
         ),
         'OAT/interact-rotate' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/interact-rotate'
+            'path' => 'js/legacyPortableSharedLib/OAT/interact-rotate'
         ),
         'OAT/sts/transform-helper' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/sts/transform-helper'
+            'path' => 'js/legacyPortableSharedLib/OAT/sts/transform-helper'
         ),
         'OAT/handlebars' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/handlebars'
+            'path' => 'js/legacyPortableSharedLib/handlebars'
         ),
         'OAT/sts/stsEventManager' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/sts/stsEventManager'
+            'path' => 'js/legacyPortableSharedLib/OAT/sts/stsEventManager'
         ),
         'OAT/waitForMedia' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/waitForMedia'
+            'path' => 'js/legacyPortableSharedLib/OAT/waitForMedia'
         ),
         'OAT/customEvent' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/customEvent'
+            'path' => 'js/legacyPortableSharedLib/OAT/customEvent'
         ),
         'OAT/mediaPlayer' => array(
             'extId' => 'taoQtiItem',
-            'path' => 'js/portableSharedLibraries/OAT/mediaPlayer'
+            'path' => 'js/legacyPortableSharedLib/OAT/mediaPlayer'
         ),
         'taoQtiItem' => array(
             'extId' => 'taoQtiItem',
@@ -179,6 +187,38 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'taoQtiItemCss' => array(
             'extId' => 'taoQtiItem',
+            'path' => 'css'
+        ),
+        'qtiItemPci' => array(
+            'extId' => 'qtiItemPci',
+            'path' => 'js'
+        ),
+        'qtiItemPciCss' => array(
+            'extId' => 'qtiItemPci',
+            'path' => 'css'
+        ),
+        'funcAcl' => array(
+            'extId' => 'funcAcl',
+            'path' => 'js'
+        ),
+        'funcAclCss' => array(
+            'extId' => 'funcAcl',
+            'path' => 'css'
+        ),
+        'taoLti' => array(
+            'extId' => 'taoLti',
+            'path' => 'js'
+        ),
+        'taoLtiCss' => array(
+            'extId' => 'taoLti',
+            'path' => 'css'
+        ),
+        'taoLtiBasicOutcome' => array(
+            'extId' => 'taoLtiBasicOutcome',
+            'path' => 'js'
+        ),
+        'taoLtiBasicOutcomeCss' => array(
+            'extId' => 'taoLtiBasicOutcome',
             'path' => 'css'
         ),
         'taoQtiTest' => array(
@@ -205,22 +245,6 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoOutcomeUi',
             'path' => 'css'
         ),
-        'qtiItemPci' => array(
-            'extId' => 'qtiItemPci',
-            'path' => 'js'
-        ),
-        'qtiItemPciCss' => array(
-            'extId' => 'qtiItemPci',
-            'path' => 'css'
-        ),
-        'funcAcl' => array(
-            'extId' => 'funcAcl',
-            'path' => 'js'
-        ),
-        'funcAclCss' => array(
-            'extId' => 'funcAcl',
-            'path' => 'css'
-        ),
         'taoCe' => array(
             'extId' => 'taoCe',
             'path' => 'js'
@@ -229,20 +253,20 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoCe',
             'path' => 'css'
         ),
-        'taoLti' => array(
-            'extId' => 'taoLti',
+        'taoEventLog' => array(
+            'extId' => 'taoEventLog',
             'path' => 'js'
         ),
-        'taoLtiCss' => array(
-            'extId' => 'taoLti',
+        'taoEventLogCss' => array(
+            'extId' => 'taoEventLog',
             'path' => 'css'
         ),
-        'taoLtiBasicOutcome' => array(
-            'extId' => 'taoLtiBasicOutcome',
+        'taoProctoring' => array(
+            'extId' => 'taoProctoring',
             'path' => 'js'
         ),
-        'taoLtiBasicOutcomeCss' => array(
-            'extId' => 'taoLtiBasicOutcome',
+        'taoProctoringCss' => array(
+            'extId' => 'taoProctoring',
             'path' => 'css'
         ),
         'ltiDeliveryProvider' => array(

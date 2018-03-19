@@ -21,7 +21,13 @@
 
 namespace oat\oatbox\service;
 
+use oat\oatbox\log\LoggerService;
+use oat\oatbox\log\TaoLoggerAwareInterface;
+use Psr\Log\LoggerAwareInterface;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
+
 /**
  * Class ServiceManagerAwareTrait
  *
@@ -41,29 +47,64 @@ trait ServiceManagerAwareTrait
      * It should be used for service building, register, build, propagate
      * For reading operation please use $this->getServiceLocator() instead
      *
-     * @throws \common_exception_Error
      * @return ServiceManager
+     * @throws InvalidServiceManagerException
      */
     public function getServiceManager()
     {
         $serviceManager = $this->getServiceLocator();
-        if (! $serviceManager instanceof ServiceManager) {
-            throw new \common_exception_Error('Alternate service locator not compatible with ' . __CLASS__);
+        if ($serviceManager instanceof ServiceManager) {
+            return $serviceManager;
         }
-        return $serviceManager;
+        $msg = is_null($serviceManager)
+            ? 'ServiceLocator not initialized for '.get_class($this)
+            : 'Alternate service locator not compatible with getServiceManager() in ' . __CLASS__;
+        throw new InvalidServiceManagerException($msg);
     }
 
     /**
      * Register a service through ServiceManager
      *
      * @param $serviceKey
-     * @param $service
+     * @param ConfigurableService $service
      * @param bool $allowOverride
+     * @throws \common_Exception
      */
     public function registerService($serviceKey, ConfigurableService $service, $allowOverride = true)
     {
         if ($allowOverride || ! $this->getServiceLocator()->has($serviceKey)) {
             $this->getServiceManager()->register($serviceKey, $service);
         }
+    }
+
+    /**
+     * Propagate service dependencies
+     *
+     * @param $service
+     * @return mixed
+     */
+    protected function propagate($service)
+    {
+        // Propagate the service manager
+        if ($service instanceof ServiceLocatorAwareInterface) {
+            $service->setServiceLocator($this->getServiceLocator());
+        }
+
+        // Propagate the logger service
+        if ($service instanceof LoggerAwareInterface) {
+            $logger = null;
+            if ($this instanceof TaoLoggerAwareInterface) {
+                $logger = $this->getLogger();
+            } else {
+                if ($this->getServiceLocator()->has(LoggerService::SERVICE_ID)) {
+                    $logger = $this->getServiceLocator()->get(LoggerService::SERVICE_ID);
+                }
+            }
+            if (!is_null($logger)) {
+                $service->setLogger($logger);
+            }
+        }
+
+        return $service;
     }
 }

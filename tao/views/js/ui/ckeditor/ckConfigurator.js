@@ -39,7 +39,7 @@ define([
                 items : ['Bold', 'Italic', 'Subscript', 'Superscript']
             }, {
                 name : 'insert',
-                items : ['SpecialChar',  'TaoQtiTable']
+                items : ['SpecialChar',  'TaoQtiTable', 'TaoTooltip']
             }, {
                 name : 'links',
                 items : ['Link']
@@ -49,7 +49,7 @@ define([
                 items : ['Bold', 'Italic', 'Subscript', 'Superscript']
             }, {
                 name : 'insert',
-                items : ['SpecialChar', 'TaoQtiTable']
+                items : ['SpecialChar', 'TaoQtiTable', 'TaoTooltip']
             }, {
                 name : 'links',
                 items : ['Link']
@@ -59,12 +59,11 @@ define([
                 items : ['Bold', 'Italic', 'Subscript', 'Superscript']
             }, {
                 name : 'insert',
-                items : ['Image', 'SpecialChar', 'TaoQtiTable']
+                items : ['Image', 'SpecialChar', 'TaoQtiTable', 'TaoTooltip']
             }, {
                 name : 'links',
                 items : ['Link']
-            },
-            '/', {
+            }, {
                 name : 'styles',
                 items : ['Format']
             }, {
@@ -127,7 +126,8 @@ define([
                 "&Ocirc;", "&Otilde;", "&Ouml;", "&times;", "&Oslash;", "&Ugrave;", "&Uacute;", "&Ucirc;", "&Uuml;", "&Yacute;", "&THORN;", "&szlig;", "&agrave;", "&aacute;", "&acirc;",
                 "&atilde;", "&auml;", "&aring;", "&aelig;", "&ccedil;", "&egrave;", "&eacute;", "&ecirc;", "&euml;", "&igrave;", "&iacute;", "&icirc;", "&iuml;", "&eth;", "&ntilde;",
                 "&ograve;", "&oacute;", "&ocirc;", "&otilde;", "&ouml;", "&divide;", "&oslash;", "&ugrave;", "&uacute;", "&ucirc;", "&uuml;", "&yacute;", "&thorn;", "&yuml;", "&OElig;",
-                "&oelig;", "&#372;", "&#374", "&#373", "&#375;", "&sbquo;", "&#8219;", "&bdquo;", "&hellip;", "&trade;", "&#9658;", "&bull;", "&rarr;", "&rArr;", "&hArr;", "&diams;","&asymp;"]
+                "&oelig;", "&#372;", "&#374", "&#373", "&#375;", "&sbquo;", "&#8219;", "&bdquo;", "&hellip;", "&trade;", "&#9658;", "&bull;", "&rarr;", "&rArr;", "&hArr;", "&diams;","&asymp;"],
+            disableNativeTableHandles: true
         };
 
         /**
@@ -256,6 +256,7 @@ define([
          * @param {Boolean} [options.underline] - enables the underline plugin
          * @param {Boolean} [options.highlight] - enables the highlight plugin
          * @param {Boolean} [options.mathJax] - enables the mathJax plugin
+         * @param {String} [options.removePlugins] - a coma-separated list of plugins that should not be loaded: 'plugin1,plugin2,plugin3'
          *
          * @see http://docs.ckeditor.com/#!/api/CKEDITOR.config
          */

@@ -21,6 +21,11 @@
  */
 ?>
 <?php
+
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyRdfs;
+use oat\tao\model\TaoOntology;
+
 /**
  * @author CRP Henri Tudor - TAO Team - {@link http://www.tao.lu}
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
@@ -90,30 +95,30 @@ class tao_actions_Api extends tao_actions_CommonModule {
 
 			'token'			=> $this->createToken(),
 			'localNamespace' => rtrim(common_ext_NamespaceManager::singleton()->getLocalNamespace()->getUri(), '#'),
-		
-			CLASS_PROCESS_EXECUTIONS => array(
+
+			TaoOntology::CLASS_URI_PROCESS_EXECUTIONS => array(
 				'uri'		=> $processExecution->getUri(),
-				RDFS_LABEL	=> $processExecution->getLabel()
+                OntologyRdfs::RDFS_LABEL	=> $processExecution->getLabel()
 			),
-			
-			TAO_ITEM_CLASS	=> array(
+
+			TaoOntology::CLASS_URI_ITEM	=> array(
 				'uri'		=> $item->getUri(),
-				RDFS_LABEL	=> $item->getLabel()
+                OntologyRdfs::RDFS_LABEL	=> $item->getLabel()
 			),
-			TAO_TEST_CLASS	=> array(
+			TaoOntology::CLASS_URI_TEST	=> array(
 				'uri'		=> $test->getUri(),
-				RDFS_LABEL	=> $test->getLabel()
+                OntologyRdfs::RDFS_LABEL	=> $test->getLabel()
 			),
-			TAO_DELIVERY_CLASS	=> array(
+			TaoOntology::CLASS_URI_DELIVERY	=> array(
 				'uri'		=> $delivery->getUri(),
-				RDFS_LABEL	=> $delivery->getLabel()
+                OntologyRdfs::RDFS_LABEL	=> $delivery->getLabel()
 			),
-			TAO_SUBJECT_CLASS => array(
+            TaoOntology::CLASS_URI_SUBJECT => array(
 				'uri'					=> $user->getUri(),
-				RDFS_LABEL				=> $user->getLabel(),
-				PROPERTY_USER_LOGIN		=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_USER_LOGIN)),
-				PROPERTY_USER_FIRSTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_USER_FIRSTNAME)),
-				PROPERTY_USER_LASTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_USER_LASTNAME))
+                OntologyRdfs::RDFS_LABEL				=> $user->getLabel(),
+				GenerisRdf::PROPERTY_USER_LOGIN		=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_LOGIN)),
+				GenerisRdf::PROPERTY_USER_FIRSTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_FIRSTNAME)),
+				GenerisRdf::PROPERTY_USER_LASTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_LASTNAME))
 			)
 		);
 		
@@ -148,23 +153,23 @@ class tao_actions_Api extends tao_actions_CommonModule {
 		$sessionKey = self::ENV_VAR_NAME.'_'.tao_helpers_Uri::encode($user->getUri());
 		if($session->hasAttribute($sessionKey)){
 			$executionEnvironment = $session->getAttribute($sessionKey);
-			if(isset($executionEnvironment['token']) && $executionEnvironment[CLASS_PROCESS_EXECUTIONS]['uri'] == $processExecution->getUri() ){
+			if(isset($executionEnvironment['token']) && $executionEnvironment[TaoOntology::CLASS_URI_PROCESS_EXECUTIONS]['uri'] == $processExecution->getUri() ){
 				return $executionEnvironment;
 			}
 		}
 			
 		$executionEnvironment = array(
 			'token' => self::createToken(),
-			CLASS_PROCESS_EXECUTIONS => array(
+			TaoOntology::CLASS_URI_PROCESS_EXECUTIONS => array(
 				'uri'		=> $processExecution->getUri(),
-				RDFS_LABEL	=> $processExecution->getLabel()
+                OntologyRdfs::RDFS_LABEL	=> $processExecution->getLabel()
 			),
-			TAO_SUBJECT_CLASS => array(
+			TaoOntology::CLASS_URI_SUBJECT => array(
 				'uri'					=> $user->getUri(),
-				RDFS_LABEL				=> $user->getLabel(),
-				PROPERTY_USER_LOGIN		=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_USER_LOGIN)),
-				PROPERTY_USER_FIRSTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_USER_FIRSTNAME)),
-				PROPERTY_USER_LASTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(PROPERTY_USER_LASTNAME))
+                OntologyRdfs::RDFS_LABEL				=> $user->getLabel(),
+				GenerisRdf::PROPERTY_USER_LOGIN		=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_LOGIN)),
+				GenerisRdf::PROPERTY_USER_FIRSTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_FIRSTNAME)),
+				GenerisRdf::PROPERTY_USER_LASTNAME	=> (string)$user->getOnePropertyValue(new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_LASTNAME))
 			)
 		);
 		$session->setAttribute($sessionKey, $executionEnvironment);

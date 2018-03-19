@@ -18,8 +18,15 @@
  *               2009-2012 (update and modification) Public Research Centre Henri Tudor (under the project TAO-SUSTAIN & TAO-DEV);
  *
  */
+
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyRdf;
+use oat\generis\model\OntologyRdfs;
+use oat\generis\model\WidgetRdf;
 use oat\tao\helpers\form\elements\TreeAware;
 use oat\tao\helpers\form\ValidationRuleRegistry;
+use oat\tao\model\TaoOntology;
+use oat\tao\model\WidgetDefinitions;
 
 /**
  * The GenerisFormFactory enables you to create Forms using rdf data and the
@@ -95,13 +102,13 @@ class tao_helpers_form_GenerisFormFactory
 
 					if($element instanceof TreeAware){
                         $sortedOptions = $element->rangeToTree(
-							$property->getUri() === RDFS_RANGE ? new core_kernel_classes_Class( RDFS_RESOURCE ) : $range
+							$property->getUri() === OntologyRdfs::RDFS_RANGE ? new core_kernel_classes_Class( OntologyRdfs::RDFS_RESOURCE ) : $range
 						);
 					}
 					else{
 						/** @var core_kernel_classes_Resource $rangeInstance */
                         foreach ($range->getInstances(true) as $rangeInstance) {
-                            $level = $rangeInstance->getOnePropertyValue(new core_kernel_classes_Property(TAO_LIST_LEVEL_PROP));
+                            $level = $rangeInstance->getOnePropertyValue(new core_kernel_classes_Property(TaoOntology::PROPERTY_LIST_LEVEL));
                             if (is_null($level)) {
                                 $options[tao_helpers_Uri::encode($rangeInstance->getUri())] = array(tao_helpers_Uri::encode($rangeInstance->getUri()), $rangeInstance->getLabel());
                             } else {
@@ -156,7 +163,7 @@ class tao_helpers_form_GenerisFormFactory
 
 
         if(is_null($topLevelClazz)){
-			$topLevelClazz = new core_kernel_classes_Class(TAO_OBJECT_CLASS);
+			$topLevelClazz = new core_kernel_classes_Class(TaoOntology::CLASS_URI_OBJECT );
 		}
 
 
@@ -183,7 +190,7 @@ class tao_helpers_form_GenerisFormFactory
 			}
 			$lastLevelParents = array();
 			foreach($parentClasses as $parentClass){
-				if($parentClass->getUri() == RDFS_CLASS){
+				if($parentClass->getUri() == OntologyRdfs::RDFS_CLASS){
 					continue;
 				}
 				if($parentClass->getUri() == $topLevelClazz->getUri() ) {
@@ -226,7 +233,7 @@ class tao_helpers_form_GenerisFormFactory
 
 
 		 $returnValue = array(
-			new core_kernel_classes_Property(RDFS_LABEL)
+			new core_kernel_classes_Property(OntologyRdfs::RDFS_LABEL)
 		);
 
 
@@ -250,19 +257,19 @@ class tao_helpers_form_GenerisFormFactory
 
 		switch($mode){
 			case 'simple':
-				$defaultUris = array(PROPERTY_IS_LG_DEPENDENT);
+				$defaultUris = array(GenerisRdf::PROPERTY_IS_LG_DEPENDENT);
 				break;
 			case 'advanced':
 			default:
 				$defaultUris = array(
-					RDFS_LABEL,
-					PROPERTY_WIDGET,
-					RDFS_RANGE,
-					PROPERTY_IS_LG_DEPENDENT
+                    OntologyRdfs::RDFS_LABEL,
+                    WidgetRdf::PROPERTY_WIDGET,
+                    OntologyRdfs::RDFS_RANGE,
+					GenerisRdf::PROPERTY_IS_LG_DEPENDENT
 				);
 				break;
 		}
-		$resourceClass = new core_kernel_classes_Class(RDF_PROPERTY);
+		$resourceClass = new core_kernel_classes_Class(OntologyRdf::RDF_PROPERTY);
 		foreach($resourceClass->getProperties() as $property){
 			if(in_array($property->getUri(), $defaultUris)){
 				array_push($returnValue, $property);
@@ -288,65 +295,65 @@ class tao_helpers_form_GenerisFormFactory
 		$returnValue = array(
 			'text' => array(
 				'title' 	=> __('Text - Short - Field'),
-				'widget'	=> PROPERTY_WIDGET_TEXTBOX,
-				'range'		=> RDFS_LITERAL,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_TEXTBOX,
+				'range'		=> OntologyRdfs::RDFS_LITERAL,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 			'longtext' => array(
 				'title' 	=> __('Text - Long - Box'),
-				'widget'	=> PROPERTY_WIDGET_TEXTAREA,
-				'range'		=> RDFS_LITERAL,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_TEXTAREA,
+				'range'		=> OntologyRdfs::RDFS_LITERAL,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 			'html' => array(
 				'title' 	=> __('Text - Long - HTML editor'),
-				'widget'	=> PROPERTY_WIDGET_HTMLAREA,
-				'range'		=> RDFS_LITERAL,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_HTMLAREA,
+				'range'		=> OntologyRdfs::RDFS_LITERAL,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 			'list' => array(
 				'title' 	=> __('List - Single choice - Radio button'),
-				'widget'	=> PROPERTY_WIDGET_RADIOBOX,
-				'range'		=> RDFS_RESOURCE,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_RADIOBOX,
+				'range'		=> OntologyRdfs::RDFS_RESOURCE,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 
 			'multiplenodetree' => array(
 				'title' 	=> __('Tree - Multiple node choice '),
-				'widget'	=> PROPERTY_WIDGET_TREEBOX,
-				'range'		=> RDFS_RESOURCE,
-				'multiple'  => GENERIS_TRUE
+				'widget'	=> WidgetDefinitions::PROPERTY_TREEBOX,
+				'range'		=> OntologyRdfs::RDFS_RESOURCE,
+				'multiple'  => GenerisRdf::GENERIS_TRUE
 			),
 
 			'longlist' => array(
 				'title' 	=> __('List - Single choice - Drop down'),
-				'widget'	=> PROPERTY_WIDGET_COMBOBOX,
-				'range'		=> RDFS_RESOURCE,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_COMBOBOX,
+				'range'		=> OntologyRdfs::RDFS_RESOURCE,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 			'multilist' => array(
 				'title' 	=> __('List - Multiple choice - Check box'),
-				'widget'	=> PROPERTY_WIDGET_CHECKBOX,
-				'range'		=> RDFS_RESOURCE,
-			    'multiple'  => GENERIS_TRUE
+				'widget'	=> WidgetDefinitions::PROPERTY_CHECKBOX,
+				'range'		=> OntologyRdfs::RDFS_RESOURCE,
+			    'multiple'  => GenerisRdf::GENERIS_TRUE
 			),
 			'calendar' => array(
 				'title' 	=> __('Calendar'),
-				'widget'	=> PROPERTY_WIDGET_CALENDAR,
-				'range'		=> RDFS_LITERAL,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_CALENDAR,
+				'range'		=> OntologyRdfs::RDFS_LITERAL,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 			'password' => array(
 				'title' 	=> __('Password'),
-				'widget'	=> PROPERTY_WIDGET_HIDDENBOX,
-				'range'		=> RDFS_LITERAL,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_HIDDENBOX,
+				'range'		=> OntologyRdfs::RDFS_LITERAL,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			),
 			'file' => array(
 				'title' 	=> __('File'),
-				'widget'	=> PROPERTY_WIDGET_FILE,
-				'range'		=> CLASS_GENERIS_FILE,
-			    'multiple'  => GENERIS_FALSE
+				'widget'	=> WidgetDefinitions::PROPERTY_FILE,
+				'range'		=> GenerisRdf::CLASS_GENERIS_FILE,
+			    'multiple'  => GenerisRdf::GENERIS_FALSE
 			)
 		);
 

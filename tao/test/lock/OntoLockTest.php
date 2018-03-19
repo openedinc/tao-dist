@@ -22,6 +22,8 @@ namespace  oat\tao\test\lock;
 use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
 use core_kernel_classes_Class;
+use oat\generis\model\OntologyRdfs;
+use oat\tao\model\TaoOntology;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\tao\model\lock\implementation\OntoLock;
 
@@ -45,7 +47,7 @@ class OntoLockTest extends TaoPhpUnitTestRunner
      */
     public function setUp()
     {
-        $resourceClass = new core_kernel_classes_Class(RDFS_RESOURCE);
+        $resourceClass = new core_kernel_classes_Class(OntologyRdfs::RDFS_RESOURCE);
         $this->tempResource = $resourceClass->createInstance('MyTest');
         $this->ontoLock = new OntoLock();
         
@@ -111,7 +113,7 @@ class OntoLockTest extends TaoPhpUnitTestRunner
     {
         $resource = $this->prophesize('core_kernel_classes_Resource');
         
-        $lockProp = new core_kernel_classes_Property(PROPERTY_LOCK);
+        $lockProp = new core_kernel_classes_Property(TaoOntology::PROPERTY_LOCK);
         $resource->getPropertyValues($lockProp)->willReturn(array('foo','bar'));
         $this->ontoLock->releaseLock($resource->reveal(), $this->owner->getUri());
     }
@@ -123,7 +125,7 @@ class OntoLockTest extends TaoPhpUnitTestRunner
     public function testForceReleaseLock()
     {
         $resource = $this->prophesize('core_kernel_classes_Resource');
-        $lockProp = new core_kernel_classes_Property(PROPERTY_LOCK);
+        $lockProp = new core_kernel_classes_Property(TaoOntology::PROPERTY_LOCK);
         
         $this->ontoLock->forceReleaseLock($resource->reveal());
         

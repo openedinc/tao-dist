@@ -17,6 +17,6 @@
 return new oat\oatbox\config\ConfigurationService(array(
     'config' => new core_kernel_uri_DatabaseSerialUriProvider(array(
         'persistence' => 'default',
-        'namespace' => LOCAL_NAMESPACE.'#'
+        'namespace' => 'http://opened/tao.rdf#'
     ))
 ));

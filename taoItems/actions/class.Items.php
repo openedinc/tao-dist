@@ -1,9 +1,12 @@
 <?php
 
+use oat\generis\model\OntologyRdfs;
 use oat\oatbox\event\EventManagerAwareTrait;
 use oat\tao\model\lock\LockManager;
 use oat\taoItems\model\event\ItemRdfUpdatedEvent;
 use oat\taoItems\model\event\ItemUpdatedEvent;
+use oat\taoItems\model\ItemModelStatus;
+use oat\tao\model\resources\ResourceWatcher;
 
 /**
  * This program is free software; you can redistribute it and/or
@@ -169,11 +172,12 @@ class taoItems_actions_Items extends tao_actions_SaSModule
 
                 if($myForm->isSubmited() && $this->hasWriteAccess($item->getUri())){
                     if($myForm->isValid()){
-    
+
                         $properties = $myForm->getValues();
-                        unset($properties[taoItems_models_classes_ItemsService::PROPERTY_ITEM_CONTENT]);
-                        unset($properties['warning']);
-                        unset($properties['itemModelLabel']);
+                        if (array_key_exists('warning', $properties)) {
+                            common_Logger::w( 'Warning property is still in use', ['backend']);
+                            unset($properties['warning']);
+                        }
     
                         //bind item properties and set default content:
                         $binder = new tao_models_classes_dataBinding_GenerisFormDataBinder($item);
@@ -183,7 +187,7 @@ class taoItems_actions_Items extends tao_actions_SaSModule
                         $this->getEventManager()->trigger(new ItemRdfUpdatedEvent($item->getUri(), $properties));
 
                         //if item label has been changed, do not use getLabel() to prevent cached value from lazy loading
-                        $label = $item->getOnePropertyValue(new core_kernel_classes_Property(RDFS_LABEL));
+                        $label = $item->getOnePropertyValue(new core_kernel_classes_Property(OntologyRdfs::RDFS_LABEL));
                         $this->setData("selectNode", tao_helpers_Uri::encode($item->getUri()));
                         $this->setData('label', ($label != null) ? $label->literal : '');
                         $this->setData('message', __('Item saved'));
@@ -199,13 +203,13 @@ class taoItems_actions_Items extends tao_actions_SaSModule
             $hasModel   = false;
             if(!empty($currentModel)) {
                 $hasModel = true;
-                $isDeprecated = $this->getClassService()->hasModelStatus($item, array(TAO_ITEM_MODEL_STATUS_DEPRECATED));
+                $isDeprecated = $this->getClassService()->hasModelStatus($item, array(ItemModelStatus::INSTANCE_DEPRECATED));
                 $hasPreview = !$isDeprecated && $this->getClassService()->hasItemContent($item);
             }
 
-            $myForm->removeElement(tao_helpers_Uri::encode(taoItems_models_classes_ItemsService::PROPERTY_ITEM_CONTENT));
-
+            $updatedAt = $this->getServiceLocator()->get(ResourceWatcher::SERVICE_ID)->getUpdatedAt($item);
             $this->setData('isPreviewEnabled', $hasPreview);
+            $this->setData('updatedAt', $updatedAt);
             $this->setData('isAuthoringEnabled', $hasModel);
 
             $this->setData('formTitle', __('Edit Item'));
@@ -234,14 +238,14 @@ class taoItems_actions_Items extends tao_actions_SaSModule
                     if($clazz instanceof core_kernel_classes_Resource){
                         $this->setData("selectNode", tao_helpers_Uri::encode($clazz->getUri()));
                     }
-                    $this->setData('message', __('Class saved'));
-                    $this->setData('reload', true);
+                    $this->setData('message', __('Class schema saved'));
+                    $this->setData('reload', false);
                 }
             }
         } else {
             $myForm->setActions(array());
         }
-        $this->setData('formTitle', __('Edit item class'));
+        $this->setData('formTitle', __('Manage item class schema'));
         $this->setData('myForm', $myForm->render());
         $this->setView('form.tpl', 'tao');
     }
@@ -259,14 +263,25 @@ class taoItems_actions_Items extends tao_actions_SaSModule
     }
 
     /**
-     * delete an item class
-     * called via ajax
+     * delete a class
      * @requiresRight id WRITE
      * @throws Exception
      */
     public function deleteClass()
     {
         return parent::deleteClass();
+    }
+
+    /**
+     * Delete all given resources
+     *
+     * @requiresRight ids WRITE
+     *
+     * @throws Exception
+     */
+    public function deleteAll()
+    {
+        return parent::deleteAll();
     }
 
     /**

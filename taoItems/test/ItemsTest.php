@@ -20,10 +20,14 @@
  */
 namespace oat\taoItems\test;
 
+use oat\tao\model\TaoOntology;
+use oat\generis\model\OntologyRdfs;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use core_kernel_classes_Property;
 use core_kernel_classes_Resource;
+use oat\taoItems\model\ItemModelStatus;
 use oat\taoQtiItem\model\ItemModel;
+use taoItems_models_classes_itemModel;
 use taoItems_models_classes_ItemsService;
 
 /**
@@ -68,10 +72,9 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
      */
     public function testClassCreate()
     {
-        $this->assertTrue(defined('TAO_ITEM_CLASS'));
         $ItemClass = $this->itemsService->getRootClass();
         $this->assertInstanceOf(\core_kernel_classes_Class::class, $ItemClass);
-        $this->assertEquals(TAO_ITEM_CLASS, $ItemClass->getUri());
+        $this->assertEquals(TaoOntology::ITEM_CLASS_URI, $ItemClass->getUri());
 
         return $ItemClass;
     }
@@ -124,8 +127,7 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
         $this->assertInstanceOf(core_kernel_classes_Resource::class, $instance);
         $this->assertEquals($label, $instance->getLabel());
 
-        $this->assertTrue(defined('RDFS_LABEL'));
-        $instance->removePropertyValues(new \core_kernel_classes_Property(RDFS_LABEL));
+        $instance->removePropertyValues(new \core_kernel_classes_Property(OntologyRdfs::RDFS_LABEL));
         $instance->setLabel($label);
 
 
@@ -145,7 +147,7 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
         $this->assertFalse($this->itemsService->hasItemModel($instance, array(ItemModel::MODEL_URI)));
         $this->assertFalse($this->itemsService->hasItemContent($instance));
 
-        $instance->setPropertyValue(new \core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY), ItemModel::MODEL_URI);
+        $instance->setPropertyValue(new \core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL), ItemModel::MODEL_URI);
 
         $directory = $this->itemsService->getItemDirectory($instance);
         $this->assertTrue($directory->getFile('qti.xml')->write('test'));
@@ -162,13 +164,13 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
         $this->assertEquals(count($this->itemsService->getAllByModel($instance)), 0);
         $this->assertEquals(count($this->itemsService->getAllByModel(null)), 0);
 
-        $this->assertFalse($this->itemsService->hasModelStatus($instance, array(TAO_ITEM_MODEL_STATUS_DEPRECATED)));
+        $this->assertFalse($this->itemsService->hasModelStatus($instance, array(ItemModelStatus::INSTANCE_DEPRECATED)));
     }
 
     public function testIsItemClass()
     {
         $clazz = $this->prophesize('core_kernel_classes_Class');
-        $clazz->getUri()->willReturn(TAO_ITEM_CLASS);   
+        $clazz->getUri()->willReturn(TaoOntology::ITEM_CLASS_URI);
         $this->assertTrue($this->itemsService->isItemClass($clazz->reveal()));
         
         
@@ -176,7 +178,7 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
         $clazz->getUri()->willReturn('uri');
         
         $parent = $this->prophesize('core_kernel_classes_Class');
-        $parent->getUri()->willReturn(TAO_ITEM_CLASS);
+        $parent->getUri()->willReturn(TaoOntology::ITEM_CLASS_URI);
         
         $clazz->getParentClasses(true)->willReturn(array($parent->reveal()));
         $this->assertTrue($this->itemsService->isItemClass($clazz->reveal()));
@@ -186,9 +188,9 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
     {
         $item = $this->prophesize('core_kernel_classes_Resource');
         $itemModel = $this->prophesize('core_kernel_classes_Resource');
-        $itemModel->getOnePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_RUNTIME_PROPERTY))
+        $itemModel->getOnePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_itemModel::CLASS_URI_RUNTIME))
             ->willReturn('returnValue');
-        $item->getOnePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY))
+        $item->getOnePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL))
             ->willReturn($itemModel->reveal());
         
         $this->assertEquals('returnValue', $this->itemsService->getModelRuntime($item->reveal()));
@@ -199,7 +201,7 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
         $item = $this->prophesize('core_kernel_classes_Resource');
         $itemModelProphecy = $this->prophesize('core_kernel_classes_Resource');
         $itemModel = $itemModelProphecy->reveal();
-        $item->getOnePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY))
+        $item->getOnePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL))
         ->willReturn($itemModel);
         $this->assertEquals($itemModel, $this->itemsService->getItemModel($item->reveal()));
     }
@@ -258,11 +260,11 @@ class ItemsTestCase extends TaoPhpUnitTestRunner
         
         $this->assertFalse($this->itemsService->isItemModelDefined($item->reveal()));
         
-        $item->getOnePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY))
+        $item->getOnePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL))
             ->willReturn('notnull');        
         $this->assertTrue($this->itemsService->isItemModelDefined($item->reveal()));
         
-        $item->getOnePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY))
+        $item->getOnePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL))
         ->willReturn(new \core_kernel_classes_Literal('notnull'));
         $this->assertTrue($this->itemsService->isItemModelDefined($item->reveal()));
     }

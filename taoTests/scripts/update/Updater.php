@@ -22,6 +22,7 @@
 namespace oat\taoTests\scripts\update;
 
 use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoTests\models\runner\providers\TestProviderService;
 use oat\taoTests\scripts\install\RegisterTestPluginService;
 use oat\taoTests\scripts\install\RegisterTestRunnerFeatureService;
 use oat\tao\model\accessControl\func\AclProxy;
@@ -88,6 +89,18 @@ class Updater extends \common_ext_ExtensionUpdater
             $this->setVersion('6.0.1');
         }
 
-        $this->skip('6.0.1', '6.4.1');
-	}
+        $this->skip('6.0.1', '6.10.0');
+
+        if ($this->isVersion('6.10.0')){
+
+            //register test plugin service
+            $serviceManager = $this->getServiceManager();
+            $testProviderService = new TestProviderService();
+            $serviceManager->register(TestProviderService::SERVICE_ID, $testProviderService);
+
+            $this->setVersion('6.11.0');
+        }
+
+        $this->skip('6.11.0', '7.3.0');
+    }
 }

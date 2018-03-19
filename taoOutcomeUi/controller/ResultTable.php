@@ -15,62 +15,52 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * Copyright (c) 2009-2012 (original work) Public Research Centre Henri Tudor (under the project TAO-SUSTAIN & TAO-DEV);
- *
+ *               2012-2017 Open Assessment Technologies SA;
  *
  */
-
 
 namespace oat\taoOutcomeUi\controller;
 
 use \common_Exception;
-use \core_kernel_classes_Class;
-use \core_kernel_classes_Property;
-use \core_kernel_classes_Resource;
-use \tao_models_classes_table_Column;
-use \tao_models_classes_table_PropertyColumn;
+use oat\taoOutcomeUi\model\export\ColumnsProvider;
+use oat\generis\model\OntologyAwareTrait;
+use oat\taoOutcomeUi\model\export\ResultsExporter;
 use oat\taoOutcomeUi\model\ResultsService;
-use oat\taoOutcomeUi\model\table\GradeColumn;
-use oat\taoOutcomeUi\model\table\ResponseColumn;
-use oat\taoOutcomeUi\model\table\VariableColumn;
-use oat\taoOutcomeRds\model\RdsResultStorage;
+use oat\taoOutcomeUi\model\table\ResultsPayload;
+use oat\taoTaskQueue\model\TaskLogActionTrait;
 use tao_helpers_Uri;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 
 /**
- * should be entirelyrefactored
- * Results Controller provide actions performed from url resolution
+ * Delivery Results export functionalities
  *
- * @author Joel Bout <joel@taotesting.com>
- * @author Patrick Plichart <patrick@taotesting.com>
- * @package taoOutcomeUi
- * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
- *
+ * @author Gyula Szucs <gyula@taotesting.com>
  */
-class ResultTable extends \tao_actions_CommonModule {
+class ResultTable extends \tao_actions_CommonModule
+{
+    const PARAMETER_COLUMNS = 'columns';
+    const PARAMETER_DELIVERY_URI = 'uri';
+    const PARAMETER_FILTER = 'filter';
+
+    use OntologyAwareTrait;
+    use TaskLogActionTrait;
 
     /**
-     * constructor: initialize the service and the default data
-     * @return Results
-     */
-    protected $service;
-
-    public function __construct() {
-
-        parent::__construct();
-        $this->service = ResultsService::singleton();
-    }
-
-    /**
-     * Result Table entry page
+     * Return the Result Table entry page displaying the datatable and the filters to be applied.
+     *
+     * @throws \tao_models_classes_MissingRequestParameterException
      */
     public function index()
     {
         $deliveryService = DeliveryAssemblyService::singleton();
         if($this->getRequestParameter('classUri') !== $deliveryService->getRootClass()->getUri()) {
             $filter = $this->getRequestParameter('filter');
-            $classUri = $this->getRequestParameter('classUri');
+            $uri = $this->getRequestParameter('uri');
+            if (!\common_Utils::isUri(tao_helpers_Uri::decode($uri))) {
+                throw new \tao_models_classes_MissingRequestParameterException('uri');
+            }
             $this->setData('filter', $filter);
-            $this->setData('classUri', $classUri);
+            $this->setData('uri', $uri);
             $this->setView('resultTable.tpl');
         } else {
             $this->setData('type', 'info');
@@ -80,366 +70,143 @@ class ResultTable extends \tao_actions_CommonModule {
     }
 
     /**
-     * Relies on two optionnal parameters,
-     * - filters (facet based query) ($this->hasRequestParameter('filter'))
-     * - the list of columns currently selected on the frontend side ($this->hasRequestParameter('columns'))
-     * @return void - a csv string is being sent out by parent class -> data method into the buffer
+     * Feeds js datatable component with the values to be exported.
+     *
+     * @throws common_Exception
      */
-    public function getCsvFile(){
-        $rows = array();
-
-        $filter =  $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : array();
-    	$columns = $this->hasRequestParameter('columns') ? $this->getColumns('columns') : array();
-
-        $delivery = new \core_kernel_classes_Resource(tao_helpers_Uri::decode($this->getRequestParameter('classUri')));
-        $implementation = $this->service->getReadableImplementation($delivery);
-        $this->service->setImplementation($implementation);
-    	
-        $delivery = array();
-        if($this->hasRequestParameter('classUri')){
-            $delivery[] = \tao_helpers_Uri::decode($this->getRequestParameter('classUri'));
+    public function feedDataTable()
+    {
+        if (!\tao_helpers_Request::isAjax()) {
+            throw new \Exception('Only ajax call allowed.');
         }
 
-    	//The list of delivery Results matching the current selection filters
-        $results = array();
-        foreach($this->service->getImplementation()->getResultByDelivery($delivery) as $result){
-            $results[] = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($result['deliveryResultIdentifier']);
-        }
-        $dpmap = array();
-        foreach ($columns as $column) {
-                $dataprovider = $column->getDataProvider();
-                $found = false;
-                foreach ($dpmap as $k => $dp) {
-                        if ($dp['instance'] == $dataprovider) {
-                                $found = true;
-                                $dpmap[$k]['columns'][] = $column;
-                        }
-                }
-                if (!$found) {
-                        $dpmap[] = array(
-                                'instance'	=> $dataprovider,
-                                'columns'	=> array(
-                                        $column
-                                )
-                        );
-                }
+        if (!$this->hasRequestParameter(self::PARAMETER_COLUMNS)) {
+            throw new common_Exception('Parameter "'. self::PARAMETER_COLUMNS .'" missing');
         }
 
-        foreach ($dpmap as $arr) {
-            $arr['instance']->prepare($results, $arr['columns']);
-        }
-
-        /** @var \taoDelivery_models_classes_execution_DeliveryExecution $result */
-        foreach($results as $result) {
-            $cellData = array();
-            foreach ($columns as $column) {
-                if (count($column->getDataProvider()->cache) > 0) {
-                    $cellData[]=self::filterCellData($column->getDataProvider()->getValue(new core_kernel_classes_Resource($result->getIdentifier()), $column), $filter);
-                } else {
-                    $cellData[]=self::filterCellData(
-                        (string)$this->service->getTestTaker($result)->getOnePropertyValue(new \core_kernel_classes_Property(PROPERTY_USER_LOGIN)),
-                        $filter);
-                }
-            }
-            $rows[] = array(
-                    'id' => $result->getIdentifier(),
-                    'cell' => $cellData
-            );
-        }
-
-        $encodedData = $this->dataToCsv($columns, $rows,';','"');
-
-        header('Set-Cookie: fileDownload=true'); //used by jquery file download to find out the download has been triggered ...
-        setcookie("fileDownload","true", 0, "/");
-        header("Content-type: text/csv");
-        header('Content-Disposition: attachment; filename=Data.csv');
-        echo $encodedData;
+        $this->returnJSON((new ResultsPayload($this->getExporterService()->getExporter()))->getPayload());
     }
 
     /**
-     * Returns the default column selection that contains the Result of Subject property (This has been removed from the other commodity function adding grades and responses)
+     * Exports results by a single delivery.
+     *
+     * Only creating the export task.
+     *
+     * @throws \Exception
      */
-    public function getResultOfSubjectColumn(){
-
-		$testtaker = new tao_models_classes_table_PropertyColumn(new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT));
-		$arr[] = $testtaker->toArray();
-        echo json_encode(array(
-                'columns' => $arr,
-                'first'   => true
-        ));
-    }
-
-    /** 
-     * Returns all columns with all responses pertaining to the current delivery results selection
-     */
-    public function getResponseColumns() {
-	    $this->getVariableColumns(CLASS_RESPONSE_VARIABLE);
-    }
-
-    /** 
-     * Returns all columns with all grades pertaining to the current delivery results selection
-     */
-     public function getGradeColumns() {
-        $this->getVariableColumns(CLASS_OUTCOME_VARIABLE);
-    }
-
-     /**
-     * Retrieve the different variables columns pertainign to the current selection of results
-     * Implementation note : it nalyses all the data collected to identify the different response variables submitted by the items in the context of activities
-     */
-    protected function getVariableColumns($variableClassUri) {
-
-		$columns = array();
-        $filter =  $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : array();
-
-        $delivery = new \core_kernel_classes_Resource(tao_helpers_Uri::decode($this->getRequestParameter('classUri')));
-        $implementation = $this->service->getReadableImplementation($delivery);
-        $this->service->setImplementation($implementation);
-		
-
-        $delivery = array();
-        if($this->hasRequestParameter('classUri')){
-            $delivery[] = \tao_helpers_Uri::decode($this->getRequestParameter('classUri'));
+    public function export()
+    {
+        if (!\tao_helpers_Request::isAjax()) {
+            throw new \Exception('Only ajax call allowed.');
         }
 
-		//The list of delivery Results matching the current selection filters
-        $results = $this->service->getImplementation()->getResultByDelivery($delivery, $filter);
-
-		//retrieveing all individual response variables referring to the  selected delivery results
-		$selectedVariables = array ();
-		foreach ($results as $result){
-            $de = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($result["deliveryResultIdentifier"]);
-            $variables = $this->service->getVariables($de);
-            $selectedVariables = array_merge($selectedVariables, $variables);
-		}
-		//retrieving The list of the variables identifiers per activities defintions as observed
-		$variableTypes = array();
-		foreach ($selectedVariables as $variable) {
-            if((!is_null($variable[0]->item) ||  !is_null($variable[0]->test))&& (get_class($variable[0]->variable) == 'taoResultServer_models_classes_OutcomeVariable' && $variableClassUri == CLASS_OUTCOME_VARIABLE)
-            || (get_class($variable[0]->variable) == 'taoResultServer_models_classes_ResponseVariable' && $variableClassUri == CLASS_RESPONSE_VARIABLE)){
-                //variableIdentifier
-                $variableIdentifier = $variable[0]->variable->identifier;
-                $uri = (!is_null($variable[0]->item))? $variable[0]->item : $variable[0]->test;
-                $object = new core_kernel_classes_Resource($uri);
-                if (get_class($object) == "core_kernel_classes_Resource") {
-                $contextIdentifierLabel = $object->getLabel();
-                $contextIdentifier = $object->getUri(); // use the callId/itemResult identifier
-                }
-                else {
-                    $contextIdentifierLabel = $object->__toString();
-                    $contextIdentifier = $object->__toString();
-                }
-                $variableTypes[$contextIdentifier.$variableIdentifier] = array("contextLabel" => $contextIdentifierLabel, "contextId" => $contextIdentifier, "variableIdentifier" => $variableIdentifier);
-            }
-        }
-		foreach ($variableTypes as $variable){
-
-		    switch ($variableClassUri){
-                case CLASS_RESPONSE_VARIABLE:{ $columns[] = new ResponseColumn($variable["contextId"], $variable["contextLabel"], $variable["variableIdentifier"]);break;}
-                case CLASS_OUTCOME_VARIABLE: { $columns[] = new GradeColumn($variable["contextId"], $variable["contextLabel"], $variable["variableIdentifier"]);break;}
-                default:{$columns[] = new ResponseColumn($variable["contextId"], $variable["contextLabel"], $variable["variableIdentifier"]);}
-			}
-		}
-		$arr = array();
-		foreach ($columns as $column) {
-			$arr[] = $column->toArray();
-		}
-    	echo json_encode(array(
-    		'columns' => $arr
-    	));
+        return $this->returnTaskJson($this->getExporterService()->createExportTask());
     }
 
     /**
-     * @return string A csv file with the data table
-     * @param columns an array of column objects including the property information and as it is used in the tao class.Table.php context
+     * Returns test taker metadata columns.
+     *
+     * @throws \Exception
      */
-    private function dataToCsv($columns, $rows, $delimiter, $enclosure){
-       //opens a temporary stream rather than producing a file and get benefit of csv php helpers
-        $handle = fopen('php://temp', 'r+');
-        //print_r($this->columnsToFlatArray($columns));
-       fputcsv($handle, $this->columnsToFlatArray($columns), $delimiter, $enclosure);
-       foreach ($rows as $line) {
-           $seralizedData = array();
-           foreach ($line["cell"] as $cellData){
+    public function getTestTakerColumns()
+    {
+        if (!\tao_helpers_Request::isAjax()) {
+            throw new \Exception('Only ajax call allowed.');
+        }
 
-             if (!is_array($cellData)) {
-                 $seralizedData[] = $cellData;
-             } else {
-                 $seralizedData[] = array_pop($cellData);
-             }
-               //$seralizedData[] = $this->cellDataToString($cellData);
-           }
-           fputcsv($handle, $seralizedData, $delimiter, $enclosure);
-       }
-       rewind($handle);
-       //read the content of the csv
-       $encodedData = "";
-       while (!feof($handle)) {
-           $encodedData .= fread($handle, 8192);
-       }
-       fclose($handle);
-       return $encodedData;
+        return $this->returnJson([
+            'columns' => $this->getColumnsProvider()->getTestTakerColumns(),
+            'first'   => true
+        ]);
     }
 
     /**
-     * Returns a flat array with the list of column labels.
-     * @param columns an array of column object including the property information and that is used within tao class.Table context
+     * Returns delivery metadata columns.
+     *
+     * @throws \Exception
      */
-    private function columnsToFlatArray($columns){
-        $flatColumnsArray = array();
-        foreach ($columns as $column){
-            $flatColumnsArray[] = $column->label;
+    public function getDeliveryColumns()
+    {
+        if (!\tao_helpers_Request::isAjax()) {
+            throw new \Exception('Only ajax call allowed.');
         }
-        return $flatColumnsArray;
+
+        return $this->returnJson([
+            'columns' => $this->getColumnsProvider()->getDeliveryColumns()
+        ]);
     }
 
-
-     protected  function getColumns($identifier) {
-    	 if (!$this->hasRequestParameter($identifier)) {
-    	 	throw new common_Exception('Missing parameter "'.$identifier.'" for getColumns()');
-    	 }
-    	 $columns = array();
-    	 foreach ($this->getRequestParameter($identifier) as $array) {
-    	 	$column = tao_models_classes_table_Column::buildColumnFromArray($array);
-    	 	if (!is_null($column)) {
-    	 		$columns[] = $column;
-    	 	}
-    	 }
-    	 return $columns;
-    }
-    
     /**
-     * Data provider for the table, returns json encoded data according to the parameter
-     * @author Bertrand Chevrier, <taosupport@tudor.lu>,
+     * Returns grade columns.
+     *
+     * @throws \Exception
      */
-    public function data() {
-       	$filterData =  $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : array();
-       	$deliveryUri =  \tao_helpers_Uri::decode($this->getRequestParameter('classUri'));
-
-    	$columns = $this->hasRequestParameter('columns') ? $this->getColumns('columns') : array();
-    	$page = $this->getRequestParameter('page');
-        $limit = $this->getRequestParameter('rows');
-        $sidx = $this->getRequestParameter('sidx');
-        $sord = $this->getRequestParameter('sord');
-        $start = $limit * $page - $limit;
-
-        $options = array (
-            'recursive'=>true, 
-            'like' => false, 
-            'offset' => $start, 
-            'limit' => $limit, 
-            'order' => $sidx, 
-            'orderdir' => $sord  
-        );
-        $response = new \stdClass();
-
-        $delivery = new \core_kernel_classes_Resource($deliveryUri);
-        $implementation = $this->service->getReadableImplementation($delivery);
-        $this->service->setImplementation($implementation);
-        
-                $deliveryResults = $this->service->getImplementation()->getResultByDelivery(array($deliveryUri), $options);
-        $counti = $this->service->getImplementation()->countResultByDelivery(array($deliveryUri));
-        $results = array();
-        foreach($deliveryResults as $deliveryResult){
-            $results[] = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryResult['deliveryResultIdentifier']);
+    public function getGradeColumns()
+    {
+        if (!\tao_helpers_Request::isAjax()) {
+            throw new \Exception('Only ajax call allowed.');
         }
 
-        $dpmap = array();
-        foreach ($columns as $column) {
-            $dataprovider = $column->getDataProvider();
-            $found = false;
-            foreach ($dpmap as $k => $dp) {
-                if ($dp['instance'] == $dataprovider) {
-                    $found = true;
-                    $dpmap[$k]['columns'][] = $column;
-                }
-            }
-            if (!$found) {
-                $dpmap[] = array(
-                    'instance'	=> $dataprovider,
-                    'columns'	=> array(
-                            $column
-                    )
-                );
-            }
-        }
-
-        foreach ($dpmap as $arr) {
-            $arr['instance']->prepare($results, $arr['columns']);
-        }
-
-        /** @var \taoDelivery_models_classes_execution_DeliveryExecution $result */
-        foreach($results as $result) {
-            $data = array(
-                'id' => $result->getIdentifier()
-            );
-            foreach ($columns as $column) {
-                $key = null;
-                if($column instanceof tao_models_classes_table_PropertyColumn){
-                    $key = $column->getProperty()->getUri(); 
-                } else  if ($column instanceof VariableColumn) {
-                    $key =  $column->getContextIdentifier() . '_' . $column->getIdentifier();
-                }
-                if(!is_null($key)){
-                    if (count($column->getDataProvider()->cache) > 0) {
-                        $data[$key] = self::filterCellData(
-                            $column->getDataProvider()->getValue(new core_kernel_classes_Resource($result->getIdentifier()), $column),
-                            $filterData
-                        );
-                    } else {
-                        $data[$key] = self::filterCellData(
-                            (string)$this->service->getTestTaker($result)->getOnePropertyValue(new \core_kernel_classes_Property(PROPERTY_USER_LOGIN)),
-                            $filterData
-                        );
-                    }
-                }
-                else {
-                    \common_Logger::w('KEY IS NULL');
-                }
-            }
-            $response->data[] = $data;
-        }
-
-        $response->page = (int)$page;
-        if ($limit!=0) {
-            $response->total = ceil($counti / $limit);
-        } else {
-            $response->total = 1;
-        }
-        $response->records = count($results);
-
-        $this->returnJSON($response);
+        return $this->returnJson([
+            'columns' => $this->getColumnsProvider()->getGradeColumns()
+        ]);
     }
 
-    private static function filterCellData($observationsList, $filterData){
-        //if the cell content is not an array with multiple entries, do not filter
-
-        if (!(is_array($observationsList))){
-            return $observationsList;
-
+    /**
+     * Returns response columns.
+     *
+     * @throws \Exception
+     */
+    public function getResponseColumns()
+    {
+        if (!\tao_helpers_Request::isAjax()) {
+            throw new \Exception('Only ajax call allowed.');
         }
-        //takes only the alst or the first observation
-            if (
-                ($filterData=="lastSubmitted" or $filterData=="firstSubmitted")
-                and
-                (is_array($observationsList))
-            ){
-            $returnValue = array();
 
-            //sort by timestamp observation
-           uksort($observationsList, "oat\\taoOutcomeUi\\model\\ResultsService::sortTimeStamps" );
-           $filteredObservation = ($filterData=='lastSubmitted') ? array_pop($observationsList) : array_shift($observationsList);
-            $returnValue[]= $filteredObservation[0];
+        return $this->returnJson([
+            'columns' => $this->getColumnsProvider()->getResponseColumns()
+        ]);
+    }
 
-            } else {
-               $cellData = "";
-               foreach ($observationsList as $observation) {
-                   $cellData.= $observation[0].$observation[1].'
-                       ';
-               }
-                $returnValue = $cellData;
-            }
-        return $returnValue;
+    /**
+     * @return ColumnsProvider
+     */
+    private function getColumnsProvider()
+    {
+        return new ColumnsProvider($this->getDeliveryUri(), ResultsService::singleton());
+    }
+
+    /**
+     * @return ResultsExporter
+     * @throws common_Exception
+     */
+    private function getExporterService()
+    {
+        /** @var ResultsExporter $exporter */
+        $exporter = $this->getServiceManager()
+            ->propagate(new ResultsExporter($this->getDeliveryUri(), ResultsService::singleton()));
+
+        if ($this->hasRequestParameter(self::PARAMETER_COLUMNS)) {
+            $exporter->setColumnsToExport($this->getRawParameter(self::PARAMETER_COLUMNS));
+        }
+
+        if ($this->hasRequestParameter(self::PARAMETER_FILTER)) {
+            $exporter->setVariableToExport($this->getRequestParameter(self::PARAMETER_FILTER));
+        }
+
+        return $exporter;
+    }
+
+    /**
+     * @return string
+     * @throws common_Exception
+     */
+    private function getDeliveryUri()
+    {
+        if (!$this->hasRequestParameter(self::PARAMETER_DELIVERY_URI)) {
+            throw new common_Exception('Parameter "'. self::PARAMETER_DELIVERY_URI .'" missing');
+        }
+
+        return \tao_helpers_Uri::decode($this->getRequestParameter(self::PARAMETER_DELIVERY_URI));
     }
 }
-?>

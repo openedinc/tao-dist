@@ -25,11 +25,10 @@
 define([
     'lodash',
     'core/promise',
-    'core/store',
     'moment',
     'lib/uuid',
     'lib/moment-timezone.min'
-], function (_, Promise, store, moment, uuid){
+], function (_, Promise, moment, uuid){
     'use strict';
 
     var timeZone = moment.tz.guess();
@@ -38,12 +37,11 @@ define([
 
     /**
      * Create the overseer intance
-     * @param {String} testIdentifier - a unique id for a test execution
-     * @param {runner} runner - a insance of a test runner
+     * @param {runner} runner - a instance of a test runner
      * @returns {probeOverseer} the new probe overseer
      * @throws TypeError if something goes wrong
      */
-    return function probeOverseerFactory(testIdentifier, runner){
+    return function probeOverseerFactory(runner){
 
         // the created instance
         var overseer;
@@ -60,19 +58,42 @@ define([
         /**
          * @type {Storage} to store the collected events
          */
-        var storage;
+        var queueStorage;
 
-        //writing promises array
-        var writing = [];
+        /**
+         * @type {Promise} Promises chain to avoid write collisions
+         */
+        var writing = Promise.resolve();
 
         //is the overseer started
         var started = false;
 
         /**
+         * Get the storage instance
+         * @returns {Promise} that resolves with the storage
+         */
+        var getStorage = function getStorage(){
+            if(queueStorage){
+                return Promise.resolve(queueStorage);
+            }
+            return runner.getTestStore().getStore('test-probe').then(function(newStorage){
+                queueStorage = newStorage;
+                return Promise.resolve(queueStorage);
+            });
+        };
+
+        /**
+         * Unset the storage instance
+         */
+        var resetStorage = function resetStorage() {
+            queueStorage = null;
+        };
+
+        /**
          * Register the collection event of a probe against a runner
          * @param {Object} probe - a valid probe
          */
-        var collectEvent = function collectEvent(probe){
+        function collectEvent(probe){
 
             var eventNs = '.probe-' + probe.name;
 
@@ -100,9 +121,9 @@ define([
                 var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
                 runner.on(listen, _.partial(probeHandler, eventName));
             });
-        };
+        }
 
-        var collectLatencyEvent = function collectLatencyEvent(probe){
+        function collectLatencyEvent(probe){
 
             var eventNs = '.probe-' + probe.name;
 
@@ -158,33 +179,9 @@ define([
                 var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
                 runner.on(listen, _.partial(stopHandler, eventName));
             });
-        };
-
-        /**
-         * Get the storage instance
-         * @returns {Promise} that resolves with the storage
-         */
-        var getStorage = function getStorage(){
-            if(storage){
-                return Promise.resolve(storage);
-            }
-            return store('test-probe-' + testIdentifier).then(function(newStorage){
-                storage = newStorage;
-                return Promise.resolve(storage);
-            });
-        };
-
-        /**
-         * Unset the storage instance
-         */
-        var resetStorage = function resetStorage() {
-            storage = null;
-        };
+        }
 
         //argument validation
-        if(_.isEmpty(testIdentifier)){
-            throw new TypeError('Please set a test identifier');
-        }
         if(!_.isPlainObject(runner) || !_.isFunction(runner.init) || !_.isFunction(runner.on)){
             throw new TypeError('Please set a test runner');
         }
@@ -274,16 +271,16 @@ define([
             },
 
             /**
-             * Push an time entry to the queue
+             * Push a time entry to the queue
              * @param {Object} entry - the time entry
              */
             push : function push(entry){
-                queue.push(entry);
-                immutableQueue.push(entry);
-                //ensure the queue is pushed to the store consistently and atomically
-                Promise.all(writing).then(function(){
-                    getStorage().then(function(storage){
-                        writing.push(storage.setItem('queue', queue));
+                getStorage().then(function(storage){
+                    //ensure the queue is pushed to the store consistently and atomically
+                    writing = writing.then(function(){
+                        queue.push(entry);
+                        immutableQueue.push(entry);
+                        return storage.setItem('queue', queue);
                     });
                 });
             },
@@ -293,11 +290,10 @@ define([
              * @returns {Promise} with the data in parameter
              */
             flush: function flush(){
-                return getStorage().then(function(storage){
-                    return new Promise(function(resolve){
-                        Promise.all(writing).then(function () {
-                            writing = [];
-                            storage.getItem('queue').then(function(flushed){
+                return new Promise(function(resolve){
+                    getStorage().then(function(storage){
+                        writing = writing.then(function () {
+                            return storage.getItem('queue').then(function(flushed){
                                 queue = [];
                                 return storage.setItem('queue', queue).then(function(){
                                     resolve(flushed);
@@ -347,7 +343,7 @@ define([
                 queue = [];
                 immutableQueue = [];
                 return getStorage().then(function(storage){
-                    return storage.removeStore().then(resetStorage);
+                    return storage.removeItem('queue').then(resetStorage);
                 });
             }
         };

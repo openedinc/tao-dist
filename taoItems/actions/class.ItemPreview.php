@@ -22,6 +22,7 @@
 
 use oat\taoItems\model\media\ItemMediaResolver;
 use oat\tao\model\media\sourceStrategy\HttpSource;
+use oat\taoItems\model\preview\OntologyItemNotFoundException;
 /**
  * Preview API
  *
@@ -35,7 +36,13 @@ class taoItems_actions_ItemPreview extends tao_actions_CommonModule
         $item = new core_kernel_classes_Resource(tao_helpers_Uri::decode($this->getRequestParameter('uri')));
         $lang = DEFAULT_LANG;
         $previewUrl = taoItems_models_classes_ItemsService::singleton()->getPreviewUrl($item, $lang);
+
+        if (null === $previewUrl) {
+            throw new OntologyItemNotFoundException();
+        }
+
         $this->forwardUrl($previewUrl);
+
     }
 
     /**
@@ -84,7 +91,7 @@ class taoItems_actions_ItemPreview extends tao_actions_CommonModule
     }
 
     protected function getRenderedItem($item){
-        $itemModel = $item->getOnePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY));
+        $itemModel = $item->getOnePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL));
         $impl = taoItems_models_classes_ItemsService::singleton()->getItemModelImplementation($itemModel);
         if(is_null($impl)){
             throw new common_Exception('preview not supported for this item type '.$itemModel->getUri());

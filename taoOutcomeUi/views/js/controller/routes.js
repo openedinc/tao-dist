@@ -32,7 +32,12 @@ define(function(){
         'ResultTable': {
             'actions': {
                 'index' : 'controller/resultTable'
-            }       
+            }
+        },
+        'ResultsMonitoring': {
+            'actions': {
+                'index': 'controller/resultsMonitoring'
+            }
         }
     };
 });

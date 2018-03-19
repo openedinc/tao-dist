@@ -13,4 +13,4 @@ php tao/scripts/taoInstall.php \
 --module_url $ROOT_URL \
 --user_login $ADMIN_USERNAME \
 --user_pass $ADMIN_PASSWORD \
--e taoCe,taoLti,taoLtiBasicOutcome,ltiDeliveryProvider,taoCaliper,taoQtiTest
+-e taoCe,taoLti,taoLtiBasicOutcome,taoEventLog,taoProctoring,ltiDeliveryProvider,taoCaliper,taoQtiTest

@@ -4,90 +4,90 @@
  */
 
 return new oat\oatbox\filesystem\FileSystemService(array(
-    'filesPath' => FILES_PATH,
+    'filesPath' => '/home/poseydon/projects/tao-dist/data/',
     'adapters' => array(
         'taskQueueStorage' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'taskQueueStorage'
+                'root' => '/home/poseydon/projects/tao-dist/data/taskQueueStorage'
             )
         ),
         'fileUploadDirectory' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/upload'
+                'root' => '/home/poseydon/projects/tao-dist/data/tao/upload'
             )
         ),
         'public' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/public'
+                'root' => '/home/poseydon/projects/tao-dist/data/tao/public'
             )
         ),
         'private' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/private'
+                'root' => '/home/poseydon/projects/tao-dist/data/tao/private'
             )
         ),
         'log' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tao/log'
+                'root' => '/home/poseydon/projects/tao-dist/data/tao/log'
             )
         ),
         'sharedTmp' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'tmp'
+                'root' => '/home/poseydon/projects/tao-dist/data/tmp'
             )
         ),
         'stateBackup' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'stateBackup'
+                'root' => '/home/poseydon/projects/tao-dist/data/stateBackup'
             )
         ),
         'itemDirectory' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'taoItems/itemData'
+                'root' => '/home/poseydon/projects/tao-dist/data/taoItems/itemData'
             )
         ),
         'taoQtiItem' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'taoQtiItem'
-            )
-        ),
-        'taoQtiTest' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'taoQtiTest'
-            )
-        ),
-        'taoQtiTestSessionFilesystem' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'taoQtiTestSessionFilesystem'
+                'root' => '/home/poseydon/projects/tao-dist/data/taoQtiItem'
             )
         ),
         'qtiItemPci' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'qtiItemPci'
+                'root' => '/home/poseydon/projects/tao-dist/data/qtiItemPci'
             )
         ),
         'qtiItemImsPci' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'qtiItemImsPci'
+                'root' => '/home/poseydon/projects/tao-dist/data/qtiItemImsPci'
             )
         ),
         'portableElementStorage' => array(
             'class' => 'Local',
             'options' => array(
-                'root' => FILES_PATH.'portableElement'
+                'root' => '/home/poseydon/projects/tao-dist/data/portableElementStorage'
+            )
+        ),
+        'taoQtiTest' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => '/home/poseydon/projects/tao-dist/data/taoQtiTest'
+            )
+        ),
+        'taoQtiTestSessionFilesystem' => array(
+            'class' => 'Local',
+            'options' => array(
+                'root' => '/home/poseydon/projects/tao-dist/data/taoQtiTestSessionFilesystem'
             )
         )
     )

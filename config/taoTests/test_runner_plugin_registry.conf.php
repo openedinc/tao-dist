@@ -132,9 +132,22 @@ return new oat\oatbox\config\ConfigurationService(array(
                 'qti'
             )
         ),
-        'taoQtiTest/runner/plugins/controls/timer/timer' => array(
+        'taoQtiTest/runner/plugins/content/responsiveness/collapser' => array(
+            'id' => 'collapser',
+            'module' => 'taoQtiTest/runner/plugins/content/responsiveness/collapser',
+            'bundle' => null,
+            'position' => null,
+            'name' => 'Collapser',
+            'description' => 'Reduce the size of the tools when the available space is not enough',
+            'category' => 'content',
+            'active' => true,
+            'tags' => array(
+                'core'
+            )
+        ),
+        'taoQtiTest/runner/plugins/controls/timer/plugin' => array(
             'id' => 'timer',
-            'module' => 'taoQtiTest/runner/plugins/controls/timer/timer',
+            'module' => 'taoQtiTest/runner/plugins/controls/timer/plugin',
             'bundle' => 'taoQtiTest/loader/testPlugins.min',
             'position' => null,
             'name' => 'Timer indicator',

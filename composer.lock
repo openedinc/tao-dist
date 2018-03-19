@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "59b975dcab75f44e0aae0d984b46aeae",
+    "content-hash": "953752771b78047285b4ebf94bc8c5ac",
     "packages": [
         {
             "name": "clearfw/clearfw",
@@ -450,16 +450,16 @@
         },
         {
             "name": "doctrine/inflector",
-            "version": "1.1.x-dev",
+            "version": "1.0.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/inflector.git",
-                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae"
+                "reference": "0bcb2e79d8571787f18b7eb036ed3d004908e604"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/inflector/zipball/90b2128806bfde671b6952ab8bea493942c1fdae",
-                "reference": "90b2128806bfde671b6952ab8bea493942c1fdae",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/0bcb2e79d8571787f18b7eb036ed3d004908e604",
+                "reference": "0bcb2e79d8571787f18b7eb036ed3d004908e604",
                 "shasum": ""
             },
             "require": {
@@ -471,7 +471,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "1.0.x-dev"
                 }
             },
             "autoload": {
@@ -513,7 +513,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06T14:35:42+00:00"
+            "time": "2014-12-20T21:24:13+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -633,16 +633,16 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-            "version": "v4.9.3",
+            "version": "v4.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "95e1bae3182efc0f3422896a3236e991049dac69"
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/95e1bae3182efc0f3422896a3236e991049dac69",
-                "reference": "95e1bae3182efc0f3422896a3236e991049dac69",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d85d39da4576a6934b72480be6978fb10c860021",
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021",
                 "shasum": ""
             },
             "require": {
@@ -676,20 +676,20 @@
             "keywords": [
                 "html"
             ],
-            "time": "2017-06-03T02:28:16+00:00"
+            "time": "2018-02-23T01:58:20+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.3.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699"
+                "reference": "ba1bce30baab94dddde21c4ae93872b1762d39fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f4db5a78a5ea468d4831de7f0bf9d9415e348699",
-                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ba1bce30baab94dddde21c4ae93872b1762d39fa",
+                "reference": "ba1bce30baab94dddde21c4ae93872b1762d39fa",
                 "shasum": ""
             },
             "require": {
@@ -699,7 +699,7 @@
             },
             "require-dev": {
                 "ext-curl": "*",
-                "phpunit/phpunit": "^4.0 || ^5.0",
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.4",
                 "psr/log": "^1.0"
             },
             "suggest": {
@@ -708,7 +708,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.2-dev"
+                    "dev-master": "6.3-dev"
                 }
             },
             "autoload": {
@@ -741,7 +741,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-06-22T18:50:49+00:00"
+            "time": "2018-03-11T15:03:34+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -749,12 +749,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "e9cdab6ff93ff789b5b599326c727f51d10893a6"
+                "reference": "0940c910fd14a68bd24a8b7c4a5528415a479c42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/e9cdab6ff93ff789b5b599326c727f51d10893a6",
-                "reference": "e9cdab6ff93ff789b5b599326c727f51d10893a6",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/0940c910fd14a68bd24a8b7c4a5528415a479c42",
+                "reference": "0940c910fd14a68bd24a8b7c4a5528415a479c42",
                 "shasum": ""
             },
             "require": {
@@ -792,7 +792,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2017-10-06T12:25:00+00:00"
+            "time": "2018-02-28T07:24:33+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -800,12 +800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "d2537c86fa8b004c29e9b9f5e10028f0a29df101"
+                "reference": "649e354b657977c312cb6fb95720b1ac485f2092"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/d2537c86fa8b004c29e9b9f5e10028f0a29df101",
-                "reference": "d2537c86fa8b004c29e9b9f5e10028f0a29df101",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/649e354b657977c312cb6fb95720b1ac485f2092",
+                "reference": "649e354b657977c312cb6fb95720b1ac485f2092",
                 "shasum": ""
             },
             "require": {
@@ -857,7 +857,47 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-10-07T03:19:56+00:00"
+            "time": "2018-02-28T07:24:56+00:00"
+        },
+        {
+            "name": "imsglobal/lti",
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/IMSGlobal/LTI-Tool-Provider-Library-PHP.git",
+                "reference": "06b12f70c2803ee08da116bcda2951eefd411ac9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/IMSGlobal/LTI-Tool-Provider-Library-PHP/zipball/06b12f70c2803ee08da116bcda2951eefd411ac9",
+                "reference": "06b12f70c2803ee08da116bcda2951eefd411ac9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "IMSGlobal\\LTI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Stephen Vickers",
+                    "email": "svickers@imsglobal.org"
+                }
+            ],
+            "description": "LTI Tool Provider Library",
+            "homepage": "https://www.imsglobal.org/lti",
+            "keywords": [
+                "LTI"
+            ],
+            "time": "2016-09-18T04:22:22+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -932,12 +972,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "3b7394d78ad5936dab8a7041c63ac83722af27d9"
+                "reference": "1ce7cc142d906ba58dc54c82915d355a9191c8a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/3b7394d78ad5936dab8a7041c63ac83722af27d9",
-                "reference": "3b7394d78ad5936dab8a7041c63ac83722af27d9",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/1ce7cc142d906ba58dc54c82915d355a9191c8a8",
+                "reference": "1ce7cc142d906ba58dc54c82915d355a9191c8a8",
                 "shasum": ""
             },
             "require": {
@@ -948,9 +988,8 @@
             },
             "require-dev": {
                 "ext-fileinfo": "*",
-                "mockery/mockery": "~0.9",
-                "phpspec/phpspec": "^2.2",
-                "phpunit/phpunit": "^4.8.35"
+                "phpspec/phpspec": "^3.4",
+                "phpunit/phpunit": "^5.7"
             },
             "suggest": {
                 "ext-fileinfo": "Required for MimeType",
@@ -1009,24 +1048,74 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-11-23T17:51:36+00:00"
+            "time": "2018-03-01T10:27:04+00:00"
         },
         {
-            "name": "nikic/fast-route",
-            "version": "v1.2.0",
+            "name": "naneau/semver",
+            "version": "0.0.7",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nikic/FastRoute.git",
-                "reference": "b5f95749071c82a8e0f58586987627054400cdf6"
+                "url": "https://github.com/naneau/semver.git",
+                "reference": "60ea59641aad840f97f3c9057e2f2b7bc087eaa3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/FastRoute/zipball/b5f95749071c82a8e0f58586987627054400cdf6",
-                "reference": "b5f95749071c82a8e0f58586987627054400cdf6",
+                "url": "https://api.github.com/repos/naneau/semver/zipball/60ea59641aad840f97f3c9057e2f2b7bc087eaa3",
+                "reference": "60ea59641aad840f97f3c9057e2f2b7bc087eaa3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Naneau\\SemVer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maurice Fonk",
+                    "email": "maurice@naneau.net",
+                    "homepage": "http://mauricefonk.com",
+                    "role": "developer"
+                }
+            ],
+            "description": "A decent, standards-compliant, Semantic Versioning (SemVer) parser and library",
+            "homepage": "https://github.com/naneau/semver",
+            "keywords": [
+                "semantic",
+                "semver",
+                "versioning"
+            ],
+            "time": "2013-01-04T00:00:00+00:00"
+        },
+        {
+            "name": "nikic/fast-route",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/FastRoute.git",
+                "reference": "181d480e08d9476e61381e04a71b34dc0432e812"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/FastRoute/zipball/181d480e08d9476e61381e04a71b34dc0432e812",
+                "reference": "181d480e08d9476e61381e04a71b34dc0432e812",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35|~5.7"
             },
             "type": "library",
             "autoload": {
@@ -1052,7 +1141,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2017-01-19T11:35:12+00:00"
+            "time": "2018-02-13T20:26:39+00:00"
         },
         {
             "name": "oat-sa/extension-builder",
@@ -1091,16 +1180,16 @@
         },
         {
             "name": "oat-sa/extension-pcisample",
-            "version": "v2.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-pcisample.git",
-                "reference": "f05ba2c9a0922d0365d6586afb777fcf6fa1afcc"
+                "reference": "923046b80d060a4bb150e246610eff6ec8d3cb9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-pcisample/zipball/f05ba2c9a0922d0365d6586afb777fcf6fa1afcc",
-                "reference": "f05ba2c9a0922d0365d6586afb777fcf6fa1afcc",
+                "url": "https://api.github.com/repos/oat-sa/extension-pcisample/zipball/923046b80d060a4bb150e246610eff6ec8d3cb9d",
+                "reference": "923046b80d060a4bb150e246610eff6ec8d3cb9d",
                 "shasum": ""
             },
             "require": {
@@ -1117,7 +1206,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1129,20 +1218,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-06-23T15:10:11+00:00"
+            "time": "2018-02-23T15:03:05+00:00"
         },
         {
             "name": "oat-sa/extension-tao-backoffice",
-            "version": "v1.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-backoffice.git",
-                "reference": "f78d16628814132cec892012ee0e409e968eb11b"
+                "reference": "5c3522220b06470620d5b08c0c493da9468766d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-backoffice/zipball/f78d16628814132cec892012ee0e409e968eb11b",
-                "reference": "f78d16628814132cec892012ee0e409e968eb11b",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-backoffice/zipball/5c3522220b06470620d5b08c0c493da9468766d7",
+                "reference": "5c3522220b06470620d5b08c0c493da9468766d7",
                 "shasum": ""
             },
             "require": {
@@ -1159,7 +1248,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1171,24 +1260,68 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-05-12T13:52:21+00:00"
+            "time": "2018-01-26T17:17:51+00:00"
         },
         {
-            "name": "oat-sa/extension-tao-community",
-            "version": "v3.4.1",
+            "name": "oat-sa/extension-tao-clientdiag",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-community.git",
-                "reference": "a4c1ec476496f632465578af1d1b328d72a85591"
+                "url": "https://github.com/oat-sa/extension-tao-clientdiag.git",
+                "reference": "328242e99b732ebd183d6a53bdda1f2bf6476876"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-community/zipball/a4c1ec476496f632465578af1d1b328d72a85591",
-                "reference": "a4c1ec476496f632465578af1d1b328d72a85591",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-clientdiag/zipball/328242e99b732ebd183d6a53bdda1f2bf6476876",
+                "reference": "328242e99b732ebd183d6a53bdda1f2bf6476876",
                 "shasum": ""
             },
             "require": {
-                "oat-sa/extension-tao-delivery-rdf": "~3.8.0",
+                "oat-sa/oatbox-extension-installer": "dev-master",
+                "sinergi/browser-detector": "^6.0.2"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoClientDiagnostic"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoClientDiagnostic\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies SA"
+                }
+            ],
+            "description": "Check compatibility of the os and browser of a client",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "TAO",
+                "computer-based-assessment"
+            ],
+            "time": "2018-02-23T14:50:28+00:00"
+        },
+        {
+            "name": "oat-sa/extension-tao-community",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oat-sa/extension-tao-community.git",
+                "reference": "64b8fff1717e46d557968c568abf4fdb4ee5d246"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-community/zipball/64b8fff1717e46d557968c568abf4fdb4ee5d246",
+                "reference": "64b8fff1717e46d557968c568abf4fdb4ee5d246",
+                "shasum": ""
+            },
+            "require": {
+                "oat-sa/extension-tao-delivery-rdf": "~4.6.0||dev-develop",
                 "oat-sa/oatbox-extension-installer": "dev-master"
             },
             "type": "tao-extension",
@@ -1202,7 +1335,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1246,20 +1379,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-21T14:07:38+00:00"
+            "time": "2018-02-23T15:35:15+00:00"
         },
         {
             "name": "oat-sa/extension-tao-dac-simple",
-            "version": "v2.0.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-dac-simple.git",
-                "reference": "b7704d160593552e11e1f4596134c3dbbfc96465"
+                "reference": "7bc724b57ea5357054ed3f376d65332d2fdab882"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-dac-simple/zipball/b7704d160593552e11e1f4596134c3dbbfc96465",
-                "reference": "b7704d160593552e11e1f4596134c3dbbfc96465",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-dac-simple/zipball/7bc724b57ea5357054ed3f376d65332d2fdab882",
+                "reference": "7bc724b57ea5357054ed3f376d65332d2fdab882",
                 "shasum": ""
             },
             "require": {
@@ -1276,7 +1409,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1289,20 +1422,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-20T16:17:33+00:00"
+            "time": "2018-01-26T14:53:08+00:00"
         },
         {
             "name": "oat-sa/extension-tao-delivery",
-            "version": "v7.0.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-delivery.git",
-                "reference": "701e7808ebfd5dd977d19f4f18c5f0b27f42c6cc"
+                "reference": "05468d1feea2fbb72b2a595271efd2de1a2794f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-delivery/zipball/701e7808ebfd5dd977d19f4f18c5f0b27f42c6cc",
-                "reference": "701e7808ebfd5dd977d19f4f18c5f0b27f42c6cc",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-delivery/zipball/05468d1feea2fbb72b2a595271efd2de1a2794f5",
+                "reference": "05468d1feea2fbb72b2a595271efd2de1a2794f5",
                 "shasum": ""
             },
             "require": {
@@ -1319,7 +1452,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1362,20 +1495,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-21T14:17:05+00:00"
+            "time": "2018-02-09T15:35:08+00:00"
         },
         {
             "name": "oat-sa/extension-tao-delivery-rdf",
-            "version": "v3.8.1",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-delivery-rdf.git",
-                "reference": "1a2ec20594f93dc4ec1da6a5731615d8cef47f97"
+                "reference": "ee0241f3cca8cad1398d1d137929e02614339b86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-delivery-rdf/zipball/1a2ec20594f93dc4ec1da6a5731615d8cef47f97",
-                "reference": "1a2ec20594f93dc4ec1da6a5731615d8cef47f97",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-delivery-rdf/zipball/ee0241f3cca8cad1398d1d137929e02614339b86",
+                "reference": "ee0241f3cca8cad1398d1d137929e02614339b86",
                 "shasum": ""
             },
             "require": {
@@ -1392,7 +1525,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1405,20 +1538,63 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-09-08T13:48:55+00:00"
+            "time": "2018-03-19T10:06:39+00:00"
         },
         {
-            "name": "oat-sa/extension-tao-funcacl",
-            "version": "4.0.0",
+            "name": "oat-sa/extension-tao-eventlog",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-funcacl.git",
-                "reference": "a12fb576f67d3714f1d7ee3d12a4f64285494e4a"
+                "url": "https://github.com/oat-sa/extension-tao-eventlog.git",
+                "reference": "b96933cd1943360593fdf923f4fe8d1e1d02351a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-funcacl/zipball/a12fb576f67d3714f1d7ee3d12a4f64285494e4a",
-                "reference": "a12fb576f67d3714f1d7ee3d12a4f64285494e4a",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-eventlog/zipball/b96933cd1943360593fdf923f4fe8d1e1d02351a",
+                "reference": "b96933cd1943360593fdf923f4fe8d1e1d02351a",
+                "shasum": ""
+            },
+            "require": {
+                "oat-sa/oatbox-extension-installer": "dev-master"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoEventLog"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoEventLog\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies SA"
+                }
+            ],
+            "description": "The event logging system",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "TAO",
+                "computer-based-assessment"
+            ],
+            "time": "2018-02-09T15:39:54+00:00"
+        },
+        {
+            "name": "oat-sa/extension-tao-funcacl",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oat-sa/extension-tao-funcacl.git",
+                "reference": "ac5fbd3ebef0d5f3610f31ca41261c19a61aeb61"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-funcacl/zipball/ac5fbd3ebef0d5f3610f31ca41261c19a61aeb61",
+                "reference": "ac5fbd3ebef0d5f3610f31ca41261c19a61aeb61",
                 "shasum": ""
             },
             "require": {
@@ -1435,7 +1611,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1479,20 +1655,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-05-12T13:27:48+00:00"
+            "time": "2018-01-26T14:45:14+00:00"
         },
         {
             "name": "oat-sa/extension-tao-group",
-            "version": "v3.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-group.git",
-                "reference": "df1d25a3801f473a4eb2c732d4a8081f979f0c58"
+                "reference": "f240a62a7ee732b2d0691dc9ab57c03f6fe2ecab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-group/zipball/df1d25a3801f473a4eb2c732d4a8081f979f0c58",
-                "reference": "df1d25a3801f473a4eb2c732d4a8081f979f0c58",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-group/zipball/f240a62a7ee732b2d0691dc9ab57c03f6fe2ecab",
+                "reference": "f240a62a7ee732b2d0691dc9ab57c03f6fe2ecab",
                 "shasum": ""
             },
             "require": {
@@ -1509,7 +1685,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1552,20 +1728,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-05-12T13:28:40+00:00"
+            "time": "2018-02-23T14:34:11+00:00"
         },
         {
             "name": "oat-sa/extension-tao-item",
-            "version": "v5.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-item.git",
-                "reference": "406389829bc5dd1a3b0df9b5ec9322f5dd8ef89b"
+                "reference": "49c0292082d1b847eb39ca5874f6e9735baae46f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-item/zipball/406389829bc5dd1a3b0df9b5ec9322f5dd8ef89b",
-                "reference": "406389829bc5dd1a3b0df9b5ec9322f5dd8ef89b",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-item/zipball/49c0292082d1b847eb39ca5874f6e9735baae46f",
+                "reference": "49c0292082d1b847eb39ca5874f6e9735baae46f",
                 "shasum": ""
             },
             "require": {
@@ -1585,7 +1761,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1628,20 +1804,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-08-04T14:38:09+00:00"
+            "time": "2018-03-09T13:43:31+00:00"
         },
         {
             "name": "oat-sa/extension-tao-itemhtml",
-            "version": "v3.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-itemhtml.git",
-                "reference": "890b9ba94d356287622aaeb2ee67d1d5a987507d"
+                "reference": "615f8da96bc20df995d1437d5a3db11fa024dc1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemhtml/zipball/890b9ba94d356287622aaeb2ee67d1d5a987507d",
-                "reference": "890b9ba94d356287622aaeb2ee67d1d5a987507d",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemhtml/zipball/615f8da96bc20df995d1437d5a3db11fa024dc1f",
+                "reference": "615f8da96bc20df995d1437d5a3db11fa024dc1f",
                 "shasum": ""
             },
             "require": {
@@ -1658,7 +1834,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1702,95 +1878,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-04-28T08:59:46+00:00"
-        },
-        {
-            "name": "oat-sa/extension-tao-itemqti",
-            "version": "v9.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-itemqti.git",
-                "reference": "b81744b128131279f04dc712b785350a291d9453"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti/zipball/b81744b128131279f04dc712b785350a291d9453",
-                "reference": "b81744b128131279f04dc712b785350a291d9453",
-                "shasum": ""
-            },
-            "require": {
-                "oat-sa/lib-tao-qti": "~3.3.0",
-                "oat-sa/oatbox-extension-installer": "dev-master"
-            },
-            "type": "tao-extension",
-            "extra": {
-                "tao-extension-name": "taoQtiItem"
-            },
-            "autoload": {
-                "psr-4": {
-                    "oat\\taoQtiItem\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Open Assessment Technologies S.A.",
-                    "homepage": "http://www.taotesting.com"
-                },
-                {
-                    "name": "Jérôme Bogaerts",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Joel Bout",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Bertrand Chevrier",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Lionel Lecaque",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Patrick Plichart",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Dieter Raber",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Somsack Sipasseuth",
-                    "role": "Developer"
-                }
-            ],
-            "description": "extension to create QTI items",
-            "homepage": "http://www.taotesting.com",
-            "keywords": [
-                "OAT",
-                "QTI",
-                "TAO",
-                "computer-based-assessment"
-            ],
-            "time": "2017-08-10T13:51:50+00:00"
+            "time": "2018-01-26T14:49:03+00:00"
         },
         {
             "name": "oat-sa/extension-tao-itemqti-pci",
-            "version": "v3.1.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-itemqti-pci.git",
-                "reference": "236b3b9733b546bc260e32bcc1985c12042db349"
+                "reference": "4992de6889add5b9bfa0feceefe53904687b72a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti-pci/zipball/236b3b9733b546bc260e32bcc1985c12042db349",
-                "reference": "236b3b9733b546bc260e32bcc1985c12042db349",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti-pci/zipball/4992de6889add5b9bfa0feceefe53904687b72a9",
+                "reference": "4992de6889add5b9bfa0feceefe53904687b72a9",
                 "shasum": ""
             },
             "require": {
@@ -1807,7 +1908,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1819,20 +1920,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-09-08T13:55:53+00:00"
+            "time": "2018-01-30T13:33:41+00:00"
         },
         {
             "name": "oat-sa/extension-tao-itemqti-pic",
-            "version": "v4.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-itemqti-pic.git",
-                "reference": "d56baa20b773439f33040b3cd1044ba25ea662b9"
+                "reference": "d874b607f2dc1eff1ec5ef18986ee9ad43187563"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti-pic/zipball/d56baa20b773439f33040b3cd1044ba25ea662b9",
-                "reference": "d56baa20b773439f33040b3cd1044ba25ea662b9",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-itemqti-pic/zipball/d874b607f2dc1eff1ec5ef18986ee9ad43187563",
+                "reference": "d874b607f2dc1eff1ec5ef18986ee9ad43187563",
                 "shasum": ""
             },
             "require": {
@@ -1849,7 +1950,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1861,20 +1962,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-21T14:13:47+00:00"
+            "time": "2018-01-26T15:10:34+00:00"
         },
         {
             "name": "oat-sa/extension-tao-mediamanager",
-            "version": "v2.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-mediamanager.git",
-                "reference": "93e0331ed725fe3e0c4215b88650d6ccfbe75707"
+                "reference": "0ff94e264d599d63b5e503d905909ebbb5e43444"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-mediamanager/zipball/93e0331ed725fe3e0c4215b88650d6ccfbe75707",
-                "reference": "93e0331ed725fe3e0c4215b88650d6ccfbe75707",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-mediamanager/zipball/0ff94e264d599d63b5e503d905909ebbb5e43444",
+                "reference": "0ff94e264d599d63b5e503d905909ebbb5e43444",
                 "shasum": ""
             },
             "require": {
@@ -1891,7 +1992,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1904,20 +2005,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-07-07T13:54:01+00:00"
+            "time": "2018-03-09T13:34:53+00:00"
         },
         {
             "name": "oat-sa/extension-tao-outcome",
-            "version": "v3.4.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-outcome.git",
-                "reference": "b4e9e580515558d83b7cc0f2ce39ac21288ed5ea"
+                "reference": "99e3395e06cc7e2f993a7e7b21fee8a9845c326a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcome/zipball/b4e9e580515558d83b7cc0f2ce39ac21288ed5ea",
-                "reference": "b4e9e580515558d83b7cc0f2ce39ac21288ed5ea",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcome/zipball/99e3395e06cc7e2f993a7e7b21fee8a9845c326a",
+                "reference": "99e3395e06cc7e2f993a7e7b21fee8a9845c326a",
                 "shasum": ""
             },
             "require": {
@@ -1934,7 +2035,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -1977,20 +2078,94 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-11-09T09:37:30+00:00"
+            "time": "2018-02-23T14:50:26+00:00"
         },
         {
-            "name": "oat-sa/extension-tao-outcomelti",
-            "version": "v3.0.1",
+            "name": "oat-sa/extension-tao-outcomekeyvalue",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-outcomelti.git",
-                "reference": "9b594bec763414b9aac07daae0ae8a7022cb397a"
+                "url": "https://github.com/oat-sa/extension-tao-outcomekeyvalue.git",
+                "reference": "09bc8780b5a8d7befdd82f60ccdb0d35466ffd82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomelti/zipball/9b594bec763414b9aac07daae0ae8a7022cb397a",
-                "reference": "9b594bec763414b9aac07daae0ae8a7022cb397a",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomekeyvalue/zipball/09bc8780b5a8d7befdd82f60ccdb0d35466ffd82",
+                "reference": "09bc8780b5a8d7befdd82f60ccdb0d35466ffd82",
+                "shasum": ""
+            },
+            "require": {
+                "oat-sa/oatbox-extension-installer": "dev-master"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoAltResultStorage"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoAltResultStorage\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies S.A.",
+                    "homepage": "http://www.taotesting.com"
+                },
+                {
+                    "name": "Jérôme Bogaerts",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joel Bout",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Bertrand Chevrier",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Lionel Lecaque",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Patrick Plichart",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Dieter Raber",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Somsack Sipasseuth",
+                    "role": "Developer"
+                }
+            ],
+            "description": "extension to manage key-value outcomes in TAO",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "OAT",
+                "QTI",
+                "TAO",
+                "computer-based-assessment"
+            ],
+            "time": "2018-02-23T15:01:46+00:00"
+        },
+        {
+            "name": "oat-sa/extension-tao-outcomelti",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oat-sa/extension-tao-outcomelti.git",
+                "reference": "8b5a94ee769e94df0c157fb0c91d5086568e911d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomelti/zipball/8b5a94ee769e94df0c157fb0c91d5086568e911d",
+                "reference": "8b5a94ee769e94df0c157fb0c91d5086568e911d",
                 "shasum": ""
             },
             "require": {
@@ -2002,7 +2177,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2046,20 +2221,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-09-25T13:31:47+00:00"
+            "time": "2018-02-23T14:44:24+00:00"
         },
         {
             "name": "oat-sa/extension-tao-outcomerds",
-            "version": "v2.2.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-outcomerds.git",
-                "reference": "358e1cf2ae11abc84464ba101bdabf1abf8561fb"
+                "reference": "754782d9a3c4fc184afe82a7b17b7c8cd83736fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomerds/zipball/358e1cf2ae11abc84464ba101bdabf1abf8561fb",
-                "reference": "358e1cf2ae11abc84464ba101bdabf1abf8561fb",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomerds/zipball/754782d9a3c4fc184afe82a7b17b7c8cd83736fc",
+                "reference": "754782d9a3c4fc184afe82a7b17b7c8cd83736fc",
                 "shasum": ""
             },
             "require": {
@@ -2076,7 +2251,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2089,20 +2264,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-09-15T14:01:57+00:00"
+            "time": "2018-02-23T15:02:07+00:00"
         },
         {
             "name": "oat-sa/extension-tao-outcomeui",
-            "version": "v2.7.5",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-outcomeui.git",
-                "reference": "9e2cc01e57bf72a6321e55b6f39c798815ded6bc"
+                "reference": "a67c52f05576c63aa155db7d32538a4058890dad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomeui/zipball/9e2cc01e57bf72a6321e55b6f39c798815ded6bc",
-                "reference": "9e2cc01e57bf72a6321e55b6f39c798815ded6bc",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-outcomeui/zipball/a67c52f05576c63aa155db7d32538a4058890dad",
+                "reference": "a67c52f05576c63aa155db7d32538a4058890dad",
                 "shasum": ""
             },
             "require": {
@@ -2119,7 +2294,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2163,20 +2338,63 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2016-08-22T11:59:27+00:00"
+            "time": "2018-03-09T13:19:44+00:00"
         },
         {
-            "name": "oat-sa/extension-tao-revision",
-            "version": "v3.0.0",
+            "name": "oat-sa/extension-tao-proctoring",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-revision.git",
-                "reference": "a524e9a29dbb2c7888defae58fefadb43b701b85"
+                "url": "https://github.com/oat-sa/extension-tao-proctoring.git",
+                "reference": "9642ca8e7e0654e53df6807983a6910e3bd8dbe3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-revision/zipball/a524e9a29dbb2c7888defae58fefadb43b701b85",
-                "reference": "a524e9a29dbb2c7888defae58fefadb43b701b85",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-proctoring/zipball/9642ca8e7e0654e53df6807983a6910e3bd8dbe3",
+                "reference": "9642ca8e7e0654e53df6807983a6910e3bd8dbe3",
+                "shasum": ""
+            },
+            "require": {
+                "oat-sa/oatbox-extension-installer": "dev-master"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoProctoring"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoProctoring\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies SA"
+                }
+            ],
+            "description": "Proctoring for deliveries",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "TAO",
+                "computer-based-assessment"
+            ],
+            "time": "2018-03-15T15:45:25+00:00"
+        },
+        {
+            "name": "oat-sa/extension-tao-revision",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oat-sa/extension-tao-revision.git",
+                "reference": "b1861e02c9f44455d92e5bbb9909c3ddafd71068"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-revision/zipball/b1861e02c9f44455d92e5bbb9909c3ddafd71068",
+                "reference": "b1861e02c9f44455d92e5bbb9909c3ddafd71068",
                 "shasum": ""
             },
             "require": {
@@ -2193,7 +2411,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2205,20 +2423,72 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-04-28T09:03:42+00:00"
+            "time": "2018-01-26T14:17:41+00:00"
         },
         {
-            "name": "oat-sa/extension-tao-test",
-            "version": "v6.4.1",
+            "name": "oat-sa/extension-tao-task-queue",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/oat-sa/extension-tao-test.git",
-                "reference": "02c747fb496f0e783942a5a7a99eae896f2f2d79"
+                "url": "https://github.com/oat-sa/extension-tao-task-queue.git",
+                "reference": "e451a41a0e3a5d4e545fc32ffe125d6720bc8f0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-test/zipball/02c747fb496f0e783942a5a7a99eae896f2f2d79",
-                "reference": "02c747fb496f0e783942a5a7a99eae896f2f2d79",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-task-queue/zipball/e451a41a0e3a5d4e545fc32ffe125d6720bc8f0d",
+                "reference": "e451a41a0e3a5d4e545fc32ffe125d6720bc8f0d",
+                "shasum": ""
+            },
+            "require": {
+                "oat-sa/oatbox-extension-installer": "dev-master",
+                "php": ">=5.5"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoTaskQueue"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoTaskQueue\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies S.A.",
+                    "homepage": "http://www.taotesting.com"
+                },
+                {
+                    "name": "Gyula Szucs",
+                    "role": "Developer"
+                }
+            ],
+            "description": "TAO specific Task Queue with custom GUI",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "OAT",
+                "TAO",
+                "computer-based-assessment",
+                "queue",
+                "task"
+            ],
+            "time": "2018-02-09T15:08:16+00:00"
+        },
+        {
+            "name": "oat-sa/extension-tao-test",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oat-sa/extension-tao-test.git",
+                "reference": "5b2e3f333cf820112df13a79bb7113e943412bbd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-test/zipball/5b2e3f333cf820112df13a79bb7113e943412bbd",
+                "reference": "5b2e3f333cf820112df13a79bb7113e943412bbd",
                 "shasum": ""
             },
             "require": {
@@ -2238,7 +2508,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2281,20 +2551,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-09-12T18:02:52+00:00"
+            "time": "2018-02-23T14:47:00+00:00"
         },
         {
             "name": "oat-sa/extension-tao-testlinear",
-            "version": "v3.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-testlinear.git",
-                "reference": "63786fde4c499110bfcc733da57e35fef6f197f4"
+                "reference": "98319b6121c7a240bc14bcf64da0bbd4eecece37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-testlinear/zipball/63786fde4c499110bfcc733da57e35fef6f197f4",
-                "reference": "63786fde4c499110bfcc733da57e35fef6f197f4",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-testlinear/zipball/98319b6121c7a240bc14bcf64da0bbd4eecece37",
+                "reference": "98319b6121c7a240bc14bcf64da0bbd4eecece37",
                 "shasum": ""
             },
             "require": {
@@ -2311,7 +2581,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2324,20 +2594,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-04-28T08:57:57+00:00"
+            "time": "2018-01-26T14:11:37+00:00"
         },
         {
             "name": "oat-sa/extension-tao-testtaker",
-            "version": "v3.0.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-testtaker.git",
-                "reference": "3132f57f3375926a3e6e624f3184cae4837cfeee"
+                "reference": "3dc586ab4cd6913c16fbfa79add25a316d00af44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-testtaker/zipball/3132f57f3375926a3e6e624f3184cae4837cfeee",
-                "reference": "3132f57f3375926a3e6e624f3184cae4837cfeee",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-testtaker/zipball/3dc586ab4cd6913c16fbfa79add25a316d00af44",
+                "reference": "3dc586ab4cd6913c16fbfa79add25a316d00af44",
                 "shasum": ""
             },
             "require": {
@@ -2354,7 +2624,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2397,20 +2667,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-10-13T13:37:45+00:00"
+            "time": "2018-02-23T14:46:47+00:00"
         },
         {
             "name": "oat-sa/extension-tao-workspace",
-            "version": "v1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/extension-tao-workspace.git",
-                "reference": "76685e860faa8ffd99f99e29125524ccd36e63a2"
+                "reference": "6a9726b4c37689b8d1d738628a56c7dab827d6c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/extension-tao-workspace/zipball/76685e860faa8ffd99f99e29125524ccd36e63a2",
-                "reference": "76685e860faa8ffd99f99e29125524ccd36e63a2",
+                "url": "https://api.github.com/repos/oat-sa/extension-tao-workspace/zipball/6a9726b4c37689b8d1d738628a56c7dab827d6c8",
+                "reference": "6a9726b4c37689b8d1d738628a56c7dab827d6c8",
                 "shasum": ""
             },
             "require": {
@@ -2440,20 +2710,20 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-04-28T09:06:56+00:00"
+            "time": "2017-10-13T13:59:44+00:00"
         },
         {
             "name": "oat-sa/generis",
-            "version": "v4.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/generis.git",
-                "reference": "815aab42de57ac67051a3a0fc44d820e1887334d"
+                "reference": "b9db7b66edae7924aab14df9f14a9c7c06e8d9db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/generis/zipball/815aab42de57ac67051a3a0fc44d820e1887334d",
-                "reference": "815aab42de57ac67051a3a0fc44d820e1887334d",
+                "url": "https://api.github.com/repos/oat-sa/generis/zipball/b9db7b66edae7924aab14df9f14a9c7c06e8d9db",
+                "reference": "b9db7b66edae7924aab14df9f14a9c7c06e8d9db",
                 "shasum": ""
             },
             "require": {
@@ -2477,6 +2747,7 @@
             "autoload": {
                 "psr-4": {
                     "oat\\generis\\model\\": "core/",
+                    "oat\\generis\\Helper\\": "helpers/",
                     "oat\\oatbox\\": "common/oatbox/",
                     "oat\\generis\\test\\": "test/",
                     "oat\\generis\\scripts\\": "scripts/"
@@ -2488,7 +2759,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2532,7 +2803,7 @@
                 "computer-based-assessment",
                 "doctrine-dbal"
             ],
-            "time": "2017-07-21T14:09:46+00:00"
+            "time": "2018-03-09T13:12:28+00:00"
         },
         {
             "name": "oat-sa/jig",
@@ -2652,16 +2923,16 @@
         },
         {
             "name": "oat-sa/lib-tao-dtms",
-            "version": "v0.5.4",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-tao-dtms.git",
-                "reference": "3b123a58922325cfe98052d1ee66e5da71e9710c"
+                "reference": "dc3979af897154850756bc72e19a9670064b9f25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-tao-dtms/zipball/3b123a58922325cfe98052d1ee66e5da71e9710c",
-                "reference": "3b123a58922325cfe98052d1ee66e5da71e9710c",
+                "url": "https://api.github.com/repos/oat-sa/lib-tao-dtms/zipball/dc3979af897154850756bc72e19a9670064b9f25",
+                "reference": "dc3979af897154850756bc72e19a9670064b9f25",
                 "shasum": ""
             },
             "require": {
@@ -2678,7 +2949,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPLv2"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2704,26 +2975,26 @@
                 "ms",
                 "time"
             ],
-            "time": "2015-10-19T14:21:30+00:00"
+            "time": "2018-02-19T14:54:02+00:00"
         },
         {
             "name": "oat-sa/lib-tao-qti",
-            "version": "v3.3.0",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-tao-qti.git",
-                "reference": "5d408ac921744dfc7bb55e7e6e7f6a8478e71550"
+                "reference": "74084f8edfccb85da6cc9d45f4c5848752981cdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-tao-qti/zipball/5d408ac921744dfc7bb55e7e6e7f6a8478e71550",
-                "reference": "5d408ac921744dfc7bb55e7e6e7f6a8478e71550",
+                "url": "https://api.github.com/repos/oat-sa/lib-tao-qti/zipball/74084f8edfccb85da6cc9d45f4c5848752981cdf",
+                "reference": "74084f8edfccb85da6cc9d45f4c5848752981cdf",
                 "shasum": ""
             },
             "require": {
                 "oat-sa/lib-beeme": "~0.0.0",
                 "php": ">=5.3.10",
-                "qtism/qtism": "0.12.1"
+                "qtism/qtism": "0.14.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "<6.0.0"
@@ -2739,7 +3010,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2765,20 +3036,20 @@
                 "QTI",
                 "TAO"
             ],
-            "time": "2017-08-03T09:24:21+00:00"
+            "time": "2018-02-26T20:19:19+00:00"
         },
         {
             "name": "oat-sa/lib-test-cat",
-            "version": "v0.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/lib-test-cat.git",
-                "reference": "a4a91b88209905d0787d36df274fcd88e532678b"
+                "reference": "c10fde6c7140c41f9c56623522c2114e725c3772"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/lib-test-cat/zipball/a4a91b88209905d0787d36df274fcd88e532678b",
-                "reference": "a4a91b88209905d0787d36df274fcd88e532678b",
+                "url": "https://api.github.com/repos/oat-sa/lib-test-cat/zipball/c10fde6c7140c41f9c56623522c2114e725c3772",
+                "reference": "c10fde6c7140c41f9c56623522c2114e725c3772",
                 "shasum": ""
             },
             "require": {
@@ -2814,7 +3085,7 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-08-08T14:59:04+00:00"
+            "time": "2018-02-28T12:32:02+00:00"
         },
         {
             "name": "oat-sa/oatbox-extension-installer",
@@ -2870,21 +3141,22 @@
         },
         {
             "name": "oat-sa/tao-core",
-            "version": "v12.8.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/tao-core.git",
-                "reference": "80d60d0d8443a5e55bfc70cf7923ea92c6435370"
+                "reference": "bfc8509989283c5d49ab6a6e40ef174b6d4fce7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/tao-core/zipball/80d60d0d8443a5e55bfc70cf7923ea92c6435370",
-                "reference": "80d60d0d8443a5e55bfc70cf7923ea92c6435370",
+                "url": "https://api.github.com/repos/oat-sa/tao-core/zipball/bfc8509989283c5d49ab6a6e40ef174b6d4fce7b",
+                "reference": "bfc8509989283c5d49ab6a6e40ef174b6d4fce7b",
                 "shasum": ""
             },
             "require": {
                 "ezyang/htmlpurifier": "^4.9",
                 "guzzlehttp/guzzle": "~6.0",
+                "imsglobal/lti": "^3.0",
                 "justinrainbow/json-schema": "5.2.1",
                 "oat-sa/extension-builder": "^0.1",
                 "oat-sa/jig": "~0.1",
@@ -2913,7 +3185,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -2956,14 +3228,14 @@
                 "TAO",
                 "computer-based-assessment"
             ],
-            "time": "2017-08-04T15:05:39+00:00"
+            "time": "2018-03-15T15:32:48+00:00"
         },
         {
             "name": "openedinc/extension-tao-caliper",
-            "version": "dev-master",
+            "version": "dev-latest",
             "dist": {
                 "type": "path",
-                "url": "packages/taoCaliper",
+                "url": "packages2/taoCaliper",
                 "reference": "7bd148e6f95380e9c46d55e9dad40f40ce818627",
                 "shasum": null
             },
@@ -3004,15 +3276,16 @@
         },
         {
             "name": "openedinc/extension-tao-itemqti",
-            "version": "dev-allow_styles",
+            "version": "dev-latest",
             "dist": {
                 "type": "path",
-                "url": "packages/taoQtiItem",
-                "reference": "876df6368a553a7261d66a824d1d2132e80e81de",
+                "url": "packages2/taoQtiItem",
+                "reference": "7878a3e1af21576bb4d2603296e68124e2edcea2",
                 "shasum": null
             },
             "require": {
-                "oat-sa/lib-tao-qti": "~3.3.0",
+                "naneau/semver": "~0.0.7",
+                "oat-sa/lib-tao-qti": "~4.1.0",
                 "oat-sa/oatbox-extension-installer": "dev-master"
             },
             "type": "tao-extension",
@@ -3025,7 +3298,7 @@
                 }
             },
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -3076,11 +3349,11 @@
         },
         {
             "name": "openedinc/extension-tao-lti",
-            "version": "dev-master",
+            "version": "dev-latest",
             "dist": {
                 "type": "path",
-                "url": "packages/taoLti",
-                "reference": "4a8ac9a5fc2dc7f5e097d55033dbfadb8c1a4657",
+                "url": "packages2/taoLti",
+                "reference": "3c2839f56db3ba6ec239562c6b93cccdd4237147",
                 "shasum": null
             },
             "require": {
@@ -3096,7 +3369,7 @@
                 }
             },
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -3147,11 +3420,11 @@
         },
         {
             "name": "openedinc/extension-tao-ltideliveryprovider",
-            "version": "dev-persisting_qti_tests",
+            "version": "dev-latest",
             "dist": {
                 "type": "path",
-                "url": "packages/ltiDeliveryProvider",
-                "reference": "85cdc53c92a91052205f49b1a63983b20a054e6d",
+                "url": "packages2/ltiDeliveryProvider",
+                "reference": "8053de64a79f92b7b12820ab4db759d5432154f7",
                 "shasum": null
             },
             "require": {
@@ -3167,7 +3440,7 @@
                 }
             },
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -3218,15 +3491,15 @@
         },
         {
             "name": "openedinc/extension-tao-testqti",
-            "version": "dev-master",
+            "version": "dev-latest",
             "dist": {
                 "type": "path",
-                "url": "packages/taoQtiTest",
-                "reference": "b2aedb565c32d4f9f9af5ee6682882c8c347501f",
+                "url": "packages2/taoQtiTest",
+                "reference": "8ba27ee8fb98d3801db6b726dc317e41e34f9fcf",
                 "shasum": null
             },
             "require": {
-                "oat-sa/lib-test-cat": "0.2.0",
+                "oat-sa/lib-test-cat": "2.3.0",
                 "oat-sa/oatbox-extension-installer": "dev-master"
             },
             "type": "tao-extension",
@@ -3242,7 +3515,7 @@
                 }
             },
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -3680,17 +3953,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/VersionControl_Git.git",
-                "reference": "f074b9e7805197cb1019e05953960dde35ef3e31"
+                "reference": "6308acdf0ef5c57d1545e6a720fbddf755813753"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/VersionControl_Git/zipball/f074b9e7805197cb1019e05953960dde35ef3e31",
-                "reference": "f074b9e7805197cb1019e05953960dde35ef3e31",
+                "url": "https://api.github.com/repos/pear/VersionControl_Git/zipball/6308acdf0ef5c57d1545e6a720fbddf755813753",
+                "reference": "6308acdf0ef5c57d1545e6a720fbddf755813753",
                 "shasum": ""
             },
             "require": {
                 "pear/pear-core-minimal": "^1.9",
-                "pear/pear_exception": "*"
+                "pear/pear_exception": "~1.0.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^5"
@@ -3706,7 +3979,7 @@
                 "./"
             ],
             "license": [
-                "Apache License"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -3716,25 +3989,25 @@
                 }
             ],
             "description": "VersionControl_Git is a library that provides OO interface to handle Git repository.",
-            "time": "2017-08-23T19:37:51+00:00"
+            "time": "2018-01-29T21:14:27+00:00"
         },
         {
             "name": "phing/phing",
-            "version": "2.16.0",
+            "version": "2.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phingofficial/phing.git",
-                "reference": "151a0f4d8cebf7711eccc62dde3f09bc36a00d7b"
+                "reference": "cbe0f969e434e269af91b4160b86fe899c6e07c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phingofficial/phing/zipball/151a0f4d8cebf7711eccc62dde3f09bc36a00d7b",
-                "reference": "151a0f4d8cebf7711eccc62dde3f09bc36a00d7b",
+                "url": "https://api.github.com/repos/phingofficial/phing/zipball/cbe0f969e434e269af91b4160b86fe899c6e07c7",
+                "reference": "cbe0f969e434e269af91b4160b86fe899c6e07c7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.0",
-                "symfony/yaml": "^3.1"
+                "symfony/yaml": "^3.1 || ^4.0"
             },
             "require-dev": {
                 "ext-pdo_sqlite": "*",
@@ -3809,7 +4082,7 @@
                 "task",
                 "tool"
             ],
-            "time": "2016-12-22T20:16:33+00:00"
+            "time": "2018-01-25T13:18:09+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -3866,16 +4139,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "dd2b4bc5fb4a988ca080b5613903d04c88d410c1"
+                "reference": "d7a4babcfdcdda57a19f8ce1f9a444151bc42028"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/dd2b4bc5fb4a988ca080b5613903d04c88d410c1",
-                "reference": "dd2b4bc5fb4a988ca080b5613903d04c88d410c1",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/d7a4babcfdcdda57a19f8ce1f9a444151bc42028",
+                "reference": "d7a4babcfdcdda57a19f8ce1f9a444151bc42028",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
+                "ext-filter": "*",
                 "php": ">=5.5.0"
             },
             "require-dev": {
@@ -3923,7 +4197,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-11-17T11:24:17+00:00"
+            "time": "2018-03-16T11:26:12+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -3931,12 +4205,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "b5e5c1809fc323428715aa6a66ddca180e0adc0f"
+                "reference": "9aaff1cb2f24988bd5d23a20f1578da118360525"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/b5e5c1809fc323428715aa6a66ddca180e0adc0f",
-                "reference": "b5e5c1809fc323428715aa6a66ddca180e0adc0f",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/9aaff1cb2f24988bd5d23a20f1578da118360525",
+                "reference": "9aaff1cb2f24988bd5d23a20f1578da118360525",
                 "shasum": ""
             },
             "require": {
@@ -3973,7 +4247,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2017-08-23T11:42:00+00:00"
+            "time": "2018-02-09T15:35:40+00:00"
         },
         {
             "name": "psr/container",
@@ -4123,20 +4397,20 @@
         },
         {
             "name": "qtism/qtism",
-            "version": "0.12.1",
+            "version": "0.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oat-sa/qti-sdk.git",
-                "reference": "b6484d14d29e8e3144e064c4ed58d074082bb3c2"
+                "reference": "6e034b25efad5c87fca1fe0a49d57d5fc1e60c4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oat-sa/qti-sdk/zipball/b6484d14d29e8e3144e064c4ed58d074082bb3c2",
-                "reference": "b6484d14d29e8e3144e064c4ed58d074082bb3c2",
+                "url": "https://api.github.com/repos/oat-sa/qti-sdk/zipball/6e034b25efad5c87fca1fe0a49d57d5fc1e60c4d",
+                "reference": "6e034b25efad5c87fca1fe0a49d57d5fc1e60c4d",
                 "shasum": ""
             },
             "require": {
-                "oat-sa/lib-tao-dtms": "~0.5",
+                "oat-sa/lib-tao-dtms": "1.0.0",
                 "php": ">=5.3.0"
             },
             "require-dev": {
@@ -4150,7 +4424,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-only"
             ],
             "authors": [
                 {
@@ -4176,7 +4450,7 @@
                 "QTI",
                 "TAO"
             ],
-            "time": "2017-08-03T09:17:08+00:00"
+            "time": "2018-02-26T20:15:11+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -4184,12 +4458,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "ca4154648d3d4348bce636a43a72df3f9cd9134c"
+                "reference": "62628862df4c7b6568630d23f403bc42436d7c5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/ca4154648d3d4348bce636a43a72df3f9cd9134c",
-                "reference": "ca4154648d3d4348bce636a43a72df3f9cd9134c",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/62628862df4c7b6568630d23f403bc42436d7c5e",
+                "reference": "62628862df4c7b6568630d23f403bc42436d7c5e",
                 "shasum": ""
             },
             "require": {
@@ -4200,17 +4474,15 @@
                 "rhumsaa/uuid": "self.version"
             },
             "require-dev": {
-                "apigen/apigen": "^4.1",
                 "codeception/aspect-mock": "^1.0 | ~2.0.0",
                 "doctrine/annotations": "~1.2.0",
                 "goaop/framework": "1.0.0-alpha.2 | ^1.0 | ^2.1",
                 "ircmaxell/random-lib": "^1.1",
                 "jakub-onderka/php-parallel-lint": "^0.9.0",
-                "mockery/mockery": "^0.9.4",
+                "mockery/mockery": "^0.9.9",
                 "moontoast/math": "^1.1",
                 "php-mock/php-mock-phpunit": "^0.3|^1.1",
                 "phpunit/phpunit": "^4.7|^5.0",
-                "satooshi/php-coveralls": "^0.6.1",
                 "squizlabs/php_codesniffer": "^2.3"
             },
             "suggest": {
@@ -4258,7 +4530,56 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2017-11-09T03:25:25+00:00"
+            "time": "2018-02-07T23:28:02+00:00"
+        },
+        {
+            "name": "sinergi/browser-detector",
+            "version": "6.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sinergi/php-browser-detector.git",
+                "reference": "e1bee473663bb82e5ff58a3a2c0bf81c8671de5a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sinergi/php-browser-detector/zipball/e1bee473663bb82e5ff58a3a2c0bf81c8671de5a",
+                "reference": "e1bee473663bb82e5ff58a3a2c0bf81c8671de5a",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.3 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8 || ^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sinergi\\BrowserDetector\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Schuld"
+                },
+                {
+                    "name": "Gabriel Bull",
+                    "email": "me@gabrielbull.com"
+                }
+            ],
+            "description": "Detecting the user's browser, operating system and language.",
+            "keywords": [
+                "browser",
+                "detection",
+                "language",
+                "operating system",
+                "os"
+            ],
+            "time": "2016-12-28T16:31:30+00:00"
         },
         {
             "name": "slim/slim",
@@ -4266,12 +4587,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/slimphp/Slim.git",
-                "reference": "c9a768c5a062c5f1aaa0a588d7bb90e8ce18bfd6"
+                "reference": "d0d9655a66c61e5fd25fdbdc2fc80a6e37af469c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slimphp/Slim/zipball/c9a768c5a062c5f1aaa0a588d7bb90e8ce18bfd6",
-                "reference": "c9a768c5a062c5f1aaa0a588d7bb90e8ce18bfd6",
+                "url": "https://api.github.com/repos/slimphp/Slim/zipball/d0d9655a66c61e5fd25fdbdc2fc80a6e37af469c",
+                "reference": "d0d9655a66c61e5fd25fdbdc2fc80a6e37af469c",
                 "shasum": ""
             },
             "require": {
@@ -4329,7 +4650,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2017-11-18T15:38:27+00:00"
+            "time": "2018-02-14T16:32:04+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -4337,12 +4658,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "14568820af0af65e8ae97c3999b58cc94ea408bf"
+                "reference": "6af42631dcf89e9c616242c900d6c52bd53bd1bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/14568820af0af65e8ae97c3999b58cc94ea408bf",
-                "reference": "14568820af0af65e8ae97c3999b58cc94ea408bf",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/6af42631dcf89e9c616242c900d6c52bd53bd1bb",
+                "reference": "6af42631dcf89e9c616242c900d6c52bd53bd1bb",
                 "shasum": ""
             },
             "require": {
@@ -4387,7 +4708,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-10T19:03:56+00:00"
+            "time": "2018-02-16T09:50:28+00:00"
         },
         {
             "name": "zendframework/zend-servicemanager",
@@ -4443,7 +4764,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "oat-sa/extension-tao-delivery-rdf": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

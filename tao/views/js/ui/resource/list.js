@@ -133,6 +133,8 @@ define([
 
                 this.classUri = this.config.classUri;
 
+                this.setState('multiple', !!this.config.multiple);
+
                 this.render($container);
             })
             .on('render', function(){
@@ -147,14 +149,10 @@ define([
                     var $instance = $(e.currentTarget);
                     e.preventDefault();
                     e.stopPropagation();
-
                     if($instance.hasClass('selected')){
                         self.unselect($instance.data('uri'));
                     } else {
-                        if(self.config.multiple !== true){
-                            self.clearSelection();
-                        }
-                        self.select($instance.data('uri'));
+                        self.select($instance.data('uri'), !self.is('multiple'));
                     }
                 });
 
@@ -179,6 +177,11 @@ define([
             })
             .on('update', function(){
                 this.setState('loading', false);
+            })
+            .on('remove', function(uri){
+                if(this.is('rendered')){
+                    $('[data-uri="' + uri + '"]', this.getElement()).remove();
+                }
             });
 
         //always defer the initialization to let consumers listen for init and render events.

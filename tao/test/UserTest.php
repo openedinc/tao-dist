@@ -18,7 +18,10 @@
  *               2009-2012 (update and modification) Public Research Centre Henri Tudor (under the project TAO-SUSTAIN & TAO-DEV);
  * 
  */
+
+use oat\generis\model\GenerisRdf;
 use oat\generis\model\user\PasswordConstraintsService;
+use oat\tao\model\TaoOntology;
 
 /**
  * Test the user management 
@@ -38,28 +41,28 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 	 * @var array user data set
 	 */
 	protected $testUserData = array(
-		PROPERTY_USER_LOGIN		=> 	'tjdoe',
-		PROPERTY_USER_PASSWORD	=>	'test123',
-		PROPERTY_USER_LASTNAME	=>	'Doe',
-		PROPERTY_USER_FIRSTNAME	=>	'John',
-		PROPERTY_USER_MAIL		=>	'jdoe@tao.lu',
-		PROPERTY_USER_DEFLG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-		PROPERTY_USER_UILG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-		PROPERTY_USER_ROLES		=>  'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole'
+		GenerisRdf::PROPERTY_USER_LOGIN		=> 	'tjdoe',
+		GenerisRdf::PROPERTY_USER_PASSWORD	=>	'test123',
+		GenerisRdf::PROPERTY_USER_LASTNAME	=>	'Doe',
+		GenerisRdf::PROPERTY_USER_FIRSTNAME	=>	'John',
+		GenerisRdf::PROPERTY_USER_MAIL		=>	'jdoe@tao.lu',
+		GenerisRdf::PROPERTY_USER_DEFLG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+		GenerisRdf::PROPERTY_USER_UILG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+		GenerisRdf::PROPERTY_USER_ROLES		=>  'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole'
 	);
 	
 	/**
 	 * @var array user data set with special chars
 	 */
 	protected $testUserUtf8Data = array(
-		PROPERTY_USER_LOGIN		=> 	'f.lecé',
-		PROPERTY_USER_PASSWORD	=>	'6crète!',
-		PROPERTY_USER_LASTNAME	=>	'Lecéfranc',
-		PROPERTY_USER_FIRSTNAME	=>	'François',
-		PROPERTY_USER_MAIL		=>	'f.lecé@tao.lu',
-		PROPERTY_USER_DEFLG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-		PROPERTY_USER_UILG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langfr-FR',
-		PROPERTY_USER_ROLES		=>  'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole'
+		GenerisRdf::PROPERTY_USER_LOGIN		=> 	'f.lecé',
+		GenerisRdf::PROPERTY_USER_PASSWORD	=>	'6crète!',
+		GenerisRdf::PROPERTY_USER_LASTNAME	=>	'Lecéfranc',
+		GenerisRdf::PROPERTY_USER_FIRSTNAME	=>	'François',
+		GenerisRdf::PROPERTY_USER_MAIL		=>	'f.lecé@tao.lu',
+		GenerisRdf::PROPERTY_USER_DEFLG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+		GenerisRdf::PROPERTY_USER_UILG		=>	'http://www.tao.lu/Ontologies/TAO.rdf#Langfr-FR',
+		GenerisRdf::PROPERTY_USER_ROLES		=>  'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole'
 	);
 	
 	/**
@@ -77,8 +80,8 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp(){		
 		$this->userService = tao_models_classes_UserService::singleton();
-		$this->testUserData[PROPERTY_USER_PASSWORD] = core_kernel_users_Service::getPasswordHash()->encrypt($this->testUserData[PROPERTY_USER_PASSWORD]);
-		$this->testUserUtf8Data[PROPERTY_USER_PASSWORD] = core_kernel_users_Service::getPasswordHash()->encrypt($this->testUserUtf8Data[PROPERTY_USER_PASSWORD]);
+		$this->testUserData[GenerisRdf::PROPERTY_USER_PASSWORD] = core_kernel_users_Service::getPasswordHash()->encrypt($this->testUserData[GenerisRdf::PROPERTY_USER_PASSWORD]);
+		$this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_PASSWORD] = core_kernel_users_Service::getPasswordHash()->encrypt($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_PASSWORD]);
 	}
 	
 	/**
@@ -99,18 +102,18 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 	public function testAddUser(){
 
 		//insert it
-		$this->assertTrue($this->userService->loginAvailable($this->testUserData[PROPERTY_USER_LOGIN]));
-		$tmclass = new core_kernel_classes_Class(CLASS_TAO_USER);
+		$this->assertTrue($this->userService->loginAvailable($this->testUserData[GenerisRdf::PROPERTY_USER_LOGIN]));
+		$tmclass = new core_kernel_classes_Class(TaoOntology::CLASS_URI_TAO_USER);
 		$this->testUser = $tmclass->createInstance();
 		$this->assertNotNull($this->testUser);
 		$this->assertTrue($this->testUser->exists());
 		$result = $this->userService->bindProperties($this->testUser, $this->testUserData);
 		$this->assertNotNull($result);
 		$this->assertNotEquals($result,false);
-		$this->assertFalse($this->userService->loginAvailable($this->testUserData[PROPERTY_USER_LOGIN]));
+		$this->assertFalse($this->userService->loginAvailable($this->testUserData[GenerisRdf::PROPERTY_USER_LOGIN]));
 		
 		//check inserted data
-		$this->testUser = $this->getUserByLogin($this->testUserData[PROPERTY_USER_LOGIN]);
+		$this->testUser = $this->getUserByLogin($this->testUserData[GenerisRdf::PROPERTY_USER_LOGIN]);
 		$this->assertInstanceOf( 'core_kernel_classes_Resource', $this->testUser );
 		foreach($this->testUserData as $prop => $value){
 			try{
@@ -130,18 +133,18 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testAddUtf8User(){
 		
-		$this->assertTrue($this->userService->loginAvailable($this->testUserUtf8Data[PROPERTY_USER_LOGIN]));
-		$tmclass = new core_kernel_classes_Class(CLASS_TAO_USER);
+		$this->assertTrue($this->userService->loginAvailable($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]));
+		$tmclass = new core_kernel_classes_Class(TaoOntology::CLASS_URI_TAO_USER);
 		$this->testUserUtf8 = $tmclass->createInstance();
 		$this->assertNotNull($this->testUserUtf8);
 		$this->assertTrue($this->testUserUtf8->exists());
 		$result = $this->userService->bindProperties($this->testUserUtf8, $this->testUserUtf8Data);
 		$this->assertNotNull($result);
 		$this->assertNotEquals($result,false);
-		$this->assertFalse($this->userService->loginAvailable($this->testUserUtf8Data[PROPERTY_USER_LOGIN]));
+		$this->assertFalse($this->userService->loginAvailable($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]));
 		
 		//check inserted data
-		$this->testUserUtf8 = $this->getUserByLogin($this->testUserUtf8Data[PROPERTY_USER_LOGIN]);
+		$this->testUserUtf8 = $this->getUserByLogin($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]);
 		$this->assertInstanceOf( 'core_kernel_classes_Resource', $this->testUserUtf8 );
 		foreach($this->testUserUtf8Data as $prop => $value){
 			try{
@@ -157,11 +160,11 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testLoginAvailability(){
-		$user = $this->getUserByLogin($this->testUserUtf8Data[PROPERTY_USER_LOGIN]);
-		$loginProperty = new core_kernel_classes_Property(PROPERTY_USER_LOGIN);
+		$user = $this->getUserByLogin($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]);
+		$loginProperty = new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_LOGIN);
 		
 		$this->assertTrue(!empty($user));
-		$this->assertFalse($this->userService->loginAvailable($this->testUserUtf8Data[PROPERTY_USER_LOGIN]));
+		$this->assertFalse($this->userService->loginAvailable($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]));
 		
 		// Test to cover issue #2135
 		$this->assertTrue($this->userService->loginAvailable('my new user'));
@@ -169,7 +172,7 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($this->userService->loginExists('my new user'));
 		$this->assertFalse($this->userService->loginAvailable('my new user'));
 		
-		$user->EditPropertyValues($loginProperty, $this->testUserUtf8Data[PROPERTY_USER_LOGIN]);
+		$user->EditPropertyValues($loginProperty, $this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]);
 	}
 
 	/**
@@ -177,22 +180,22 @@ class UserTestCase extends \PHPUnit_Framework_TestCase {
 	 * @see tao_models_classes_UserService::removeUser
 	 */
 	public function testDelete(){
-		$this->testUser = $this->getUserByLogin($this->testUserData[PROPERTY_USER_LOGIN]);
+		$this->testUser = $this->getUserByLogin($this->testUserData[GenerisRdf::PROPERTY_USER_LOGIN]);
 		$this->assertInstanceOf( 'core_kernel_classes_Resource', $this->testUser );
 		$this->assertTrue($this->userService->removeUser($this->testUser));
-		$this->assertTrue($this->userService->loginAvailable($this->testUserData[PROPERTY_USER_LOGIN]));
+		$this->assertTrue($this->userService->loginAvailable($this->testUserData[GenerisRdf::PROPERTY_USER_LOGIN]));
 		
 		
-		$this->testUserUtf8 = $this->getUserByLogin($this->testUserUtf8Data[PROPERTY_USER_LOGIN]);
+		$this->testUserUtf8 = $this->getUserByLogin($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]);
 		$this->assertInstanceOf( 'core_kernel_classes_Resource', $this->testUserUtf8 );
 		$this->assertTrue($this->userService->removeUser($this->testUserUtf8));
-		$this->assertTrue($this->userService->loginAvailable($this->testUserUtf8Data[PROPERTY_USER_LOGIN]));
+		$this->assertTrue($this->userService->loginAvailable($this->testUserUtf8Data[GenerisRdf::PROPERTY_USER_LOGIN]));
 	}
 	
 	protected function getUserByLogin($login) {
-        $class = new core_kernel_classes_Class(CLASS_GENERIS_USER);
+        $class = new core_kernel_classes_Class(GenerisRdf::CLASS_GENERIS_USER);
         $users = $class->searchInstances(
-            array(PROPERTY_USER_LOGIN => $login),
+            array(GenerisRdf::PROPERTY_USER_LOGIN => $login),
             array('like' => false, 'recursive' => true)
         );
 

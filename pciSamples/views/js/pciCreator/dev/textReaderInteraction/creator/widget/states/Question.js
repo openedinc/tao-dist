@@ -27,8 +27,7 @@ define([
     'tpl!textReaderInteraction/creator/tpl/propertiesForm',
     'lodash',
     'jquery',
-    'css!textReaderInteraction/creator/css/textReaderInteraction',
-    'css!textReaderInteraction/creator/css/userTooltips'
+    'css!textReaderInteraction/creator/css/textReaderInteraction'
 ], function (
     Promise,
     stateFactory,
@@ -165,18 +164,6 @@ define([
             }
         });
 
-        this.tooltips.on('tooltipCreated', function(createdTooltip) {
-            var tooltipInfos = getTooltipInfos(createdTooltip.id);
-            if (tooltipInfos) {
-                saveColumn(
-                    interaction,
-                    tooltipInfos.pageId,
-                    tooltipInfos.colIndex,
-                    tooltipInfos.colHtml
-                );
-            }
-        });
-
         /**
          * Identify the position in the reader (page id and column index) of the given tooltip
          */
@@ -195,12 +182,12 @@ define([
         }
 
         initEditors($container, interaction)
-        .then(function() {
-            self.tooltips.init();
-        })
-        .catch(function(err) {
-            throw new Error('Error in editors initialisation ' + err.message);
-        });
+            .then(function() {
+                self.tooltips.init();
+            })
+            .catch(function(err) {
+                throw new Error('Error in editors initialisation ' + err.message);
+            });
 
 
     }, function () {
@@ -220,6 +207,14 @@ define([
             interaction = _widget.element,
             $positionSelect;
 
+        // display/hide the panels according to selected config
+        function toggleNavigation(multiPages, navigation) {
+            multiPages = multiPages === 'true' || multiPages === true;
+            $('.js-navigation-select-panel').toggle(multiPages);
+            $('.js-tab-position-panel').toggle(multiPages && navigation !== 'buttons');
+            $('.js-button-labels-panel').toggle(multiPages && navigation !== 'tabs');
+        }
+
         //render the form using the form template
         $form.html(formTpl(
             interaction.properties
@@ -229,8 +224,7 @@ define([
         $('.js-tab-position').val(interaction.properties.tabsPosition);
         $('.js-navigation-select').val(interaction.properties.navigation);
 
-        $('.js-tab-position-panel').toggle(interaction.properties.navigation !== 'buttons');
-        $('.js-button-labels-panel').toggle(interaction.properties.navigation !== 'tabs');
+        toggleNavigation(interaction.properties.multiPages, interaction.properties.navigation);
 
         if (interaction.properties.navigation === 'both') {
             $positionSelect = $('.js-tab-position');
@@ -251,9 +245,13 @@ define([
                 i.properties.pageHeight = value;
                 i.widgetRenderer.renderPages(i.properties);
             },
+            multiPages: function (i, value) {
+                toggleNavigation(value, i.properties.navigation);
+                i.properties.multiPages = value;
+                i.widgetRenderer.renderAll(i.properties);
+            },
             navigation : function (i, value) {
-                $('.js-tab-position-panel').toggle(value !== 'buttons');
-                $('.js-button-labels-panel').toggle(value !== 'tabs');
+                toggleNavigation(i.properties.multiPages, value);
 
                 if (value === 'buttons') {
                     i.properties.tabsPosition = 'top';
@@ -289,7 +287,8 @@ define([
      * @returns {undefined}
      */
     function initEditors($container, interaction) {
-        var $pages = $container.find('.js-tab-content'),
+        var widget = interaction.data('widget'),
+            $pages = $container.find('.js-tab-content'),
             editorsReady = [];
 
         $pages.each(function () {
@@ -308,7 +307,8 @@ define([
                         markup : interaction.properties.pages[pageIndex].content[colIndex],
                         related : interaction,
                         colIndex : colIndex,
-                        highlight: true
+                        highlight: true,
+                        areaBroker: widget.getAreaBroker()
                     });
 
                     $editor.on('editorready', function() {

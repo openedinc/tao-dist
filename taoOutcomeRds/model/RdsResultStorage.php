@@ -20,6 +20,9 @@
 
 namespace oat\taoOutcomeRds\model;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use oat\taoResultServer\models\classes\ResultDeliveryExecutionDelete;
 use oat\taoResultServer\models\classes\ResultManagement;
 use \core_kernel_classes_Resource;
 use oat\oatbox\service\ConfigurableService;
@@ -31,6 +34,7 @@ use oat\oatbox\service\ConfigurableService;
 class RdsResultStorage extends ConfigurableService
     implements \taoResultServer_models_classes_WritableResultStorage, \taoResultServer_models_classes_ReadableResultStorage, ResultManagement
 {
+    use ResultDeliveryExecutionDelete;
     const SERVICE_ID = 'taoOutcomeRds/RdsResultStorage';
 
     /**
@@ -74,11 +78,15 @@ class RdsResultStorage extends ConfigurableService
     /** result storage persistence identifier */
     const OPTION_PERSISTENCE = 'persistence';
 
-    private function getPersistence()
+    /**
+     * @return \common_persistence_SqlPersistence
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     */
+    public function getPersistence()
     {
         $persistenceId = $this->hasOption(self::OPTION_PERSISTENCE) ?
             $this->getOption(self::OPTION_PERSISTENCE) : 'default';
-        return \common_persistence_Manager::getPersistence($persistenceId);
+        return $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID)->getPersistenceById($persistenceId);
     }
 
 
@@ -104,21 +112,35 @@ class RdsResultStorage extends ConfigurableService
         \taoResultServer_models_classes_Variable $testVariable,
         $callIdTest
     ) {
-        //ensure that variable have epoch
-        if(!$testVariable->isSetEpoch()){
-            $testVariable->setEpoch(microtime());
-        }
-
         $this->getPersistence()->insert(
             self::VARIABLES_TABLENAME,
-            array(
-                self::VARIABLES_FK_COLUMN => $deliveryResultIdentifier,
-                self::TEST_COLUMN => $test,
-                self::CALL_ID_TEST_COLUMN => $callIdTest,
-                self::VARIABLE_IDENTIFIER => $testVariable->getIdentifier(),
-                self::VARIABLE_VALUE => serialize($testVariable)
+            $this->prepareTestVariableData(
+                $deliveryResultIdentifier,
+                $test, 
+                $testVariable,
+                $callIdTest
             )
         );
+    }
+    
+    public function storeTestVariables(
+        $deliveryResultIdentifier,
+        $test,
+        array $testVariables,
+        $callIdTest
+    ) {
+        $dataToInsert = [];
+        
+        foreach ($testVariables as $testVariable) {
+            $dataToInsert[] = $this->prepareTestVariableData(
+                $deliveryResultIdentifier,
+                $test,
+                $testVariable,
+                $callIdTest
+            );
+        };
+        
+        $this->getPersistence()->insertMultiple(self::VARIABLES_TABLENAME, $dataToInsert);
     }
 
     /**
@@ -136,29 +158,45 @@ class RdsResultStorage extends ConfigurableService
         \taoResultServer_models_classes_Variable $itemVariable,
         $callIdItem
     ) {
-        //ensure that variable have epoch
-        if(!$itemVariable->isSetEpoch()){
-            $itemVariable->setEpoch(microtime());
-        }
-
         //store value in all case
         $this->getPersistence()->insert(
             self::VARIABLES_TABLENAME,
-            array(
-                self::VARIABLES_FK_COLUMN => $deliveryResultIdentifier,
-                self::TEST_COLUMN => $test,
-                self::ITEM_COLUMN => $item,
-                self::CALL_ID_ITEM_COLUMN => $callIdItem,
-                self::VARIABLE_IDENTIFIER => $itemVariable->getIdentifier(),
-                self::VARIABLE_VALUE => serialize($itemVariable)
+            $this->prepareItemVariableData(
+                $deliveryResultIdentifier,
+                $test,
+                $item,
+                $itemVariable,
+                $callIdItem
             )
         );
+    }
+    
+    public function storeItemVariables(
+        $deliveryResultIdentifier,
+        $test,
+        $item,
+        array $itemVariables,
+        $callIdItem
+    ) {
+        $dataToInsert = [];
+        
+        foreach ($itemVariables as $itemVariable) {
+            $dataToInsert[] = $this->prepareItemVariableData(
+                $deliveryResultIdentifier,
+                $test,
+                $item,
+                $itemVariable,
+                $callIdItem
+            );
+        }
+        
+        $this->getPersistence()->insertMultiple(self::VARIABLES_TABLENAME, $dataToInsert);
     }
 
     /*
      * retrieve specific parameters from the resultserver to configure the storage
      */
-    public function configure(core_kernel_classes_Resource $resultserver, $callOptions = array())
+    public function configure($callOptions = array())
     {
         \common_Logger::d('configure  RdsResultStorage with options : ' . implode(" ", $callOptions));
     }
@@ -210,35 +248,42 @@ class RdsResultStorage extends ConfigurableService
         }
     }
 
+    /**
+     * @return QueryBuilder
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     */
+    private function getQueryBuilder()
+    {
+        /**@var \common_persistence_sql_pdo_mysql_Driver $driver */
+        return $this->getPersistence()->getPlatform()->getQueryBuilder();
+    }
+
 
     /**
-     * @param string $callId
+     * @param string|array $callId Either an item call id or a test call id
      * @return array
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function getVariables($callId)
     {
-        $sql = 'SELECT * FROM ' . self::VARIABLES_TABLENAME . '
-        WHERE (' . self::CALL_ID_ITEM_COLUMN . ' = ? OR ' . self::CALL_ID_TEST_COLUMN . ' = ?) ORDER BY ' . self::VARIABLES_TABLE_ID;
-        $params = array($callId, $callId);
-        $variables = $this->getPersistence()->query($sql, $params);
-
-        $returnValue = array();
-
-        // for each variable we construct the array
-        foreach ($variables as $variable) {
-
-            $resultVariable = unserialize($variable[self::VARIABLE_VALUE]);
-            $object = new \stdClass();
-            $object->uri = $variable[self::VARIABLES_TABLE_ID];
-            $object->class = get_class($resultVariable);
-            $object->deliveryResultIdentifier = $variable[self::VARIABLES_FK_COLUMN];
-            $object->callIdItem = $variable[self::CALL_ID_ITEM_COLUMN];
-            $object->callIdTest = $variable[self::CALL_ID_TEST_COLUMN];
-            $object->test = $variable[self::TEST_COLUMN];
-            $object->item = $variable[self::ITEM_COLUMN];
-            $object->variable = clone $resultVariable;
-            $returnValue[$variable[self::VARIABLES_TABLE_ID]][] = $object;
+        if (!is_array($callId)) {
+            $callId = [$callId];
         }
+
+        $qb = $this->getQueryBuilder()
+            ->select('*')
+            ->from(self::VARIABLES_TABLENAME)
+            ->andWhere(self::CALL_ID_ITEM_COLUMN .' IN(:ids)')
+            ->orWhere(self::CALL_ID_TEST_COLUMN .' IN(:ids)')
+            ->orderBy(self::VARIABLES_TABLE_ID)
+            ->setParameter('ids', $callId, Connection::PARAM_STR_ARRAY);
+
+        $returnValue = [];
+
+        foreach ($qb->execute()->fetchAll() as $variable) {
+            $returnValue[$variable[self::VARIABLES_TABLE_ID]][] = $this->getResultRow($variable);
+        }
+
         return $returnValue;
     }
 
@@ -248,6 +293,7 @@ class RdsResultStorage extends ConfigurableService
      */
     public function getDeliveryVariables($deliveryResultIdentifier)
     {
+
         $sql = 'SELECT * FROM ' . self::VARIABLES_TABLENAME . '
         WHERE ' . self::VARIABLES_FK_COLUMN . ' = ? ORDER BY ' . self::VARIABLES_TABLE_ID;
         $params = array($deliveryResultIdentifier);
@@ -257,17 +303,7 @@ class RdsResultStorage extends ConfigurableService
 
         // for each variable we construct the array
         foreach ($variables as $variable) {
-            $resultVariable = unserialize($variable[self::VARIABLE_VALUE]);
-            $object = new \stdClass();
-            $object->uri = $variable[self::VARIABLES_TABLE_ID];
-            $object->class = get_class($resultVariable);
-            $object->deliveryResultIdentifier = $variable[self::VARIABLES_FK_COLUMN];
-            $object->callIdItem = $variable[self::CALL_ID_ITEM_COLUMN];
-            $object->callIdTest = $variable[self::CALL_ID_TEST_COLUMN];
-            $object->test = $variable[self::TEST_COLUMN];
-            $object->item = $variable[self::ITEM_COLUMN];
-            $object->variable = clone $resultVariable;
-            $returnValue[$variable[self::VARIABLES_TABLE_ID]][] = $object;
+            $returnValue[$variable[self::VARIABLES_TABLE_ID]][] = $this->getResultRow($variable);
         }
         return $returnValue;
     }
@@ -291,18 +327,7 @@ class RdsResultStorage extends ConfigurableService
 
         // for each variable we construct the array
         foreach ($variables as $variable) {
-            $resultVariable = unserialize($variable[self::VARIABLE_VALUE]);
-
-            $object = new \stdClass();
-            $object->uri = $variable[self::VARIABLES_TABLE_ID];
-            $object->class = get_class($resultVariable);
-            $object->deliveryResultIdentifier = $variable[self::VARIABLES_FK_COLUMN];
-            $object->callIdItem = $variable[self::CALL_ID_ITEM_COLUMN];
-            $object->callIdTest = $variable[self::CALL_ID_TEST_COLUMN];
-            $object->test = $variable[self::TEST_COLUMN];
-            $object->item = $variable[self::ITEM_COLUMN];
-            $object->variable = clone $resultVariable;
-            $returnValue[$variable[self::VARIABLES_TABLE_ID]] = $object;
+            $returnValue[$variable[self::VARIABLES_TABLE_ID]] = $this->getResultRow($variable);
         }
         return $returnValue;
 
@@ -315,7 +340,8 @@ class RdsResultStorage extends ConfigurableService
         $params = array($variableId);
         $variableValue = $this->getPersistence()->query($sql, $params)->fetchColumn();
         $getter = 'get' . ucfirst($property);
-        $variableValue = unserialize($variableValue);
+
+        $variableValue = $this->unserializeVariableValue($variableValue);
         if(is_callable([$variableValue, $getter])){
             return $variableValue->$getter();
         }
@@ -546,5 +572,85 @@ class RdsResultStorage extends ConfigurableService
         } else {
             return 0;
         }
+    }
+
+
+    protected function prepareItemVariableData(
+        $deliveryResultIdentifier,
+        $test,
+        $item,
+        \taoResultServer_models_classes_Variable $itemVariable,
+        $callIdItem
+    ) {
+        //ensure that variable have epoch
+        if(!$itemVariable->isSetEpoch()){
+            $itemVariable->setEpoch(microtime());
+        }
+
+        return [
+            self::VARIABLES_FK_COLUMN => $deliveryResultIdentifier,
+            self::TEST_COLUMN => $test,
+            self::ITEM_COLUMN => $item,
+            self::CALL_ID_ITEM_COLUMN => $callIdItem,
+            self::VARIABLE_IDENTIFIER => $itemVariable->getIdentifier(),
+            self::VARIABLE_VALUE => $this->serializeVariableValue($itemVariable)
+        ];
+    }
+
+    protected function prepareTestVariableData(
+        $deliveryResultIdentifier,
+        $test,
+        \taoResultServer_models_classes_Variable $testVariable,
+        $callIdTest
+    ) {
+        if (!$testVariable->isSetEpoch()){
+            $testVariable->setEpoch(microtime());
+        }
+
+        return [
+            self::VARIABLES_FK_COLUMN => $deliveryResultIdentifier,
+            self::TEST_COLUMN => $test,
+            self::CALL_ID_TEST_COLUMN => $callIdTest,
+            self::VARIABLE_IDENTIFIER => $testVariable->getIdentifier(),
+            self::VARIABLE_VALUE => $this->serializeVariableValue($testVariable)
+        ];
+    }
+
+    /**
+     * @param array $variable
+     * @return \stdClass
+     */
+    protected function getResultRow($variable)
+    {
+        $resultVariable = $this->unserializeVariableValue($variable[self::VARIABLE_VALUE]);
+        $object = new \stdClass();
+        $object->uri = $variable[self::VARIABLES_TABLE_ID];
+        $object->class = get_class($resultVariable);
+        $object->deliveryResultIdentifier = $variable[self::VARIABLES_FK_COLUMN];
+        $object->callIdItem = $variable[self::CALL_ID_ITEM_COLUMN];
+        $object->callIdTest = $variable[self::CALL_ID_TEST_COLUMN];
+        $object->test = $variable[self::TEST_COLUMN];
+        $object->item = $variable[self::ITEM_COLUMN];
+        $object->variable = clone $resultVariable;
+
+        return $object;
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    protected function unserializeVariableValue($value)
+    {
+        return unserialize($value);
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    protected function serializeVariableValue($value)
+    {
+        return serialize($value);
     }
 }
