@@ -70,6 +70,10 @@
         {
             "type" : "path",
             "url" : "packages/taoQtiItem"
+        },
+        {
+            "type": "path",
+            "url": "packages/taoItems"
         }
     ],
     "minimum-stability": "dev",
@@ -89,7 +93,7 @@
         "oat-sa/extension-tao-delivery" : "~7.0.2",
         "oat-sa/extension-tao-delivery-rdf" : "~3.8.0",
         "oat-sa/extension-tao-group" : "~3.0.1",
-        "oat-sa/extension-tao-item" : "~5.1.0",
+        "openedinc/extension-tao-item" : "*",
         "openedinc/extension-tao-lti" : "*",
         "oat-sa/extension-tao-outcomelti" : "~3.0.0",
         "oat-sa/extension-tao-mediamanager" : "~2.0.1",

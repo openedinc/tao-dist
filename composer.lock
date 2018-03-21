@@ -3003,6 +3003,79 @@
             ]
         },
         {
+            "name": "openedinc/extension-tao-item",
+            "version": "dev-fix-resize",
+            "dist": {
+                "type": "path",
+                "url": "packages/taoItems",
+                "reference": "680e7736cdfffeed8088da60f6221f850c95b202",
+                "shasum": null
+            },
+            "require": {
+                "oat-sa/oatbox-extension-installer": "dev-master"
+            },
+            "type": "tao-extension",
+            "extra": {
+                "tao-extension-name": "taoItems"
+            },
+            "autoload": {
+                "psr-4": {
+                    "oat\\taoItems\\model\\": "models/classes/",
+                    "oat\\taoItems\\helpers\\": "helpers",
+                    "oat\\taoItems\\test\\": "test",
+                    "oat\\taoItems\\scripts\\": "scripts"
+                }
+            },
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Open Assessment Technologies S.A.",
+                    "homepage": "http://www.taotesting.com"
+                },
+                {
+                    "name": "Jérôme Bogaerts",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joel Bout",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Bertrand Chevrier",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Lionel Lecaque",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Patrick Plichart",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Dieter Raber",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Somsack Sipasseuth",
+                    "role": "Developer"
+                }
+            ],
+            "description": "extension to manage items",
+            "homepage": "http://www.taotesting.com",
+            "keywords": [
+                "computer-based-assessment",
+                "oat",
+                "tao"
+            ],
+            "support": {
+                "forum": "http://forum.taotesting.com",
+                "issues": "http://forge.taotesting.com"
+            }
+        },
+        {
             "name": "openedinc/extension-tao-itemqti",
             "version": "dev-allow_styles",
             "dist": {
