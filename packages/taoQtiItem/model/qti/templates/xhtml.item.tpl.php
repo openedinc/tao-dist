@@ -32,6 +32,7 @@
             }
         </style>
         <script type="text/javascript" src="//openedtoolbar.speechstream.net/opened/standardconfigdemo.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap-grid.css">
         <script id="initQtiRunner" type="text/javascript">
             (function(){
                 window.tao = window.tao || {};
