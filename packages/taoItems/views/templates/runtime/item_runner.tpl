@@ -3,7 +3,7 @@ use oat\tao\helpers\Template;
 ?><!doctype html>
 <html>
 	<head>
-            <link src="<?=Template::css('normalize.css', 'tao')?>"/>
+
             <script src="<?= Template::js('lib/require.js', 'tao')?>"></script>
             <script>
             (function(){
