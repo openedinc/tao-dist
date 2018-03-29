@@ -32,7 +32,7 @@
             }
         </style>
         <script type="text/javascript" src="//openedtoolbar.speechstream.net/opened/standardconfigdemo.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap-grid.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <script id="initQtiRunner" type="text/javascript">
             (function(){
                 window.tao = window.tao || {};
