@@ -44,9 +44,10 @@ define(['jquery', 'lodash', 'iframeNotifier', 'urlParser'],
 
                     var resultServerApi = new ResultServerApi(resultServer.endpoint, resultServer.params);
 
-                    var setIframeHeight = function(newHeight) {
+                    var setIframeHeight = function(parentHeight) {
 
                         var neverResized = $frame.height() === 150;
+                        var contentHeight;
 
                         var resize = function resize(newHeight, notifyParent) {
                             $frame.css({height: newHeight});
@@ -55,7 +56,10 @@ define(['jquery', 'lodash', 'iframeNotifier', 'urlParser'],
                             }
                         };
 
-                        resize(newHeight || $frame.contents().outerHeight(true), !newHeight);
+                        $frame.css({height: ''});
+                        contentHeight = $frame.contents().outerHeight(true);
+
+                        resize(contentHeight, contentHeight != parentHeight);
 
                         if(neverResized) {
                             _.delay(function() {

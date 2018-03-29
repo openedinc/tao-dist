@@ -4,7 +4,7 @@
         "url": "git@github.com:oat-sa/oatbox-extension-installer.git"
     }],
 
-    "name": "oat-sa/extension-tao-item",
+    "name": "openedinc/extension-tao-item",
     "authors": [{
         "name": "Open Assessment Technologies S.A.",
         "homepage": "http://www.taotesting.com"
