@@ -119,7 +119,7 @@ use oat\tao\model\theme\Theme;
 </div>
 <div class="timeout-modal-feedback modal">
     <div class="modal-body clearfix">
-        <p><?= __('Time limit reached, please finish the assessment.') ?></p>
+        <p><?= __("Time's up! You have reached the time limit for this section of the ACT Exam. Since this is practice, feel free to continue.") ?></p>
         <div class="rgt">
             <button class="btn-info small js-timeout-confirm" type="button"><?= __('Ok') ?></button>
         </div>
