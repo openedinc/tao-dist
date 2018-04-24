@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "59b975dcab75f44e0aae0d984b46aeae",
+    "content-hash": "737a1562780dd8086a64423fa0038f3c",
     "packages": [
         {
             "name": "clearfw/clearfw",
@@ -446,7 +446,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2017-07-22T20:45:23+00:00"
+            "time": "2017-07-22 20:45:23"
         },
         {
             "name": "doctrine/inflector",
@@ -513,7 +513,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06T14:35:42+00:00"
+            "time": "2015-11-06 14:35:42"
         },
         {
             "name": "doctrine/lexer",
@@ -567,7 +567,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2017-07-24T09:37:08+00:00"
+            "time": "2017-07-24 09:37:08"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -792,7 +792,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2017-10-06T12:25:00+00:00"
+            "time": "2017-10-06 12:25:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -857,7 +857,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-10-07T03:19:56+00:00"
+            "time": "2017-10-07 03:19:56"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -1009,7 +1009,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-11-23T17:51:36+00:00"
+            "time": "2017-11-23 17:51:36"
         },
         {
             "name": "nikic/fast-route",
@@ -2961,11 +2961,16 @@
         {
             "name": "openedinc/extension-tao-caliper",
             "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/openedinc/tao-caliper-opened.git",
+                "reference": "2c13b7bad253dd73e95e4fa45c1cb22a970a2493"
+            },
             "dist": {
-                "type": "path",
-                "url": "packages/taoCaliper",
-                "reference": "7bd148e6f95380e9c46d55e9dad40f40ce818627",
-                "shasum": null
+                "type": "zip",
+                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/2c13b7bad253dd73e95e4fa45c1cb22a970a2493",
+                "reference": "2c13b7bad253dd73e95e4fa45c1cb22a970a2493",
+                "shasum": ""
             },
             "require": {
                 "oat-sa/oatbox-extension-installer": "dev-master",
@@ -3000,7 +3005,12 @@
                 "oat",
                 "opened",
                 "tao"
-            ]
+            ],
+            "support": {
+                "source": "https://github.com/openedinc/tao-caliper-opened/tree/master",
+                "issues": "https://github.com/openedinc/tao-caliper-opened/issues"
+            },
+            "time": "2018-04-24 21:43:28"
         },
         {
             "name": "openedinc/extension-tao-item",
@@ -3789,7 +3799,7 @@
                 }
             ],
             "description": "VersionControl_Git is a library that provides OO interface to handle Git repository.",
-            "time": "2017-08-23T19:37:51+00:00"
+            "time": "2017-08-23 19:37:51"
         },
         {
             "name": "phing/phing",
@@ -3996,7 +4006,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-11-17T11:24:17+00:00"
+            "time": "2017-11-17 11:24:17"
         },
         {
             "name": "pimple/pimple",
@@ -4046,7 +4056,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2017-08-23T11:42:00+00:00"
+            "time": "2017-08-23 11:42:00"
         },
         {
             "name": "psr/container",
@@ -4192,7 +4202,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2016-10-10 12:19:37"
         },
         {
             "name": "qtism/qtism",
@@ -4250,6 +4260,46 @@
                 "TAO"
             ],
             "time": "2017-08-03T09:17:08+00:00"
+        },
+        {
+            "name": "ralouphie/getallheaders",
+            "version": "2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ralouphie/getallheaders.git",
+                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
+                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7.0",
+                "satooshi/php-coveralls": ">=1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/getallheaders.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ralph Khattar",
+                    "email": "ralph.khattar@gmail.com"
+                }
+            ],
+            "description": "A polyfill for getallheaders.",
+            "time": "2016-02-11T07:05:27+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -4331,7 +4381,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2017-11-09T03:25:25+00:00"
+            "time": "2017-11-09 03:25:25"
         },
         {
             "name": "slim/slim",
@@ -4402,7 +4452,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2017-11-18T15:38:27+00:00"
+            "time": "2017-11-18 15:38:27"
         },
         {
             "name": "symfony/yaml",
@@ -4460,7 +4510,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-10T19:03:56+00:00"
+            "time": "2017-11-10 19:03:56"
         },
         {
             "name": "zendframework/zend-servicemanager",

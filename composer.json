@@ -52,8 +52,8 @@
             "url" : "https://github.com/oat-sa/ZendSearch"
         },
         {
-            "type" : "path",
-            "url" : "packages/taoCaliper"
+            "type" : "vcs",
+            "url" : "https://github.com/openedinc/tao-caliper-opened"
         },
         {
             "type" : "path",
@@ -108,7 +108,7 @@
         "oat-sa/extension-tao-test" : "~6.4.0",
         "oat-sa/extension-tao-testtaker" : "~3.0.1",
         "oat-sa/extension-tao-workspace" : "~1.0.0",
-        "openedinc/extension-tao-caliper": "*"
+        "openedinc/extension-tao-caliper": "master"
     },
     "description": "TAO is an Open Source e-Testing platform that empowers you to build, deliver, and share innovative and engaging assessments online \u2013 in any language or subject matter."
 }
