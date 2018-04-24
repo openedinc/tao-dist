@@ -2964,12 +2964,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/openedinc/tao-caliper-opened.git",
-                "reference": "2c13b7bad253dd73e95e4fa45c1cb22a970a2493"
+                "reference": "acac322d593128a1b04cc3da00d8e1a02a327136"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/2c13b7bad253dd73e95e4fa45c1cb22a970a2493",
-                "reference": "2c13b7bad253dd73e95e4fa45c1cb22a970a2493",
+                "url": "https://api.github.com/repos/openedinc/tao-caliper-opened/zipball/acac322d593128a1b04cc3da00d8e1a02a327136",
+                "reference": "acac322d593128a1b04cc3da00d8e1a02a327136",
                 "shasum": ""
             },
             "require": {
@@ -3010,7 +3010,7 @@
                 "source": "https://github.com/openedinc/tao-caliper-opened/tree/master",
                 "issues": "https://github.com/openedinc/tao-caliper-opened/issues"
             },
-            "time": "2018-04-24 21:43:28"
+            "time": "2018-04-24 22:20:20"
         },
         {
             "name": "openedinc/extension-tao-item",
