@@ -29,6 +29,7 @@ use oat\taoQtiTest\models\event\QtiContinueInteractionEvent;
 use \oat\taoQtiTest\models\ExtendedStateService;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoCaliper\models\events\AssessmentEvent;
 use oat\taoQtiItem\model\QtiJsonItemCompiler;
 use oat\taoQtiTest\models\event\TestExitEvent;
 use oat\taoQtiTest\models\event\TestInitEvent;
@@ -173,7 +174,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
 
         // starts the context
         $context->init();
-        
+
         return $context;
     }
 
@@ -192,6 +193,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
             $userId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->trigger(new AfterAssessmentTestSessionClosedEvent($testSession, $userId));
+            $eventManager->trigger(new AssessmentEvent($testSession));
         }
     }
 
@@ -221,7 +223,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
                 $event = new TestInitEvent($session);
                 $this->getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
                 \common_Logger::i("Assessment Test Session begun.");
-                
+
                 if ($context->isAdaptive()) {
                     \common_Logger::t("Very first item is adaptive.");
                     $nextCatItemId = $context->selectAdaptiveNextItem();
@@ -395,7 +397,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
 
                 // The identifier of the current item.
                 $response['itemIdentifier'] = $itemRef->getIdentifier();
-                
+
                 // The number of current attempt (1 for the first time ...)
                 $response['attempt'] = ($context->isAdaptive()) ? $context->getCatAttempts($response['itemIdentifier']) + 1 : $itemSession['numAttempts']->getValue();
 
@@ -556,7 +558,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
         $mapService = $this->getServiceLocator()->get(QtiRunnerMap::SERVICE_ID);
         return $mapService->getItemHref($context, $itemRef);
     }
-    
+
     /**
      * Gets definition data of a particular item
      * @param RunnerServiceContext $context
@@ -771,7 +773,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
 
             try {
                 \common_Logger::t('Responses sent from the client-side. The Response Processing will take place.');
-                
+
                 if ($context->isAdaptive()) {
                     $session->beginItemSession();
                     $session->beginAttempt();
@@ -780,49 +782,49 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
                     $assessmentItem = $session->getAssessmentItem();
                     $assessmentItemIdentifier = $assessmentItem->getIdentifier();
                     $output = $context->getLastCatItemOutput();
-                    
+
                     $output[$assessmentItemIdentifier] = new ItemResult(
                         $assessmentItemIdentifier,
-                            new ResultVariable(
-                                $score->getIdentifier(),
-                                BaseType::getNameByConstant($score->getBaseType()),
-                                $score->getValue()->getValue()
-                            )
-                        );
-                        
+                        new ResultVariable(
+                            $score->getIdentifier(),
+                            BaseType::getNameByConstant($score->getBaseType()),
+                            $score->getValue()->getValue()
+                        )
+                    );
+
                     $context->persistLastCatItemOutput($output);
-                    
+
                     // Send results to TAO Results.
                     $resultTransmitter = new \taoQtiCommon_helpers_ResultTransmitter($context->getSessionManager()->getResultServer());
                     $outcomeVariables = [];
-                    
+
                     $hrefParts = explode('|', $assessmentItem->getHref());
                     $sessionId = $context->getTestSession()->getSessionId();
                     $itemIdentifier = $assessmentItem->getIdentifier();
-                    
+
                     // Deal with attempts.
                     $attempt = $context->getCatAttempts($itemIdentifier);
                     $transmissionId = "${sessionId}.${itemIdentifier}.${attempt}";
-                    
+
                     $attempt++;
-                    
+
                     foreach ($session->getAllVariables() as $var) {
                         if ($var->getIdentifier() === 'numAttempts') {
                             $var->setValue(new \qtism\common\datatypes\QtiInteger($attempt));
                         }
-                        
+
                         $variables[] = $var;
                     }
-                    
+
                     $resultTransmitter->transmitItemVariable($variables, $transmissionId, $hrefParts[0], $hrefParts[2]);
                     $context->persistCatAttempts($itemIdentifier, $attempt);
-                    
+
                     $context->getTestSession()->endAttempt(new State(), true);
                 } else {
                     // Non adaptive case.
                     $session->endAttempt($responses, true);
                 }
-                
+
                 return true;
             } catch (AssessmentTestSessionException $e) {
                 \common_Logger::w($e->getMessage());
@@ -991,12 +993,12 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
                 }
             } catch (AssessmentTestSessionException $e) {
                 switch ($e->getCode()) {
-                    case AssessmentTestSessionException::ASSESSMENT_TEST_DURATION_OVERFLOW:
-                    case AssessmentTestSessionException::TEST_PART_DURATION_OVERFLOW:
-                    case AssessmentTestSessionException::ASSESSMENT_SECTION_DURATION_OVERFLOW:
-                    case AssessmentTestSessionException::ASSESSMENT_ITEM_DURATION_OVERFLOW:
-                        $this->onTimeout($context, $e);
-                        break;
+                case AssessmentTestSessionException::ASSESSMENT_TEST_DURATION_OVERFLOW:
+                case AssessmentTestSessionException::TEST_PART_DURATION_OVERFLOW:
+                case AssessmentTestSessionException::ASSESSMENT_SECTION_DURATION_OVERFLOW:
+                case AssessmentTestSessionException::ASSESSMENT_ITEM_DURATION_OVERFLOW:
+                    $this->onTimeout($context, $e);
+                    break;
                 }
             }
         } else {
@@ -1325,40 +1327,40 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
 
         $isLinear = $session->getCurrentNavigationMode() === NavigationMode::LINEAR;
         switch ($timeOutException->getCode()) {
-            case AssessmentTestSessionException::ASSESSMENT_TEST_DURATION_OVERFLOW:
-                \common_Logger::i('TIMEOUT: closing the assessment test session');
-                $session->endTestSession();
-                break;
+        case AssessmentTestSessionException::ASSESSMENT_TEST_DURATION_OVERFLOW:
+            \common_Logger::i('TIMEOUT: closing the assessment test session');
+            $session->endTestSession();
+            break;
 
-            case AssessmentTestSessionException::TEST_PART_DURATION_OVERFLOW:
-                if ($isLinear) {
-                    \common_Logger::i('TIMEOUT: moving to the next test part');
-                    $session->moveNextTestPart();
-                } else {
-                    \common_Logger::i('TIMEOUT: closing the assessment test part');
-                    $session->closeTestPart();
-                }
-                break;
+        case AssessmentTestSessionException::TEST_PART_DURATION_OVERFLOW:
+            if ($isLinear) {
+                \common_Logger::i('TIMEOUT: moving to the next test part');
+                $session->moveNextTestPart();
+            } else {
+                \common_Logger::i('TIMEOUT: closing the assessment test part');
+                $session->closeTestPart();
+            }
+            break;
 
-            case AssessmentTestSessionException::ASSESSMENT_SECTION_DURATION_OVERFLOW:
-                if ($isLinear) {
-                    \common_Logger::i('TIMEOUT: moving to the next assessment section');
-                    $session->moveNextAssessmentSection();
-                } else {
-                    \common_Logger::i('TIMEOUT: closing the assessment section session');
-                    $session->closeAssessmentSection();
-                }
-                break;
+        case AssessmentTestSessionException::ASSESSMENT_SECTION_DURATION_OVERFLOW:
+            if ($isLinear) {
+                \common_Logger::i('TIMEOUT: moving to the next assessment section');
+                $session->moveNextAssessmentSection();
+            } else {
+                \common_Logger::i('TIMEOUT: closing the assessment section session');
+                $session->closeAssessmentSection();
+            }
+            break;
 
-            case AssessmentTestSessionException::ASSESSMENT_ITEM_DURATION_OVERFLOW:
-                if ($isLinear) {
-                    \common_Logger::i('TIMEOUT: moving to the next item');
-                    $session->moveNextAssessmentItem();
-                } else {
-                    \common_Logger::i('TIMEOUT: closing the assessment item session');
-                    $session->closeAssessmentItem();
-                }
-                break;
+        case AssessmentTestSessionException::ASSESSMENT_ITEM_DURATION_OVERFLOW:
+            if ($isLinear) {
+                \common_Logger::i('TIMEOUT: moving to the next item');
+                $session->moveNextAssessmentItem();
+            } else {
+                \common_Logger::i('TIMEOUT: closing the assessment item session');
+                $session->closeAssessmentItem();
+            }
+            break;
         }
 
         $event = new TestTimeoutEvent($session, $timeOutException->getCode(), false);
@@ -1420,8 +1422,8 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
         $sessionTimeLimits = $session->getCurrentTestPart()->getTimeLimits();
         if ($sessionTimeLimits) {
             $sessionMaxTime = $sessionTimeLimits->hasMaxTime()
-                 ? $sessionTimeLimits->getMaxTime()->getSeconds(true)
-                 : null;
+                ? $sessionTimeLimits->getMaxTime()->getSeconds(true)
+                : null;
         }
 
         return [
@@ -1569,7 +1571,7 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
             );
         }
     }
-    
+
     /**
      * Get Current Assessment Session.
      * 
@@ -1601,18 +1603,18 @@ class QtiRunnerService extends ConfigurableService implements RunnerService
         $maxTimeSeconds = null;
         $item = null;
         switch ($qtiClassName) {
-            case 'assessmentTest' :
-                $item = $session->getAssessmentTest();
-                break;
-            case 'testPart':
-                $item = $session->getCurrentTestPart();
-                break;
-            case 'assessmentSection':
-                $item = $session->getCurrentAssessmentSection();
-                break;
-            case 'assessmentItemRef':
-                $item = $session->getCurrentAssessmentItemRef();
-                break;
+        case 'assessmentTest' :
+            $item = $session->getAssessmentTest();
+            break;
+        case 'testPart':
+            $item = $session->getCurrentTestPart();
+            break;
+        case 'assessmentSection':
+            $item = $session->getCurrentAssessmentSection();
+            break;
+        case 'assessmentItemRef':
+            $item = $session->getCurrentAssessmentItemRef();
+            break;
         }
 
         if ($item && $limits = $item->getTimeLimits()) {

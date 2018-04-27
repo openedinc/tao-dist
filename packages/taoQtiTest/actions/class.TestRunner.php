@@ -789,20 +789,6 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                     $stateOutput->addVariable($var);
                 }
 
-                if (\taoLti_models_classes_LtiService::singleton()->hasLtiSession()) {
-                   // trigger AssessmentItemEvent for Caliper
-                   $launchData = \taoLti_models_classes_LtiService::singleton()->getLtiSession()->getLaunchData();
-                   $testTaker = \common_session_SessionManager::getSession();
-                   $event = new AssessmentItemEvent($this->getTestSession(), $stateOutput->getOutput(), $testTaker, $launchData);
-
-                   try {
-                      ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
-                   } catch(\Exception $e) {
-                      \common_Logger::e('Calliper AssessmentEvent exception');
-                   }
-
-                }
-
                 $itemCompilationDirectory = $this->getDirectory($this->getRequestParameter('itemDataPath'));
                 $jsonReturn = array('success' => true,
                     'displayFeedback' => $displayFeedback,
