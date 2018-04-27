@@ -419,6 +419,12 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                 if( is_array($responsesFromLtiForm) ){
                     $itemSession = $session->getCurrentAssessmentItemSession();
                     $currentItem = $session->getCurrentAssessmentItemRef();
+
+                    $assessmentTestIdentifier = $session->getAssessmentTest()->getIdentifier();
+                    $userUri = common_session_SessionManager::getSession()->getUserUri();
+
+                    $serviceService = $this->getServiceManager()->get('tao/stateStorage');
+
                     while( array_key_exists((string)$currentItem, $responsesFromLtiForm) /* && ($itemSession->getRemainingAttempts() === -1 || $itemSession->getRemainingAttempts() > 0) */){
                         if( $itemSession->getState() !== AssessmentTestSessionState::CLOSED ){
                             $filler = new taoQtiCommon_helpers_PciVariableFiller(
@@ -427,20 +433,31 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                             );
                             $responses = new State();
                             $response = $responsesFromLtiForm[(string)$currentItem];
-                            if( preg_match("/^i(\d{1,7})/", $response)){
-                                $responseForFilter = ['base' => ['identifier' => $response]];
-                            }else{
-                                $responseForFilter = ['base' => ['string' => $response]];
-                            }
+
                             if( is_array($response)){
                                 $responseForFilter = ['list' => ['identifier' => $response]];
+                            }else{
+                                if( preg_match("/^i(\d{1,7})/", $response)){
+                                    $responseForFilter = ['base' => ['identifier' => $response]];
+                                }else{
+                                    $responseForFilter = ['base' => ['string' => $response]];
+                                }
                             }
+
                             $var = $filler->fill('RESPONSE', $responseForFilter);
+
                             // Do not take into account QTI File placeholders.
                             if (taoQtiCommon_helpers_Utils::isQtiFilePlaceHolder($var) === false) {
                                 $responses->setVariable($var);
                             }
                             $session->endAttempt($responses, true);
+
+                            $stateId = $session->getSessionId().".".$currentItem.".0";
+                            $state = json_encode(array(
+                                'RESPONSE' => array('response' => $responseForFilter)
+                            ));
+
+                            $serviceService->set($userUri, $stateId, $state);
 
                             $nextPosition = $session->getRoute()->getPosition() + 1;
                             $this->endTimedSection($nextPosition);
