@@ -20,6 +20,8 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 
+use oat\oatbox\event\EventManager;
+use oat\taoCaliper\models\events\AssessmentItemEvent;
 use oat\taoQtiTest\models\event\TraceVariableStored;
 use oat\taoQtiTest\models\runner\QtiRunnerClosedException;
 use oat\taoQtiTest\models\runner\QtiRunnerEmptyResponsesException;
@@ -516,6 +518,9 @@ class taoQtiTest_actions_Runner extends tao_actions_ServiceModule
                         throw new QtiRunnerEmptyResponsesException();
                     }
                 }
+
+                $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+                $eventManager->trigger( new AssessmentItemEvent($serviceContext->getTestSession(), json_decode($itemResponse, true)));
 
                 return $this->runnerService->storeItemResponse($serviceContext, $itemDefinition, $responses);
             }
