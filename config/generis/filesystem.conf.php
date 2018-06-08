@@ -6,6 +6,33 @@
 return new oat\oatbox\filesystem\FileSystemService(array(
     'filesPath' => FILES_PATH,
     'adapters' => array(
+        'itemDirectory' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'taoItems/itemData',
+                    'pdo_prefix' => 'taoItems'
+                )
+            ]
+        ),
+        'taoQtiItem' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'taoQtiItem',
+                    'pdo_prefix' => 'taoQtiItem'
+                )
+            ]
+        ),
+        'taoQtiTest' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'taoQtiTest',
+                    'pdo_prefix' => 'taoQtiTest'
+                )
+            ]
+        ),
         'taskQueueStorage' => array(
             'class' => 'Local',
             'options' => array(
@@ -46,24 +73,6 @@ return new oat\oatbox\filesystem\FileSystemService(array(
             'class' => 'Local',
             'options' => array(
                 'root' => FILES_PATH.'stateBackup'
-            )
-        ),
-        'itemDirectory' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'taoItems/itemData'
-            )
-        ),
-        'taoQtiItem' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'taoQtiItem'
-            )
-        ),
-        'taoQtiTest' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'taoQtiTest'
             )
         ),
         'taoQtiTestSessionFilesystem' => array(

@@ -74,6 +74,10 @@
         {
             "type": "path",
             "url": "packages/taoItems"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/openedinc/lib-flysystem-two-way-replica"
         }
     ],
     "minimum-stability": "dev",
@@ -108,7 +112,8 @@
         "oat-sa/extension-tao-test" : "~6.4.0",
         "oat-sa/extension-tao-testtaker" : "~3.0.1",
         "oat-sa/extension-tao-workspace" : "~1.0.0",
-        "openedinc/extension-tao-caliper": "master"
+        "openedinc/extension-tao-caliper": "master",
+        "openedinc/lib-flysystem-two-way-replica": "master"
     },
     "description": "TAO is an Open Source e-Testing platform that empowers you to build, deliver, and share innovative and engaging assessments online \u2013 in any language or subject matter."
 }

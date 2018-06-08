@@ -181,6 +181,38 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoQtiItem',
             'path' => 'css'
         ),
+        'qtiItemPci' => array(
+            'extId' => 'qtiItemPci',
+            'path' => 'js'
+        ),
+        'qtiItemPciCss' => array(
+            'extId' => 'qtiItemPci',
+            'path' => 'css'
+        ),
+        'funcAcl' => array(
+            'extId' => 'funcAcl',
+            'path' => 'js'
+        ),
+        'funcAclCss' => array(
+            'extId' => 'funcAcl',
+            'path' => 'css'
+        ),
+        'taoLti' => array(
+            'extId' => 'taoLti',
+            'path' => 'js'
+        ),
+        'taoLtiCss' => array(
+            'extId' => 'taoLti',
+            'path' => 'css'
+        ),
+        'taoLtiBasicOutcome' => array(
+            'extId' => 'taoLtiBasicOutcome',
+            'path' => 'js'
+        ),
+        'taoLtiBasicOutcomeCss' => array(
+            'extId' => 'taoLtiBasicOutcome',
+            'path' => 'css'
+        ),
         'taoQtiTest' => array(
             'extId' => 'taoQtiTest',
             'path' => 'js'
@@ -205,44 +237,12 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoOutcomeUi',
             'path' => 'css'
         ),
-        'qtiItemPci' => array(
-            'extId' => 'qtiItemPci',
-            'path' => 'js'
-        ),
-        'qtiItemPciCss' => array(
-            'extId' => 'qtiItemPci',
-            'path' => 'css'
-        ),
-        'funcAcl' => array(
-            'extId' => 'funcAcl',
-            'path' => 'js'
-        ),
-        'funcAclCss' => array(
-            'extId' => 'funcAcl',
-            'path' => 'css'
-        ),
         'taoCe' => array(
             'extId' => 'taoCe',
             'path' => 'js'
         ),
         'taoCeCss' => array(
             'extId' => 'taoCe',
-            'path' => 'css'
-        ),
-        'taoLti' => array(
-            'extId' => 'taoLti',
-            'path' => 'js'
-        ),
-        'taoLtiCss' => array(
-            'extId' => 'taoLti',
-            'path' => 'css'
-        ),
-        'taoLtiBasicOutcome' => array(
-            'extId' => 'taoLtiBasicOutcome',
-            'path' => 'js'
-        ),
-        'taoLtiBasicOutcomeCss' => array(
-            'extId' => 'taoLtiBasicOutcome',
             'path' => 'css'
         ),
         'ltiDeliveryProvider' => array(
@@ -259,6 +259,14 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'taoCaliperCss' => array(
             'extId' => 'taoCaliper',
+            'path' => 'css'
+        ),
+        'taoFlysystemTwoWayReplica' => array(
+            'extId' => 'taoFlysystemTwoWayReplica',
+            'path' => 'js'
+        ),
+        'taoFlysystemTwoWayReplicaCss' => array(
+            'extId' => 'taoFlysystemTwoWayReplica',
             'path' => 'css'
         )
     )
