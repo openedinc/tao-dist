@@ -3463,12 +3463,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/openedinc/lib-flysystem-two-way-replica.git",
-                "reference": "1722012c1f9839f81fadee5abda7b0de4b02b4a0"
+                "reference": "2e523903b5d8db5ffab9802ee5fb1cf95d19261b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openedinc/lib-flysystem-two-way-replica/zipball/1722012c1f9839f81fadee5abda7b0de4b02b4a0",
-                "reference": "1722012c1f9839f81fadee5abda7b0de4b02b4a0",
+                "url": "https://api.github.com/repos/openedinc/lib-flysystem-two-way-replica/zipball/2e523903b5d8db5ffab9802ee5fb1cf95d19261b",
+                "reference": "2e523903b5d8db5ffab9802ee5fb1cf95d19261b",
                 "shasum": ""
             },
             "require": {
@@ -3509,7 +3509,7 @@
                 "source": "https://github.com/openedinc/lib-flysystem-two-way-replica/tree/master",
                 "issues": "https://github.com/openedinc/lib-flysystem-two-way-replica/issues"
             },
-            "time": "2018-06-07 21:05:13"
+            "time": "2018-06-15 17:09:08"
         },
         {
             "name": "paragonie/random_compat",
