@@ -84,6 +84,7 @@
     "homepage": "http://www.taotesting.com",
     "require": {
         "php": "^5.6.0",
+        "ext-pcntl": "*",
         "oat-sa/extension-tao-funcacl" : "~4.0.0",
         "oat-sa/generis" : "~5.10.0",
         "openedinc/extension-tao-ltideliveryprovider" : "*",
