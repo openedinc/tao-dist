@@ -51,28 +51,34 @@ return new oat\oatbox\filesystem\FileSystemService(array(
                 )
             ]
         ),
+        'fileUploadDirectory' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'tao/upload',
+                    'pdo_prefix' => 'tao/upload'
+                )
+            ]
+        ),
+        'sharedTmp' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'tmp',
+                    'pdo_prefix' => 'tmp'
+                )
+            ]
+        ),
         'taskQueueStorage' => array(
             'class' => 'Local',
             'options' => array(
                 'root' => FILES_PATH.'taskQueueStorage'
             )
         ),
-        'fileUploadDirectory' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'tao/upload'
-            )
-        ),
         'log' => array(
             'class' => 'Local',
             'options' => array(
                 'root' => FILES_PATH.'tao/log'
-            )
-        ),
-        'sharedTmp' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'tmp'
             )
         ),
         'stateBackup' => array(
