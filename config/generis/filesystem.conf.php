@@ -33,6 +33,24 @@ return new oat\oatbox\filesystem\FileSystemService(array(
                 )
             ]
         ),
+        'private' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'tao/private',
+                    'pdo_prefix' => 'tao/private'
+                )
+            ]
+        ),
+        'public' => array(
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'tao/public',
+                    'pdo_prefix' => 'tao/public'
+                )
+            ]
+        ),
         'taskQueueStorage' => array(
             'class' => 'Local',
             'options' => array(
@@ -43,18 +61,6 @@ return new oat\oatbox\filesystem\FileSystemService(array(
             'class' => 'Local',
             'options' => array(
                 'root' => FILES_PATH.'tao/upload'
-            )
-        ),
-        'public' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'tao/public'
-            )
-        ),
-        'private' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'tao/private'
             )
         ),
         'log' => array(

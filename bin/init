@@ -14,3 +14,6 @@ cp bin/patches/tao-main-style.css tao/views/css/tao-main-style.css
 #Sometimes, not always, I had weird errors like 'The value 'qtism\common\datatypes\QtiIdentifier' is not compliant with the 'identifier' baseType.
 #monkey-patching by commenting throw error line
 cp bin/patches/Utils.php vendor/qtism/qtism/qtism/runtime/common/Utils.php
+
+cp config/tao/portable_websource_template.conf.php 'config/tao/websource_'$PORTABLE_WEBSOURCE_ID'.conf.php'
+cp config/tao/public_websource_template.conf.php 'config/tao/websource_'$PUBLIC_WEBSOURCE_ID'.conf.php'

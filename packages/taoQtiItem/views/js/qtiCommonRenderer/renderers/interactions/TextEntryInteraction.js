@@ -31,7 +31,6 @@ define([
     'taoQtiItem/qtiCommonRenderer/helpers/PciResponse',
     'taoQtiItem/qtiCommonRenderer/helpers/patternMask',
     'util/locale',
-    'polyfill/placeholders',
     'ui/tooltip'
 ], function($, _, __, tpl, containerHelper, instructionMgr, pciResponse, patternMaskHelper, locale){
     'use strict';
@@ -205,7 +204,7 @@ define([
             attributes = interaction.getAttributes(),
             baseType = interaction.getResponseDeclaration().attr('baseType'),
             numericBase = attributes.base || 10;
-        
+
         if($input.hasClass('invalid') || (attributes.placeholderText && $input.val() === attributes.placeholderText)){
             //invalid response or response equals to the placeholder text are considered empty
             value = '';

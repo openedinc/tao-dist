@@ -23,10 +23,10 @@ namespace oat\taoQtiTest\models\tasks;
 
 use oat\oatbox\task\AbstractTaskAction;
 use oat\oatbox\service\ServiceManager;
-use oat\oatbox\task\Queue;
-use oat\oatbox\task\Task;
 use oat\tao\model\import\ImportersService;
 use \oat\taoQtiTest\models\import\QtiTestImporter;
+use oat\taoTaskQueue\model\QueueDispatcher;
+
 /**
  * Class ImportQtiTest
  * @package oat\taoQtiTest\models\tasks
@@ -79,7 +79,7 @@ class ImportQtiTest extends AbstractTaskAction implements \JsonSerializable
      * @param array $packageFile uploaded file
      * @param \core_kernel_classes_Class $class uploaded file
      * @param bool $enableGuardians Flag that marks use or not metadata guardians during the import.
-     * @return Task created task id
+     * @return TaskInterface
      */
     public static function createTask($packageFile, \core_kernel_classes_Class $class, $enableGuardians = true)
     {
@@ -87,13 +87,17 @@ class ImportQtiTest extends AbstractTaskAction implements \JsonSerializable
         $action->setServiceLocator(ServiceManager::getServiceManager());
 
         $fileUri = $action->saveFile($packageFile['tmp_name'], $packageFile['name']);
-        $queue = ServiceManager::getServiceManager()->get(Queue::SERVICE_ID);
+        $queueDispatcher = ServiceManager::getServiceManager()->get(QueueDispatcher::SERVICE_ID);
 
-        return $queue->createTask($action, [
-            self::PARAM_FILE => $fileUri,
-            self::PARAM_CLASS_URI => $class->getUri(),
-            self::PARAM_ENABLE_GUARDIANS => $enableGuardians
-        ]);
+        return $queueDispatcher->createTask(
+            $action,
+            [
+                self::PARAM_FILE => $fileUri,
+                self::PARAM_CLASS_URI => $class->getUri(),
+                self::PARAM_ENABLE_GUARDIANS => $enableGuardians
+            ],
+            __('Import QTI TEST into "%s"', $class->getLabel())
+        );
     }
 
     /**

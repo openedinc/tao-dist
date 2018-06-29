@@ -24,12 +24,14 @@ namespace oat\taoDelivery\scripts\update;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
+use oat\tao\model\TaoOntology;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\taoDelivery\model\authorization\AuthorizationService;
 use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
 use oat\taoDelivery\model\authorization\strategy\StateValidation;
+use oat\taoDelivery\model\DeliveryPluginService;
 use oat\taoDelivery\model\entrypoint\FrontOfficeEntryPoint;
 use oat\taoDelivery\model\entrypoint\GuestAccess;
 use oat\taoDelivery\model\execution\DeliveryServerService;
@@ -270,7 +272,7 @@ class Updater extends \common_ext_ExtensionUpdater {
         if ($this->isVersion('6.2.0')) {
             $service = new DeliveryFieldsService([
                 DeliveryFieldsService::PROPERTY_CUSTOM_LABEL => [
-                    INSTANCE_ROLE_DELIVERY
+					TaoOntology::PROPERTY_INSTANCE_ROLE_DELIVERY
                 ]
             ]);
             $service->setServiceManager($this->getServiceManager());
@@ -336,5 +338,13 @@ class Updater extends \common_ext_ExtensionUpdater {
         }
 
         $this->skip('7.0.1', '7.0.2');
+
+        if ($this->isVersion('7.0.2')) {
+            // Delete unused service after refactoring
+            //$this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoDelivery']));
+            $this->setVersion('7.1.0');
+        }
+
+        $this->skip('7.1.0', '7.4.0');
     }
 }

@@ -38,8 +38,7 @@ use oat\taoDelivery\model\RuntimeService;
 class Updater extends \common_ext_ExtensionUpdater {
 
     /**
-     *
-     * @param string $currentVersion
+     * @param string $initialVersion
      * @return string $versionUpdatedTo
      */
     public function update($initialVersion) {
@@ -152,6 +151,14 @@ class Updater extends \common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(RuntimeService::SERVICE_ID, new ContainerRuntime());
             $this->setVersion('3.7.0');
         }
-	$this->skip('3.7.0', '3.8.0');
+
+        $this->skip('3.7.0', '3.9.1');
+
+        if ($this->isVersion('3.9.1')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('3.9.2');
+        }
+
+        $this->skip('3.9.2', '3.15.0');
     }
 }

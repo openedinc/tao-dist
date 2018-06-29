@@ -85,17 +85,17 @@
     "require": {
         "php": "^5.6.0",
         "oat-sa/extension-tao-funcacl" : "~4.0.0",
-        "oat-sa/generis" : "~4.0.1",
+        "oat-sa/generis" : "~5.10.0",
         "openedinc/extension-tao-ltideliveryprovider" : "*",
         "oat-sa/extension-tao-itemqti-pci" : "~3.1.0",
         "oat-sa/extension-tao-itemqti-pic" : "~4.0.0",
         "oat-sa/extension-pcisample" :"~2.0.1",
-        "oat-sa/tao-core" : "~12.8.0",
+        "oat-sa/tao-core" : "~13.1.2",
         "oat-sa/extension-tao-backoffice" : "~1.1.0",
-        "oat-sa/extension-tao-community" : "~3.4.1",
+        "oat-sa/extension-tao-community" : "3.8.0",
         "oat-sa/extension-tao-dac-simple" : "~2.0.3",
-        "oat-sa/extension-tao-delivery" : "~7.0.2",
-        "oat-sa/extension-tao-delivery-rdf" : "~3.8.0",
+        "oat-sa/extension-tao-delivery" : "7.4.0",
+        "oat-sa/extension-tao-delivery-rdf" : "3.15.0",
         "oat-sa/extension-tao-group" : "~3.0.1",
         "openedinc/extension-tao-item" : "*",
         "openedinc/extension-tao-lti" : "*",
@@ -113,7 +113,8 @@
         "oat-sa/extension-tao-testtaker" : "~3.0.1",
         "oat-sa/extension-tao-workspace" : "~1.0.0",
         "openedinc/extension-tao-caliper": "master",
-        "openedinc/lib-flysystem-two-way-replica": "master"
+        "openedinc/lib-flysystem-two-way-replica": "master",
+        "oat-sa/extension-tao-task-queue": "~0.5.1"
     },
     "description": "TAO is an Open Source e-Testing platform that empowers you to build, deliver, and share innovative and engaging assessments online \u2013 in any language or subject matter."
 }

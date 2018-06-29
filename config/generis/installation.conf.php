@@ -6,11 +6,11 @@
 return new oat\oatbox\config\ConfigurationService(array(
     'config' => array(
         'generis' => array(
-            'installed' => '4.0.1',
+            'installed' => '5.10.0',
             'enabled' => true
         ),
         'tao' => array(
-            'installed' => '12.8.0',
+            'installed' => '13.1.5',
             'enabled' => true
         ),
         'taoResultServer' => array(
@@ -22,7 +22,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoDelivery' => array(
-            'installed' => '7.0.2',
+            'installed' => '7.4.0',
             'enabled' => true
         ),
         'taoBackOffice' => array(
@@ -30,7 +30,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoTestTaker' => array(
-            'installed' => '3.0.3',
+            'installed' => '3.0.1',
             'enabled' => true
         ),
         'taoGroups' => array(
@@ -50,7 +50,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'qtiItemPci' => array(
-            'installed' => '3.1.1',
+            'installed' => '3.1.0',
             'enabled' => true
         ),
         'funcAcl' => array(
@@ -62,15 +62,23 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoLtiBasicOutcome' => array(
-            'installed' => '3.0.1',
+            'installed' => '3.0.0',
             'enabled' => true
         ),
         'taoQtiTest' => array(
             'installed' => '11.10.0',
             'enabled' => true
         ),
+        'taoFlysystemTwoWayReplica' => array(
+            'installed' => '1.0.0',
+            'enabled' => true
+        ),
+        'taoTaskQueue' => array(
+            'installed' => '0.5.1',
+            'enabled' => true
+        ),
         'taoDeliveryRdf' => array(
-            'installed' => '3.8.1',
+            'installed' => '3.15.0',
             'enabled' => true
         ),
         'taoOutcomeUi' => array(
@@ -78,7 +86,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoCe' => array(
-            'installed' => '3.4.1',
+            'installed' => '3.8.0',
             'enabled' => true
         ),
         'ltiDeliveryProvider' => array(
@@ -86,10 +94,6 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoCaliper' => array(
-            'installed' => '1.0.0',
-            'enabled' => true
-        ),
-        'taoFlysystemTwoWayReplica' => array(
             'installed' => '1.0.0',
             'enabled' => true
         )

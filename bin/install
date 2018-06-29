@@ -13,4 +13,6 @@ php tao/scripts/taoInstall.php \
 --module_url $ROOT_URL \
 --user_login $ADMIN_USERNAME \
 --user_pass $ADMIN_PASSWORD \
--e taoCe,taoLti,taoLtiBasicOutcome,ltiDeliveryProvider,taoCaliper,taoQtiTest,taoFlysystemTwoWayReplica
+-e taoCe,taoLti,taoLtiBasicOutcome,ltiDeliveryProvider,taoCaliper,taoQtiTest,taoFlysystemTwoWayReplica,taoTaskQueue
+
+php index.php 'oat\taoTaskQueue\scripts\tools\InitializeQueue' --broker=rds --persistence=default --receive=5

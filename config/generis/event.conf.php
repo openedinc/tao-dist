@@ -59,6 +59,12 @@ return new oat\oatbox\event\EventManager(array(
                 'catchFinished'
             )
         ),
+        'oat\\taoCaliper\\models\\events\\GradeEvent' => array(
+            array(
+                'oat\\taoCaliper\\models\\testSession\\TestSessionProcessor',
+                'catchGrade'
+            )
+        ),
         'oat\\taoQtiTest\\models\\event\\RestImportTestBeforeSaveItems' => array(
             array(
                 'oat\\taoCaliper\\models\\testSession\\TestSessionProcessor',

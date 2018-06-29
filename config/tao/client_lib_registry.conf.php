@@ -221,6 +221,22 @@ return new oat\oatbox\config\ConfigurationService(array(
             'extId' => 'taoQtiTest',
             'path' => 'css'
         ),
+        'taoFlysystemTwoWayReplica' => array(
+            'extId' => 'taoFlysystemTwoWayReplica',
+            'path' => 'js'
+        ),
+        'taoFlysystemTwoWayReplicaCss' => array(
+            'extId' => 'taoFlysystemTwoWayReplica',
+            'path' => 'css'
+        ),
+        'taoTaskQueue' => array(
+            'extId' => 'taoTaskQueue',
+            'path' => 'js'
+        ),
+        'taoTaskQueueCss' => array(
+            'extId' => 'taoTaskQueue',
+            'path' => 'css'
+        ),
         'taoDeliveryRdf' => array(
             'extId' => 'taoDeliveryRdf',
             'path' => 'js'
@@ -259,14 +275,6 @@ return new oat\oatbox\config\ConfigurationService(array(
         ),
         'taoCaliperCss' => array(
             'extId' => 'taoCaliper',
-            'path' => 'css'
-        ),
-        'taoFlysystemTwoWayReplica' => array(
-            'extId' => 'taoFlysystemTwoWayReplica',
-            'path' => 'js'
-        ),
-        'taoFlysystemTwoWayReplicaCss' => array(
-            'extId' => 'taoFlysystemTwoWayReplica',
             'path' => 'css'
         )
     )

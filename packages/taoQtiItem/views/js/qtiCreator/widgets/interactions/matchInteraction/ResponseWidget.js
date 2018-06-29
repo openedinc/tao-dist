@@ -5,9 +5,9 @@ define([
     'taoQtiItem/qtiCreator/widgets/helpers/formElement',
     'tpl!taoQtiItem/qtiCreator/tpl/toolbars/matchInteraction.score',
     'lodash',
-    'i18n',
-    'polyfill/placeholders'
+    'i18n'
 ], function($, commonRenderer, instructionMgr, formElement, scoreTpl, _, __){
+    'use strict';
 
     var ResponseWidget = {
         create : function(widget, responseMappingMode){

@@ -14,3 +14,5 @@ taoLti
 taoItems
 taoFlysystemTwoWayReplica
 taoQtiItem
+taoTaskQueue
+config/tao/websource_*.conf.php
