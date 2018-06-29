@@ -70,10 +70,13 @@ return new oat\oatbox\filesystem\FileSystemService(array(
             ]
         ),
         'taskQueueStorage' => array(
-            'class' => 'Local',
-            'options' => array(
-                'root' => FILES_PATH.'taskQueueStorage'
-            )
+            'class' => 'oat\\remoteFlysystem\\models\\PDOLocalReplicateAdapter',
+            'options' => [
+                array(
+                    'local_root' => FILES_PATH.'taskQueueStorage',
+                    'pdo_prefix' => 'taskQueueStorage'
+                )
+            ]
         ),
         'log' => array(
             'class' => 'Local',
