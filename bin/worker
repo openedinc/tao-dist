@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+./bin/init
+
+touch log.txt
+tail -f log.txt &
+
+php index.php 'oat\taoTaskQueue\scripts\tools\RunWorker'
