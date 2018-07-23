@@ -23,6 +23,7 @@
 use qtism\runtime\tests\AssessmentTestSessionException;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoCaliper\models\classes\GradeEventTrait;
 use qtism\data\AssessmentTest;
 use qtism\runtime\common\State;
 use qtism\runtime\common\ResponseVariable;
@@ -52,7 +53,7 @@ use oat\oatbox\event\EventManager;
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
  */
 class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
-
+      use GradeEventTrait;
     /**
      * The current AssessmentTestSession object.
      * 
@@ -873,7 +874,7 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                     $testTaker = \common_session_SessionManager::getSession();
                     $event = new AssessmentItemEvent($this->getTestSession(), $stateOutput->getOutput(), $testTaker, $launchData);
                     try {
-                       ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
+                        ServiceManager::getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
                     } catch(\Exception $e) {
                         \common_Logger::e('Calliper AssessmentItemEvent exception');
                     }
@@ -889,6 +890,7 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                     $jsonReturn['feedbacks'] = QtiRunner::getFeedbacks($itemCompilationDirectory, $itemSession);
                 }
 
+                $this->triggerGradeEvent($stateOutput->getOutput());
                 echo json_encode($jsonReturn);
             } catch (AssessmentTestSessionException $e) {
                 $this->handleAssessmentTestSessionException($e);
