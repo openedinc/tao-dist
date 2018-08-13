@@ -23,6 +23,7 @@
 use qtism\runtime\tests\AssessmentTestSessionException;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoCaliper\models\classes\AssessmentEventsTrait;
 use oat\taoCaliper\models\classes\GradeEventTrait;
 use qtism\data\AssessmentTest;
 use qtism\runtime\common\State;
@@ -53,7 +54,8 @@ use oat\oatbox\event\EventManager;
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
  */
 class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
-      use GradeEventTrait;
+    use AssessmentEventsTrait;
+    use GradeEventTrait;
     /**
      * The current AssessmentTestSession object.
      * 
@@ -411,6 +413,8 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
             if (taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
                 taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
             }
+
+            $this->triggerAssessmentEventStarted($session);
 
             /* checking if the test-taker of LtiSession will resume this assessment test. */
             $resultHasLastQuestionLtiSession = \taoLti_models_classes_LtiService::singleton()->hasLastQuestion();
