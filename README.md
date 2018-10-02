@@ -3,20 +3,20 @@ package-tao
 
 Clone repository
 
-    git clone https://github.com/oat-sa/package-tao.git
-    
+    git clone git@github.com:openedinc/tao-dist.git
+
 Install via composer missing library and extensions
 
     composer install
-    
-Add rw to www-data
 
-    sudo chown -R www-data package-tao
+Add rw to `whoami`
+
+    sudo chown -R `whoami` tao-dist
 
 Install TAO
 
 ```bash
-sudo -u www-data php tao/scripts/taoInstall.php \
+sudo -u `whoami` php tao/scripts/taoInstall.php \
 --db_driver pdo_mysql \
 --db_host localhost \
 --db_name taoUnitTest \
@@ -52,5 +52,5 @@ sudo -u www-data php tao/scripts/taoInstall.php \
 
 Custom params on LTI Sessions
 
-- `custom_caliper_endpoint`: receive a URL where will send events triggered using Caliper-like format while test-taker is responding a test.    
+- `custom_caliper_endpoint`: receive a URL where will send events triggered using Caliper-like format while test-taker is responding a test.
 - `custom_last_questions`: receive a JSON-like string then a test-taker would resume a test (each test attemp is a new LTI Session). e. g. `{"i1111111": "drinked", "i1111111": "i2222", "i1111111": ["i2222", "i3333"]}`
