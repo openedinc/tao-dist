@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "6076c83eeff64c1fc198d4d3ac8e2a18",
@@ -315,7 +315,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-07-22 12:49:21"
+            "time": "2017-07-22T12:49:21+00:00"
         },
         {
             "name": "doctrine/collections",
@@ -455,7 +455,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2017-07-22 08:35:55"
+            "time": "2017-07-22T08:35:55+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -526,7 +526,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2018-04-02 10:40:57"
+            "time": "2018-04-02T10:40:57+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -593,7 +593,7 @@
                 "singularize",
                 "string"
             ],
-            "time": "2015-11-06 14:35:42"
+            "time": "2015-11-06T14:35:42+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -650,7 +650,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2018-05-14 15:49:16"
+            "time": "2018-05-14T15:49:16+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -712,7 +712,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27 09:45:49"
+            "time": "2015-02-27T09:45:49+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -824,7 +824,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2018-06-23 21:34:47"
+            "time": "2018-06-23T21:34:47+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -875,7 +875,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2018-03-25 01:26:01"
+            "time": "2018-03-25T01:26:01+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -941,7 +941,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-06-08 08:55:26"
+            "time": "2018-06-08T08:55:26+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -1092,7 +1092,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2018-06-20 14:14:43"
+            "time": "2018-06-20T14:14:43+00:00"
         },
         {
             "name": "league/flysystem-aws-s3-v3",
@@ -1139,7 +1139,7 @@
                 }
             ],
             "description": "Flysystem adapter for the AWS S3 SDK v3.x",
-            "time": "2018-06-01 11:17:32"
+            "time": "2018-06-01T11:17:32+00:00"
         },
         {
             "name": "league/flysystem-replicate-adapter",
@@ -1185,7 +1185,7 @@
                 }
             ],
             "description": "Flysystem adapter for Replica's",
-            "time": "2018-04-10 06:42:01"
+            "time": "2018-04-10T06:42:01+00:00"
         },
         {
             "name": "mtdowling/jmespath.php",
@@ -3001,7 +3001,7 @@
                 "computer-based-assessment",
                 "oatbox"
             ],
-            "time": "2015-11-23 11:35:13"
+            "time": "2015-11-23T11:35:13+00:00"
         },
         {
             "name": "oat-sa/tao-core",
@@ -3099,12 +3099,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/openedinc/extension-tao-caliper.git",
-                "reference": "09611580a3ead10c9af7e58152986415cc6a3700"
+                "reference": "c81b59af4392a1a14a532e40c3b98522972cb687"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openedinc/extension-tao-caliper/zipball/09611580a3ead10c9af7e58152986415cc6a3700",
-                "reference": "09611580a3ead10c9af7e58152986415cc6a3700",
+                "url": "https://api.github.com/repos/openedinc/extension-tao-caliper/zipball/c81b59af4392a1a14a532e40c3b98522972cb687",
+                "reference": "c81b59af4392a1a14a532e40c3b98522972cb687",
                 "shasum": ""
             },
             "require": {
@@ -3145,7 +3145,7 @@
                 "source": "https://github.com/openedinc/extension-tao-caliper/tree/master",
                 "issues": "https://github.com/openedinc/extension-tao-caliper/issues"
             },
-            "time": "2018-08-13 20:48:56"
+            "time": "2018-10-02T21:34:14+00:00"
         },
         {
             "name": "openedinc/extension-tao-item",
@@ -3561,7 +3561,7 @@
                 "source": "https://github.com/openedinc/lib-flysystem-two-way-replica/tree/master",
                 "issues": "https://github.com/openedinc/lib-flysystem-two-way-replica/issues"
             },
-            "time": "2018-06-15 17:09:08"
+            "time": "2018-06-15T17:09:08+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -3676,7 +3676,7 @@
                 "archive",
                 "tar"
             ],
-            "time": "2017-07-31 07:04:16"
+            "time": "2017-07-31T07:04:16+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -3846,7 +3846,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-08-25 06:16:11"
+            "time": "2017-08-25T06:16:11+00:00"
         },
         {
             "name": "pear/pear-core-minimal",
@@ -3945,7 +3945,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10 20:07:52"
+            "time": "2015-02-10T20:07:52+00:00"
         },
         {
             "name": "pear/versioncontrol_git",
@@ -3989,7 +3989,7 @@
                 }
             ],
             "description": "VersionControl_Git is a library that provides OO interface to handle Git repository.",
-            "time": "2018-01-29 21:14:27"
+            "time": "2018-01-29T21:14:27+00:00"
         },
         {
             "name": "phing/phing",
@@ -4197,7 +4197,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2018-06-25 09:22:50"
+            "time": "2018-06-25T09:22:50+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -4247,7 +4247,7 @@
                 "container",
                 "dependency injection"
             ],
-            "time": "2018-04-20 06:17:25"
+            "time": "2018-04-20T06:17:25+00:00"
         },
         {
             "name": "psr/container",
@@ -4296,7 +4296,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-06-28 15:35:32"
+            "time": "2017-06-28T15:35:32+00:00"
         },
         {
             "name": "psr/http-message",
@@ -4346,7 +4346,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06 14:39:51"
+            "time": "2016-08-06T14:39:51+00:00"
         },
         {
             "name": "psr/log",
@@ -4393,7 +4393,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-04-03 15:59:15"
+            "time": "2018-04-03T15:59:15+00:00"
         },
         {
             "name": "qtism/qtism",
@@ -4570,7 +4570,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2018-04-25 19:14:32"
+            "time": "2018-04-25T19:14:32+00:00"
         },
         {
             "name": "slim/slim",
@@ -4641,7 +4641,7 @@
                 "micro",
                 "router"
             ],
-            "time": "2018-06-24 08:33:26"
+            "time": "2018-06-24T08:33:26+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -4699,7 +4699,7 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-05-17 18:32:56"
+            "time": "2018-05-17T18:32:56+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -4758,7 +4758,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-05-03 23:18:14"
+            "time": "2018-05-03T23:18:14+00:00"
         },
         {
             "name": "zendframework/zend-servicemanager",
