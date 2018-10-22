@@ -82,7 +82,7 @@ return new oat\oatbox\config\ConfigurationService(array(
             'enabled' => true
         ),
         'taoOutcomeUi' => array(
-            'installed' => '2.7.5',
+            'installed' => '2.10.0',
             'enabled' => true
         ),
         'taoCe' => array(

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint23\n"
-"PO-Revision-Date: 2016-08-18T12:02:41\n"
+"Project-Id-Version: TAO 3.1.0-sprint15\n"
+"PO-Revision-Date: 2015-12-23T13:23:24\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -14,241 +14,241 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 msgid " seconds"
-msgstr " 秒"
+msgstr ""
 
 msgid "# Collected Results"
-msgstr "# 結果"
+msgstr ""
 
 msgid "# Collected Score Variables"
-msgstr "# スコア変数"
+msgstr ""
 
 msgid "# data collected"
-msgstr "# データ収集"
+msgstr ""
 
 msgid "# Distinct Test Takers"
-msgstr "# 個別受験者"
+msgstr ""
 
 msgid "# Distinct variable types"
-msgstr "# 個別変数のタイプ"
+msgstr ""
 
 msgid "%s tests has been finished."
-msgstr "%s テストは完了しました"
+msgstr ""
 
 msgid "Add All grades"
-msgstr "すべてのグレードに追加"
+msgstr ""
 
 msgid "Add All responses"
-msgstr "すべてのレスポンスに追加"
+msgstr ""
 
 msgid "Add Test Taker"
-msgstr "受験者を追加"
+msgstr ""
 
 msgid "All collected variables"
-msgstr "すべての変数"
+msgstr ""
 
 msgid "Anonymise"
-msgstr "匿名化"
+msgstr ""
 
 msgid "Average"
-msgstr "平均"
+msgstr ""
 
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr ""
 
 msgid "Class"
-msgstr "クラス"
+msgstr ""
 
 msgid "Collected Results"
-msgstr "結果"
+msgstr ""
 
 #, tao-public
 msgid "Complete expired tests"
-msgstr "期限切れテストを完了"
+msgstr ""
 
 msgid "Data Collection per Variable"
-msgstr "変数ごとにデータを収集"
+msgstr ""
 
 msgid "Data collection statistics :"
-msgstr "データコレクションスタティクス"
+msgstr ""
 
 #, tao-public
 msgid "Delete"
-msgstr "削除"
+msgstr ""
 
 msgid "Delivery"
-msgstr "デリバリ"
+msgstr ""
 
 msgid "Download"
-msgstr "ダウンロード"
+msgstr ""
 
 msgid "Email:"
-msgstr "電子メール:"
+msgstr ""
 
 msgid "Error"
-msgstr "エラー"
+msgstr ""
 
 msgid "Export CSV File"
-msgstr "CSV ファイルにエクスポート"
+msgstr ""
 
 #, tao-public
 msgid "Export Table"
-msgstr "テーブルをエクスポート"
+msgstr ""
 
 msgid "Filter"
-msgstr "フィルタ"
+msgstr ""
 
 msgid "First Name:"
-msgstr "名:"
+msgstr ""
 
 msgid "First submitted variables only"
-msgstr "最初の変数のみをサブミット"
+msgstr ""
 
 msgid "Frequency per Score"
-msgstr "スコアごとのフリクエンシィ"
+msgstr ""
 
 msgid "Generated on: "
-msgstr "生成:"
+msgstr ""
 
 msgid "Grades"
-msgstr "グレード"
+msgstr ""
 
 msgid "Label"
-msgstr "ラベル"
+msgstr ""
 
 msgid "Label:"
-msgstr "ラベル:"
+msgstr ""
 
 msgid "Last Name:"
-msgstr "姓:"
+msgstr ""
 
 msgid "Last submitted variables only"
-msgstr "最後の変数のみサブミット"
+msgstr ""
 
 msgid "Login:"
-msgstr "ログイン名:"
+msgstr ""
 
 #, tao-public
 msgid "Manage Results"
-msgstr "結果の管理"
+msgstr ""
 
 msgid "No Results"
-msgstr "該当するものはありません。"
+msgstr ""
 
 msgid "No tests have been taken yet. As soon as a test-taker will take a test his results will be displayed here."
-msgstr "テストがまだ受験されていません。テストを受験次第結果が表示されます"
+msgstr ""
 
 msgid "Observed performances per distinc score variable types "
-msgstr "各スコアの変数タイプごとの測定パフォーマンス"
+msgstr ""
 
 msgid "Ok"
-msgstr "OK"
+msgstr ""
 
 msgid "Please confirm deletion"
-msgstr "削除を確認してください"
+msgstr ""
 
 msgid "Preview"
-msgstr "プレビュー"
+msgstr ""
 
 msgid "Print Report"
-msgstr "レポートを印刷"
+msgstr ""
 
 msgid "Related Deliveries:"
-msgstr "関連したデリバリ"
+msgstr ""
 
 msgid "Remove All grades"
-msgstr "すべてのグレードを削除"
+msgstr ""
 
 msgid "Remove All responses"
-msgstr "すべてのレスポンスを削除"
+msgstr ""
 
 msgid "Report generated from the following subset of results : "
-msgstr "結果の次のサブセットから生成されたレポート： "
+msgstr ""
 
 msgid "Responses"
-msgstr "応答"
+msgstr ""
 
 msgid "Result has been deleted"
-msgstr "結果は削除されました"
+msgstr ""
 
 #, tao-public
 msgid "Results"
-msgstr "結果"
+msgstr ""
 
 msgid "Results distribution"
-msgstr "結果の分布"
+msgstr ""
 
 #, tao-public
 msgid "Results library"
-msgstr "結果ライブラリー"
+msgstr ""
 
 msgid "score average"
-msgstr "平均点"
+msgstr ""
 
 msgid "Score average"
-msgstr "平均点"
+msgstr ""
 
 msgid "Score average per Variable"
-msgstr "変数ごとの平均点"
+msgstr ""
 
 msgid "Score per Observation"
-msgstr "観点ごとの点数"
+msgstr ""
 
 msgid "Scores and response rates statistics"
-msgstr "点数と応答率の統計情報"
+msgstr ""
 
 msgid "Something went wrong ..."
-msgstr "何かが間違っていました..."
+msgstr ""
 
 msgid "Summary Report"
-msgstr "サマリーレポート"
+msgstr ""
 
 msgid "Test taker"
-msgstr "受験者"
+msgstr ""
 
 msgid "Test Taker"
-msgstr "受験者"
+msgstr ""
 
 msgid "Test Variables"
-msgstr "テスト変数"
+msgstr ""
 
 msgid "The class you have selected contains no results to be analysed, please select a different class"
-msgstr "選択したクラスには、分析すべき結果が含まれていません。別のクラスを選択してください。"
+msgstr ""
 
 msgid "The number of observations is too low"
-msgstr "観点の値が低すぎます"
+msgstr ""
 
 msgid "There was a problem generating your report, please try again."
-msgstr "レポート生成中に問題が発生しました。再度実行してください。"
+msgstr ""
 
 msgid "This delivery doesn\'t exists"
-msgstr "このデリバリには\\'tがあります"
+msgstr ""
 
 msgid "This delivery has no readable Result Server"
-msgstr "このデリバリには読み込み可能な結果がありません"
+msgstr ""
 
 msgid "This delivery has no Result Server"
-msgstr "このデリバリには結果がありません"
+msgstr ""
 
 msgid "Total Average Score"
-msgstr "全体の平均点"
+msgstr ""
 
 msgid "Total Standard Deviation"
-msgstr "全標準偏差"
+msgstr ""
 
 msgid "unknown"
-msgstr "不明"
+msgstr ""
 
 msgid "VariableName"
-msgstr "変数名"
+msgstr ""
 
 #, tao-public
 msgid "View and format the collected results."
-msgstr "収集された結果の表示とフォーマット。"
+msgstr ""
 
 #, tao-public
 msgid "View result"
-msgstr "結果を表示"
+msgstr ""
 
 msgid "We are preparing your report, please wait..."
-msgstr "レポート作成中、しばらくお待ちください..."
+msgstr ""
 

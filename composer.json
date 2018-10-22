@@ -104,7 +104,7 @@
         "oat-sa/extension-tao-mediamanager" : "~2.0.1",
         "oat-sa/extension-tao-itemhtml" : "~3.0.0",
         "oat-sa/extension-tao-outcomerds" : "~2.2.0",
-        "oat-sa/extension-tao-outcomeui" : "~2.7.4",
+        "oat-sa/extension-tao-outcomeui" : "2.10.0",
         "openedinc/extension-tao-itemqti" : "*",
         "openedinc/extension-tao-testqti" : "*",
         "oat-sa/extension-tao-outcome" : "~3.4.0",
