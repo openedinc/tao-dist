@@ -512,9 +512,7 @@ function (
             isCurrentItemAnswered: function(){
                 var answered = false;
                 _.each(this.getCurrentItemState(), function(state){
-                    if(state && _.isObject(state.response) && (_.isObject(state.response.list) && state.response.list.identifier.length > 0 ||
-                        _.isObject(state.response.base) && (state.response.base.string !== undefined && state.response.base.string.length > 0 ||
-                        state.response.base.identifier !== undefined && state.response.base.identifier.length > 0))){
+                    if(state && _.isObject(state.response) && state.response.base !== null){
                         answered = true;//at least one response is not null so consider the item answered
                         return false;
                     }
