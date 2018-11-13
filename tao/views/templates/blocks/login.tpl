@@ -7,9 +7,6 @@ use oat\tao\model\theme\Theme;
     <?= get_data('form') ?>
     
     <?php foreach(get_data('entryPoints') as $entrypoint): ?>
-    <div>
-        <a href="<?= $entrypoint->getUrl() ?>"><?= $entrypoint->getTitle() ?></a>
-    </div>
     <?php endforeach;?>
 </div>
 <script>
