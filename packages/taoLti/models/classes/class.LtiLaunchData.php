@@ -46,6 +46,7 @@ class taoLti_models_classes_LtiLaunchData
     const CUSTOM_CALIPER_ENDPOINT               = 'custom_caliper_endpoint';
     const CUSTOM_CALIPER_APIKEY                 = 'custom_caliper_apikey';
     const CUSTOM_LAST_QUESTION                  = 'custom_last_questions';
+    const CUSTOM_USER_URI                       = 'custom_user_uri';
 
     /**
      * LTI variables
@@ -230,5 +231,13 @@ class taoLti_models_classes_LtiLaunchData
             common_Logger::w("Please provide a valid url. " . $this->getReturnUrl() . " is not valid");
         }
         return false;
+    }
+
+    public function hasCustomUserUri() {
+        return $this->hasVariable(self::CUSTOM_USER_URI);
+    }
+
+    public function getCustomUserUri() {
+        return $this->getVariable(self::CUSTOM_USER_URI);
     }
 }

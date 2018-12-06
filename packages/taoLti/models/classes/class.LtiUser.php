@@ -58,7 +58,11 @@ class taoLti_models_classes_LtiUser
 
     public function __construct(taoLti_models_classes_LtiLaunchData $ltiLaunchData) {
         $this->ltiLaunchData = $ltiLaunchData;
-        $this->userUri = taoLti_models_classes_LtiService::singleton()->findOrSpawnUser($ltiLaunchData)->getUri();
+        if ($ltiLaunchData->hasCustomUserUri()) {
+            $this->userUri = $ltiLaunchData->getCustomUserUri();
+        } else {
+            $this->userUri = taoLti_models_classes_LtiService::singleton()->findOrSpawnUser($ltiLaunchData)->getUri();
+        }
         $this->roles = $this->determinTaoRoles();
     }
 
