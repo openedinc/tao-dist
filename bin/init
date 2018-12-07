@@ -15,5 +15,8 @@ cp bin/patches/tao-main-style.css tao/views/css/tao-main-style.css
 #monkey-patching by commenting throw error line
 cp bin/patches/Utils.php vendor/qtism/qtism/qtism/runtime/common/Utils.php
 
+# Hackish way to disable DeliveryServer#index until we figure out a proper way
+cp bin/patches/DeliveryServer.php taoDelivery/controller/DeliveryServer.php
+
 cp config/tao/portable_websource_template.conf.php 'config/tao/websource_'$PORTABLE_WEBSOURCE_ID'.conf.php'
 cp config/tao/public_websource_template.conf.php 'config/tao/websource_'$PUBLIC_WEBSOURCE_ID'.conf.php'

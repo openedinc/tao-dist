@@ -76,18 +76,21 @@ class LtiAssignment extends GroupAssignment implements AssignmentService
             }
         }
 
-        //check Tokens
-        /** @var LtiDeliveryExecutionService $executionService */
-        $executionService = $this->getServiceManager()->get(LtiDeliveryExecutionService::SERVICE_ID);
 
-        $usedTokens = count($executionService->getLinkedDeliveryExecutions($delivery, $currentSession->getLtiLinkResource(), $user->getIdentifier()));
+        if ($maxExec != 0) {
+            //check Tokens
+            /** @var LtiDeliveryExecutionService $executionService */
+            $executionService = $this->getServiceManager()->get(LtiDeliveryExecutionService::SERVICE_ID);
 
-        if (($maxExec != 0) && ($usedTokens >= $maxExec)) {
-            \common_Logger::d("Attempt to start the compiled delivery ".$delivery->getUri(). " without tokens");
-            throw new \taoLti_models_classes_LtiException(
-                __('Attempts limit has been reached.'),
-                LtiErrorMessage::ERROR_LAUNCH_FORBIDDEN
-            );
+            $usedTokens = count($executionService->getLinkedDeliveryExecutions($delivery, $currentSession->getLtiLinkResource(), $user->getIdentifier()));
+
+            if ($usedTokens >= $maxExec) {
+                \common_Logger::d("Attempt to start the compiled delivery ".$delivery->getUri(). " without tokens");
+                throw new \taoLti_models_classes_LtiException(
+                    __('Attempts limit has been reached.'),
+                    LtiErrorMessage::ERROR_LAUNCH_FORBIDDEN
+                );
+            }
         }
         return true;
     }
