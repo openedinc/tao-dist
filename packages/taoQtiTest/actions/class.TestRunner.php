@@ -410,74 +410,25 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
                 common_Logger::i("Assessment Test Session begun.");
             }
 
-            if (taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
-                taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
-            }
 
             $this->triggerAssessmentEventStarted($session);
-
-            /* checking if the test-taker of LtiSession will resume this assessment test. */
             $resultHasLastQuestionLtiSession = \taoLti_models_classes_LtiService::singleton()->hasLastQuestion();
             if( $resultHasLastQuestionLtiSession['success'] && $session->isRunning() === true){
-                /* if( false ){ */
                 $responsesFromLtiForm = $resultHasLastQuestionLtiSession['lastQuestion'];
                 if( is_array($responsesFromLtiForm) ){
                     $itemSession = $session->getCurrentAssessmentItemSession();
                     $currentItem = $session->getCurrentAssessmentItemRef();
-
-                    $assessmentTestIdentifier = $session->getAssessmentTest()->getIdentifier();
-                    $userUri = common_session_SessionManager::getSession()->getUserUri();
-
-                    $serviceService = $this->getServiceManager()->get('tao/stateStorage');
-
-                    while( array_key_exists((string)$currentItem, $responsesFromLtiForm) /* && ($itemSession->getRemainingAttempts() === -1 || $itemSession->getRemainingAttempts() > 0) */){
+                    while( array_key_exists((string)$currentItem, $responsesFromLtiForm)){
                         if( $itemSession->getState() !== AssessmentTestSessionState::CLOSED ){
-                            $filler = new taoQtiCommon_helpers_PciVariableFiller(
-                                $currentItem,
-                                ServiceManager::getServiceManager()->get(QtiFlysystemFileManager::SERVICE_ID)
-                            );
-                            $responses = new State();
-                            $response = $responsesFromLtiForm[(string)$currentItem];
-
-                            if( is_array($response)){
-                                $responseForFilter = ['list' => ['identifier' => $response]];
-                            }else{
-                                if( preg_match("/^i(\d{1,7})/", $response)){
-                                    $responseForFilter = ['base' => ['identifier' => $response]];
-                                }else{
-                                    $responseForFilter = ['base' => ['string' => $response]];
-                                }
-                            }
-
-                            $var = $filler->fill('RESPONSE', $responseForFilter);
-
-                            // Do not take into account QTI File placeholders.
-                            if (taoQtiCommon_helpers_Utils::isQtiFilePlaceHolder($var) === false) {
-                                $responses->setVariable($var);
-                            }
-                            $session->endAttempt($responses, true);
-
-                            $stateId = $session->getSessionId().".".$currentItem.".0";
-                            $state = json_encode(array(
-                                'RESPONSE' => array('response' => $responseForFilter)
-                            ));
-
-                            $serviceService->set($userUri, $stateId, $state);
-
                             $nextPosition = $session->getRoute()->getPosition() + 1;
                             $this->endTimedSection($nextPosition);
                             $session->moveNext();
                             $currentItem = $session->getCurrentAssessmentItemRef();
                             $itemSession = $session->getCurrentAssessmentItemSession();
-                            if (taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
-                                common_Logger::d('****** begining: ' . (string)$currentItem);
-                                taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
-                            }
                         }
                     }
                 }
             }
-        }else {
             if (taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
                 taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
             }
@@ -671,12 +622,47 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
 
             try {
                 $this->endTimedSection($nextPosition);
-
                 $session->moveBack();
+                $resultHasLastQuestionLtiSession = \taoLti_models_classes_LtiService::singleton()->hasLastQuestion();
+                if(true === $resultHasLastQuestionLtiSession['success'] && true === $session->isRunning()) {
+                    $currentItem = $session->getCurrentAssessmentItemRef();
 
+                    $userUri = common_session_SessionManager::getSession()->getUserUri();
+                    $serviceService = $this->getServiceManager()->get('tao/stateStorage');
+
+                    $responsesFromLtiForm = $resultHasLastQuestionLtiSession['lastQuestion'];
+                    if( is_array($responsesFromLtiForm) && array_key_exists((string)$currentItem, $responsesFromLtiForm)){
+                        $filler = new taoQtiCommon_helpers_PciVariableFiller(
+                            $currentItem,
+                            ServiceManager::getServiceManager()->get(QtiFlysystemFileManager::SERVICE_ID)
+                        );
+                        $responses = new State();
+                        $response = $responsesFromLtiForm[(string)$currentItem];
+                        if( is_array($response)){
+                            $responseForFilter = ['list' => ['identifier' => $response]];
+                        }else{
+                            if( preg_match("/^i(\d{1,7})/", $response)){
+                                $responseForFilter = ['base' => ['identifier' => $response]];
+                            }else{
+                                $responseForFilter = ['base' => ['string' => $response]];
+                            }
+                        }
+                        $var = $filler->fill('RESPONSE', $responseForFilter);
+                        if (taoQtiCommon_helpers_Utils::isQtiFilePlaceHolder($var) === false) {
+                            $responses->setVariable($var);
+                        }
+                        $session->endAttempt($responses, true);
+                        $stateId = $session->getSessionId().".".$currentItem.".0";
+                        $state = json_encode(array(
+                            'RESPONSE' => array('response' => $responseForFilter)
+                        ));
+                        $serviceService->set($userUri, $stateId, $state);
+                    }
+                }
                 if (taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
                     taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
                 }
+
             } catch (AssessmentTestSessionException $e) {
                 $this->handleAssessmentTestSessionException($e);
             }
