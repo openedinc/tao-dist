@@ -25,6 +25,7 @@ use qtism\runtime\tests\AssessmentTestSessionState;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoCaliper\models\classes\AssessmentEventsTrait;
 use oat\taoCaliper\models\classes\GradeEventTrait;
+use oat\taoCaliper\models\classes\ActSummaryTrait;
 use qtism\data\AssessmentTest;
 use qtism\runtime\common\State;
 use qtism\runtime\common\ResponseVariable;
@@ -56,6 +57,7 @@ use oat\oatbox\event\EventManager;
 class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
     use AssessmentEventsTrait;
     use GradeEventTrait;
+    use ActSummaryTrait;
     /**
      * The current AssessmentTestSession object.
      * 
@@ -623,45 +625,11 @@ class taoQtiTest_actions_TestRunner extends tao_actions_ServiceModule {
             try {
                 $this->endTimedSection($nextPosition);
                 $session->moveBack();
-                $resultHasLastQuestionLtiSession = \taoLti_models_classes_LtiService::singleton()->hasLastQuestion();
-                if(true === $resultHasLastQuestionLtiSession['success'] && true === $session->isRunning()) {
-                    $currentItem = $session->getCurrentAssessmentItemRef();
-
-                    $userUri = common_session_SessionManager::getSession()->getUserUri();
-                    $serviceService = $this->getServiceManager()->get('tao/stateStorage');
-
-                    $responsesFromLtiForm = $resultHasLastQuestionLtiSession['lastQuestion'];
-                    if( is_array($responsesFromLtiForm) && array_key_exists((string)$currentItem, $responsesFromLtiForm)){
-                        $filler = new taoQtiCommon_helpers_PciVariableFiller(
-                            $currentItem,
-                            ServiceManager::getServiceManager()->get(QtiFlysystemFileManager::SERVICE_ID)
-                        );
-                        $responses = new State();
-                        $response = $responsesFromLtiForm[(string)$currentItem];
-                        if( is_array($response)){
-                            $responseForFilter = ['list' => ['identifier' => $response]];
-                        }else{
-                            if( preg_match("/^i(\d{1,7})/", $response)){
-                                $responseForFilter = ['base' => ['identifier' => $response]];
-                            }else{
-                                $responseForFilter = ['base' => ['string' => $response]];
-                            }
-                        }
-                        $var = $filler->fill('RESPONSE', $responseForFilter);
-                        if (taoQtiCommon_helpers_Utils::isQtiFilePlaceHolder($var) === false) {
-                            $responses->setVariable($var);
-                        }
-                        $session->endAttempt($responses, true);
-                        $stateId = $session->getSessionId().".".$currentItem.".0";
-                        $state = json_encode(array(
-                            'RESPONSE' => array('response' => $responseForFilter)
-                        ));
-                        $serviceService->set($userUri, $stateId, $state);
-                    }
-                }
                 if (taoQtiTest_helpers_TestRunnerUtils::isTimeout($session) === false) {
                     taoQtiTest_helpers_TestRunnerUtils::beginCandidateInteraction($session);
                 }
+                // ACT Academy action.
+                $this->summarizePrevious($session);
 
             } catch (AssessmentTestSessionException $e) {
                 $this->handleAssessmentTestSessionException($e);
