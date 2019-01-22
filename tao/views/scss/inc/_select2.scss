@@ -30,7 +30,7 @@
     /* inline-block for ie7 */
     zoom: 1;
     *display: inline;
-    vertical-align: middle;
+    vertical-align: bottom;
 }
 
 .select2-container,
@@ -511,7 +511,7 @@ disabled look for disabled choices in the results dropdown
     user-select: none;
 
     background-color: blacken($uiClickableDefaultBg, .1);
-    
+
     &.partial {
         background-color: whiten($uiClickableDefaultBg, .6);
     }
