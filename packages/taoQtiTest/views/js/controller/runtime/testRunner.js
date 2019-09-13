@@ -1218,12 +1218,7 @@ function (
                 this.displayExitMessage(
                     __('Are you sure you want to end the test?'),
                     function() {
-                        document.domain = 'opened.com';
-                        window.top.location.reload();
-                    //self.killItemSession(function () {
-                    //    self.actionCall('endTestSession');
-                    //    testMetaData.clearData();
-                    //});
+                        window.top.postMessage('closeTaoWindow', '*');
                     },
                     { scope: this.testReview ? this.testContext.reviewScope : null }
                 );
