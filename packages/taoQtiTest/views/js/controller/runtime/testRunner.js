@@ -1218,7 +1218,7 @@ function (
                 this.displayExitMessage(
                     __('Are you sure you want to end the test?'),
                     function() {
-                        window.top.postMessage('closeTaoWindow', '*');
+                        window.top.postMessage('closeLtiRunner', '*');
                     },
                     { scope: this.testReview ? this.testContext.reviewScope : null }
                 );
