@@ -23,3 +23,7 @@ RewriteRule ^(.*)$ tao/getFileFlysystem.php [L]
 
 </IfModule>
 
+
+<IfModule mod_headers.c>
+Header always edit Set-Cookie (.*) "$1; SameSite=None; Secure"
+</IfModule>
